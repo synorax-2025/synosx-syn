@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Case · VoiceWall — Verifiable Voice Governance</title>
+  <meta name="description" content="VoiceWall 是 SynOSX 治理体系中的表达与发声裁决判例：谁可以说话、以谁的身份、是否可追责。" />
+
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --surface: rgba(26, 32, 54, 0.72);
+      --surface2: rgba(18, 23, 43, 0.55);
+      --text: #e8ecf5;
+      --text-muted: #93a0bd;
+      --accent: #3b82f6;
+      --accent2: #6366f1;
+      --gradient: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+      --radius: 22px;
+      --shadow: 0 25px 60px -18px rgba(0,0,0,.55);
+      --max: 1100px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   "PingFang SC","Microsoft YaHei", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    .bg {
+      position: fixed;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(59,130,246,.14), transparent 55%),
+        radial-gradient(circle at 80% 70%, rgba(99,102,241,.14), transparent 55%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 2;
+    }
+
+    header {
+      padding: 110px 0 70px;
+    }
+
+    .kicker {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-size: 12px;
+      color: #bcd6ff;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      background: linear-gradient(135deg,#fff,#bcd6ff,#3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 22px;
+    }
+
+    .subtitle {
+      max-width: 70ch;
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+
+    section {
+      padding: 80px 0;
+    }
+
+    .card {
+      background: linear-gradient(135deg,var(--surface),var(--surface2));
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-size: 22px;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .step {
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(0,0,0,.25);
+      font-size: 13px;
+      font-weight: 700;
+      color: #dbe7ff;
+    }
+
+    .arrow {
+      align-self: center;
+      font-weight: 900;
+      color: #9fc3ff;
+    }
+
+    .code {
+      background: rgba(0,0,0,.45);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 14px;
+      padding: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      color: #bcd6ff;
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    footer {
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 36px 0 50px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: #9fc3ff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+<div class="bg"></div>
+
+<header>
+  <div class="container">
+    <span class="kicker">CASE STUDY · GOVERNANCE</span>
+    <h1>VoiceWall<br/>可验证的发声治理</h1>
+    <p class="subtitle">
+      在 AI 时代，最危险的不是模型“说错话”，  
+      而是系统**无法证明是谁在什么授权下发声**。  
+      VoiceWall 是 SynOSX 中用于裁决「谁可以说话、以谁的身份、是否可追责」的治理判例。
+    </p>
+  </div>
+</header>
+
+<section>
+  <div class="container">
+    <div class="card">
+      <h2>问题：不可追责的表达</h2>
+      <p>
+        传统系统中，“输出”常被视为无害行为：  
+        日志可选、身份模糊、权限默认放行。
+      </p>
+      <p>
+        一旦引入 AI，这个假设立即失效：  
+        语气 ≠ 权限，内容 ≠ 授权，来源 ≠ 责任。
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>制度裁决：VoiceWall 的定位</h2>
+      <p>
+        VoiceWall 不关心“说了什么”，  
+        它只裁决三件事：
+      </p>
+      <p>
+        1) 谁在发声  
+        2) 以什么身份发声  
+        3) 是否可被追责
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>裁决流程（Decision Flow）</h2>
+      <div class="flow">
+        <span class="step">外部请求 / AI 输出</span>
+        <span class="arrow">→</span>
+        <span class="step">Voice Identity 识别</span>
+        <span class="arrow">→</span>
+        <span class="step">Permission / Context 校验</span>
+        <span class="arrow">→</span>
+        <span class="step">Audit Trace 记录</span>
+        <span class="arrow">→</span>
+        <span class="step">允许 / 阻断 / 降级输出</span>
+      </div>
+      <p style="margin-top:12px;font-size:13px;color:var(--text-muted);">
+        没有身份、没有授权、没有 trace 的发声，一律不可通过。
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>判例：被阻断的请求</h2>
+      <p>一个看似“正常”的输出请求：</p>
+      <div class="code">
+POST /api/respond<br/>
+voice: "system"<br/>
+content: "Invoice approved and sent."<br/>
+trace_id: null
+      </div>
+
+      <p style="margin-top:14px;">
+        裁决结果：<strong>拒绝</strong>
+      </p>
+
+      <div class="code">
+Decision: BLOCKED<br/>
+Reason: Missing voice identity & trace_id<br/>
+Audit: rc_2026-02-voicewall-0042
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>意义：为什么这是治理，而不是功能</h2>
+      <p>
+        VoiceWall 不提升“说话能力”，  
+        它限制“谁有资格代表系统说话”。
+      </p>
+      <p>
+        这是 SynOSX 治理体系中的一个核心判例：  
+        **表达本身，就是一种高风险行为。**
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    © 2026 SynOSX · VoiceWall Case ·  
+    <a href="index.html">Back to Index</a> ·
+    <a href="manifest.html">Read Manifest</a>
+  </div>
+</footer>
+
+</body>
+</html>

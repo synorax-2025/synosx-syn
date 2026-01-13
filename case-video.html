@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SynOSX Video · Governance Case Study</title>
+  <meta name="description" content="SynOSX Video 是一个治理判例页面，用于展示在高复杂度 AI 视频系统中，SynOSX 如何通过制度裁决、权限边界与审计回放约束系统行为。" />
+
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --surface: rgba(26, 32, 54, 0.72);
+      --surface2: rgba(18, 23, 43, 0.55);
+      --text: #e8ecf5;
+      --text-muted: #93a0bd;
+      --accent-blue: #3b82f6;
+      --accent-indigo: #6366f1;
+      --gradient-1: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+      --gradient-2: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+      --shadow-lg: 0 25px 60px -18px rgba(0, 0, 0, 0.55);
+      --shadow-md: 0 16px 40px -20px rgba(0, 0, 0, 0.45);
+      --radius: 24px;
+      --max: 1200px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+                   Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.65;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    .bg-gradient {
+      position: fixed;
+      top: -35%;
+      left: -35%;
+      width: 170%;
+      height: 170%;
+      background:
+        radial-gradient(circle at 20% 40%, rgba(59,130,246,0.12) 0%, transparent 55%),
+        radial-gradient(circle at 78% 70%, rgba(99,102,241,0.12) 0%, transparent 55%),
+        radial-gradient(circle at 42% 10%, rgba(37,99,235,0.08) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 2;
+    }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      backdrop-filter: blur(18px);
+      background: rgba(10,14,26,0.72);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: background .3s ease, box-shadow .3s ease;
+    }
+    nav.scrolled {
+      background: rgba(10,14,26,0.92);
+      box-shadow: 0 14px 30px rgba(0,0,0,0.32);
+    }
+
+    .nav-content {
+      height: 76px;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 18px;
+    }
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: var(--gradient-1);
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: #071022;
+      font-weight: 900;
+    }
+
+    section { padding: 120px 0; }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .section-tag {
+      display: inline-block;
+      padding: 8px 16px;
+      background: rgba(59,130,246,0.10);
+      border: 1px solid rgba(59,130,246,0.26);
+      border-radius: 999px;
+      color: #9fc3ff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(30px,4vw,48px);
+      font-weight: 900;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg,#fff 0%,#bcd6ff 45%,#3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .section-subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 80ch;
+      margin: 0 auto;
+      line-height: 1.9;
+    }
+
+    .card {
+      background: linear-gradient(135deg,var(--surface),var(--surface2));
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: var(--radius);
+      padding: 36px;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 32px;
+    }
+    .card h3 {
+      margin-bottom: 14px;
+      font-size: 22px;
+    }
+    .card p {
+      color: var(--text-muted);
+      line-height: 1.9;
+      font-size: 14.5px;
+    }
+
+    .list {
+      margin-top: 12px;
+      padding-left: 18px;
+    }
+    .list li {
+      margin-bottom: 10px;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .step {
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.25);
+      font-size: 13px;
+      font-weight: 700;
+      color: #dbe7ff;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: .7s ease;
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+<div class="bg-gradient"></div>
+
+<nav id="navbar">
+  <div class="nav-content">
+    <div class="logo">
+      <div class="logo-icon">SX</div>
+      <span>SynOSX · Governance OS</span>
+    </div>
+    <a href="index.html" style="color:#9fc3ff;font-size:13px;">返回宪法首页</a>
+  </div>
+</nav>
+
+<section>
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-tag">Governance Case</span>
+      <h2 class="section-title">SynOSX Video</h2>
+      <p class="section-subtitle">
+        这是一个治理判例页面，而不是产品介绍。  
+        目的在于展示：当 AI 系统足够复杂时，制度如何成为唯一可信的裁决者。
+      </p>
+    </div>
+
+    <div class="card reveal">
+      <h3>问题背景（Without Governance）</h3>
+      <p>
+        在多数 AI 视频系统中，角色一致性、场景稳定性与 API 调用边界
+        通常依赖“人记得规则”。当生成规模扩大、多人协作或自动化接入后，
+        这种隐性约定会迅速崩塌。
+      </p>
+      <ul class="list">
+        <li>角色在不同镜头中逐渐漂移，却无法追责</li>
+        <li>场景靠语言复现，每次生成都发生结构变化</li>
+        <li>API 调用绕过限制，只因为“当时方便”</li>
+        <li>事后无法回答：为什么这一次会这样生成</li>
+      </ul>
+    </div>
+
+    <div class="card reveal">
+      <h3>治理目标（What Must Be Enforced）</h3>
+      <p>
+        SynOSX 在 Video 场景中的目标不是“生成得更快”，
+        而是强制保证系统行为具备制度意义上的可解释性。
+      </p>
+      <ul class="list">
+        <li>身份一致性：角色是谁，不由 prompt 决定</li>
+        <li>场景稳定性：空间是资产，而不是描述</li>
+        <li>决策边界：AI 只能提出意图，不能直接执行</li>
+        <li>行为回放：每一次生成都可被审计与复盘</li>
+      </ul>
+    </div>
+
+    <div class="card reveal">
+      <h3>被治理的对象（Governed Assets）</h3>
+      <p>
+        在 SynOSX 中，Video 系统并不直接操作“素材”，
+        而是操作被制度定义和约束的资产对象。
+      </p>
+      <ul class="list">
+        <li>Character Asset：角色身份锚点，不可被语言覆盖</li>
+        <li>Scene Asset：空间结构锚点，允许角度变化，不允许结构漂移</li>
+        <li>Style Asset：镜头语言与整体气质</li>
+        <li>Timeline / Shot Record：每一帧的制度记录</li>
+      </ul>
+    </div>
+
+    <div class="card reveal">
+      <h3>裁决流程（Decision Flow）</h3>
+      <p>
+        视频生成并不是一次“直接调用模型”的行为，
+        而是一条必须被制度裁决的决策链。
+      </p>
+      <div class="flow">
+        <div class="step">用户 / 导演意图</div>
+        <div class="step">Intent 校验</div>
+        <div class="step">治理裁决</div>
+        <div class="step">审计记录</div>
+        <div class="step">外部 API 执行</div>
+        <div class="step">结果绑定 trace_id</div>
+      </div>
+    </div>
+
+    <div class="card reveal">
+      <h3>回放与审计（Trace & Replay）</h3>
+      <p>
+        每一次视频生成，都不只是结果文件，
+        而是一条可以被完整回放的制度证据链。
+      </p>
+      <ul class="list">
+        <li>谁在什么意图下发起请求</li>
+        <li>制度是否允许，以及为什么允许</li>
+        <li>调用了哪个外部模型或服务</li>
+        <li>结果如何产生，是否存在例外</li>
+      </ul>
+      <p>
+        回放不是调试手段，而是治理能力本身。
+      </p>
+    </div>
+
+    <div class="card reveal">
+      <h3>为什么这不仅仅是 Video</h3>
+      <p>
+        Video 只是一个足够复杂、足够容易失控的领域。
+        如果制度能在这里成立，它同样可以迁移到：
+      </p>
+      <ul class="list">
+        <li>财务系统（发票 / 导出）</li>
+        <li>企业权限与自动化流程</li>
+        <li>多 Agent AI 工具调用</li>
+      </ul>
+      <p>
+        SynOSX 解决的不是“生成内容”，
+        而是“谁有权决定 AI 可以做什么”。
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © 2026 SynOSX · Governance OS — Case Study
+</footer>
+
+<script>
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 12) navbar.classList.add('scrolled');
+    else navbar.classList.remove('scrolled');
+  });
+
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => e.isIntersecting && e.target.classList.add('active'));
+  }, { threshold: 0.12 });
+  reveals.forEach(el => io.observe(el));
+</script>
+</body>
+</html>

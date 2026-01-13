@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SynOSX Whitepaper · 可验证治理系统白皮书</title>
+  <meta name="description" content="SynOSX Whitepaper：解释为什么复杂系统需要可验证治理，以及 SynOSX 如何用 Contracts-first 与裁决链路（Intent/Firewall/Audit）实现可追溯、可表达、可进化（零降维）。" />
+
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --surface: rgba(26, 32, 54, 0.72);
+      --surface2: rgba(18, 23, 43, 0.55);
+      --text: #e8ecf5;
+      --text-muted: #93a0bd;
+      --accent-blue: #3b82f6;
+      --accent-indigo: #6366f1;
+      --gradient-1: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+      --gradient-2: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+      --shadow-lg: 0 25px 60px -18px rgba(0, 0, 0, 0.55);
+      --shadow-md: 0 16px 40px -20px rgba(0, 0, 0, 0.45);
+      --radius: 24px;
+      --max: 1200px;
+
+      --toc-w: 300px;
+      --border: rgba(255,255,255,0.08);
+      --panel: rgba(255,255,255,0.03);
+      --panel2: rgba(0,0,0,0.35);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC",
+                   "Hiragino Sans GB", "Microsoft YaHei", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.75;
+    }
+    a { color: inherit; text-decoration: none; }
+    b,strong { font-weight: 800; }
+
+    .bg-gradient{
+      position: fixed;
+      top: -35%;
+      left: -35%;
+      width: 170%;
+      height: 170%;
+      background:
+        radial-gradient(circle at 20% 40%, rgba(59, 130, 246, 0.12) 0%, transparent 55%),
+        radial-gradient(circle at 78% 70%, rgba(99, 102, 241, 0.12) 0%, transparent 55%),
+        radial-gradient(circle at 42% 10%, rgba(37, 99, 235, 0.08) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+      transform: translate3d(0,0,0);
+    }
+
+    .container{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Nav */
+    nav{
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      backdrop-filter: blur(18px);
+      background: rgba(10, 14, 26, 0.72);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      transition: background .3s ease, box-shadow .3s ease;
+    }
+    nav.scrolled{
+      background: rgba(10, 14, 26, 0.92);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.32);
+    }
+    .nav-content{
+      height: 76px;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 14px;
+    }
+    .logo{
+      display:flex; align-items:center; gap: 12px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      font-size: 18px;
+      white-space: nowrap;
+    }
+    .logo-icon{
+      width: 38px; height: 38px;
+      background: var(--gradient-1);
+      border-radius: 12px;
+      display:grid; place-items:center;
+      box-shadow: 0 10px 24px rgba(59, 130, 246, 0.22);
+      color: #071022;
+      font-weight: 900;
+    }
+    .logo span b{
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-links{
+      display:flex;
+      gap: 18px;
+      list-style:none;
+      align-items:center;
+    }
+    .nav-links a{
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      transition: .25s ease;
+    }
+    .nav-links a:hover{
+      color: var(--text);
+      border-color: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .cta-button{
+      padding: 11px 18px;
+      background: var(--gradient-1);
+      border: none;
+      border-radius: 12px;
+      color: #071022;
+      font-weight: 900;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform .25s ease, box-shadow .25s ease;
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      box-shadow: 0 12px 24px rgba(59, 130, 246, 0.18);
+      white-space: nowrap;
+    }
+    .cta-button:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 16px 32px rgba(59, 130, 246, 0.28);
+    }
+    .btn-secondary{
+      padding: 11px 18px;
+      background: transparent;
+      border: 1px solid rgba(59, 130, 246, 0.55);
+      border-radius: 12px;
+      color: #9fc3ff;
+      font-weight: 900;
+      font-size: 13px;
+      cursor: pointer;
+      transition: .25s ease;
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+    .btn-secondary:hover{
+      background: rgba(59, 130, 246, 0.12);
+      transform: translateY(-2px);
+    }
+
+    /* Hero */
+    .hero{
+      padding-top: 110px;
+      padding-bottom: 46px;
+    }
+    .kicker{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      color: #b8c5e6;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+    .kicker .dot{
+      width: 8px; height: 8px;
+      border-radius: 999px;
+      background: var(--accent-blue);
+      box-shadow: 0 0 18px rgba(59,130,246,0.35);
+    }
+    .hero h1{
+      font-size: clamp(34px, 4.6vw, 60px);
+      font-weight: 950;
+      line-height: 1.06;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg, #ffffff 0%, #a9c8ff 40%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .subtitle{
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 80ch;
+      line-height: 1.95;
+      margin-bottom: 18px;
+    }
+    .hero-actions{
+      display:flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    /* Layout */
+    .layout{
+      display:grid;
+      grid-template-columns: var(--toc-w) 1fr;
+      gap: 18px;
+      align-items: start;
+      padding-bottom: 90px;
+    }
+    .toc{
+      position: sticky;
+      top: 96px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(26, 32, 54, 0.55), rgba(18, 23, 43, 0.40));
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+    .toc-header{
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .toc-title{
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #9fc3ff;
+    }
+    .toc-badge{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #dbe7ff;
+      background: rgba(255,255,255,0.04);
+      white-space: nowrap;
+    }
+    .toc-body{
+      padding: 10px 10px 12px;
+      display:grid;
+      gap: 6px;
+      max-height: calc(100vh - 130px);
+      overflow:auto;
+    }
+    .toc a{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 750;
+      transition: .22s ease;
+    }
+    .toc a:hover{
+      color: var(--text);
+      background: rgba(255,255,255,0.03);
+      border-color: rgba(255,255,255,0.06);
+    }
+    .toc a.active{
+      color: var(--text);
+      background: rgba(59,130,246,0.10);
+      border-color: rgba(59,130,246,0.24);
+    }
+    .toc .num{
+      width: 26px;
+      height: 26px;
+      border-radius: 10px;
+      display:grid;
+      place-items:center;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #d8e2ff;
+      font-weight: 900;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    /* Article */
+    .paper{
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.10);
+      background: linear-gradient(135deg, var(--surface), var(--surface2));
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    .paper-head{
+      padding: 22px 22px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display:flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .paper-meta{
+      display:flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+    .pill{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      color: #b8c5e6;
+      font-weight: 800;
+    }
+    .paper-body{
+      padding: 22px;
+    }
+    .section{
+      padding: 22px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .section:last-child{ border-bottom: none; }
+    .section h2{
+      font-size: 22px;
+      font-weight: 950;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #fff 0%, #bcd6ff 45%, var(--accent-blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .section h3{
+      font-size: 15px;
+      font-weight: 900;
+      margin-top: 14px;
+      margin-bottom: 8px;
+      color: #dbe7ff;
+    }
+    .section p{
+      color: var(--text-muted);
+      font-size: 13.5px;
+      line-height: 1.95;
+      margin-top: 10px;
+    }
+    .lead{
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.95;
+      margin-top: 8px;
+    }
+
+    .callout{
+      margin-top: 14px;
+      border: 1px solid rgba(59,130,246,0.24);
+      background: rgba(59,130,246,0.08);
+      border-radius: 18px;
+      padding: 14px 14px;
+      color: #d8e2ff;
+    }
+    .callout b{ color:#ffffff; }
+    .callout p{ margin-top: 8px; color:#c6d7ff; }
+
+    .grid{
+      display:grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .grid.two{ grid-template-columns: 1fr 1fr; }
+    .card{
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.22);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .card .tag{
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #9fc3ff;
+      margin-bottom: 6px;
+    }
+    .card h4{
+      font-size: 14px;
+      font-weight: 900;
+      color: #eaf1ff;
+      margin-bottom: 8px;
+    }
+    .card p{
+      margin-top: 0;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.85;
+    }
+
+    .code-block{
+      margin-top: 14px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 16px;
+      padding: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12.8px;
+      color: #a9c8ff;
+      line-height: 1.85;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .steps{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .step{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.22);
+      color:#dbe7ff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .arrow{
+      color: rgba(159,179,255,0.9);
+      font-weight: 900;
+      margin: 0 2px;
+      display:inline-flex;
+      align-items:center;
+    }
+
+    .mini-links{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .mini-links a{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      color: #dbe7ff;
+      font-size: 13px;
+      font-weight: 900;
+      transition: .22s ease;
+    }
+    .mini-links a:hover{
+      background: rgba(59,130,246,0.10);
+      border-color: rgba(59,130,246,0.24);
+      transform: translateY(-2px);
+    }
+
+    footer{
+      padding: 34px 0 46px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* Reveal */
+    .reveal { opacity: 0; transform: translateY(18px); transition: 0.7s ease; }
+    .reveal.active { opacity: 1; transform: translateY(0); }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .nav-links{ display:none; }
+      .layout{ grid-template-columns: 1fr; }
+      .toc{ position: relative; top: auto; }
+      .grid.two{ grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      * { animation: none !important; transition: none !important; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-gradient" aria-hidden="true"></div>
+
+  <nav id="navbar">
+    <div class="nav-content">
+      <div class="logo" aria-label="SynOSX">
+        <div class="logo-icon">SX</div>
+        <span><b>SynOSX</b> <span style="color:var(--text-muted); font-weight:900;">· Whitepaper</span></span>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="#c1">Ch1</a></li>
+        <li><a href="#c2">Ch2</a></li>
+        <li><a href="#c3">Ch3</a></li>
+        <li><a href="#c4">Ch4</a></li>
+        <li><a href="#c5">Ch5</a></li>
+        <li><a href="#c6">Ch6</a></li>
+        <li><a href="#c7">Ch7</a></li>
+        <li><a href="#c8">Ch8</a></li>
+      </ul>
+
+      <div style="display:flex; gap:10px; align-items:center;">
+        <a class="btn-secondary" href="index.html">返回首页</a>
+        <a class="cta-button" href="manifest.html">阅读 Manifest</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container">
+      <div class="kicker reveal"><span class="dot"></span> Contracts-first · 可验证治理 · Zero-Reduction</div>
+      <h1 class="reveal">SynOSX Whitepaper<br/>可验证治理系统白皮书</h1>
+      <p class="subtitle reveal">
+        这份白皮书回答一个核心问题：<strong>复杂系统与 AI 时代，为什么“做更多功能”不等于“可治理”</strong>。
+        SynOSX 的目标不是堆叠能力，而是让系统的每一次关键行为都具备<strong>可追溯、可表达、可进化</strong>的证据链，
+        通过裁决链路（<b>Intent · Firewall · Audit</b>）把“判断权”从口头约定迁移到可验证机制中。
+      </p>
+
+      <div class="hero-actions reveal">
+        <a href="#start" class="cta-button">开始阅读</a>
+        <a href="manifest.html" class="btn-secondary">直接查看治理法典</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" id="start">
+    <div class="layout">
+
+      <!-- TOC -->
+      <aside class="toc reveal" aria-label="Table of Contents">
+        <div class="toc-header">
+          <div class="toc-title">Contents</div>
+          <div class="toc-badge">Whitepaper</div>
+        </div>
+        <div class="toc-body" id="toc">
+          <a href="#c1"><span class="num">1</span> 为什么复杂系统会失控</a>
+          <a href="#c2"><span class="num">2</span> AI 为什么放大风险</a>
+          <a href="#c3"><span class="num">3</span> 为什么功能不等于治理</a>
+          <a href="#c4"><span class="num">4</span> Contracts-first 的方法</a>
+          <a href="#c5"><span class="num">5</span> 裁决链路（Intent→Firewall→Audit）</a>
+          <a href="#c6"><span class="num">6</span> 运行时治理（S0–S6）</a>
+          <a href="#c7"><span class="num">7</span> 落地：判例 · VoiceWall · Video</a>
+          <a href="#c8"><span class="num">8</span> 如何阅读 Manifest & 路线图</a>
+          <a href="#links"><span class="num">↗</span> 快速入口</a>
+        </div>
+      </aside>
+
+      <!-- Paper -->
+      <article class="paper reveal" aria-label="Whitepaper">
+        <div class="paper-head">
+          <div class="paper-meta">
+            <span class="pill">SynOSX</span>
+            <span class="pill">Whitepaper Edition</span>
+            <span class="pill">v1.0</span>
+          </div>
+          <div class="paper-meta">
+            <span>定位：解释性文本（非工程说明）</span>
+            <span>·</span>
+            <span>权威规则请以 Manifest 为准</span>
+          </div>
+        </div>
+
+        <div class="paper-body">
+
+          <!-- Chapter 1 -->
+          <section class="section" id="c1">
+            <h2>Chapter 1 · 为什么复杂系统会失控</h2>
+            <p class="lead">
+              复杂系统的失败，往往不是“缺能力”，而是<strong>缺边界、缺证据链、缺可裁决的规则</strong>。
+              当规则只存在于人的记忆里，系统就会在迭代中出现隐形路径、绕行调用、权限裂缝与不可回放的决策链。
+            </p>
+
+            <div class="grid two">
+              <div class="card">
+                <div class="tag">Failure Mode</div>
+                <h4>隐形路径（Invisible Paths）</h4>
+                <p>
+                  为了效率，调用者绕过入口与校验，形成“看不见的路径”。它不一定立刻报错，但会持续腐蚀结构，
+                  直到某次事故暴露：系统无法解释“是谁、为何、如何”到达某个结果。
+                </p>
+              </div>
+              <div class="card">
+                <div class="tag">Failure Mode</div>
+                <h4>不可回放（No Replay）</h4>
+                <p>
+                  出了问题只能猜：谁在什么上下文做了什么？没有统一 trace_id 与审计证据链，就没有治理，
+                  更谈不上合规、追责与复盘学习。
+                </p>
+              </div>
+            </div>
+
+            <div class="callout">
+              <b>关键判断：</b>
+              <p>
+                复杂度越高，越不能依赖“可信的人”。系统必须能证明自己：<strong>请求来自哪里、走过哪些裁决、最终由谁执行</strong>。
+                这不是口号，而是机制与证据链。
+              </p>
+            </div>
+          </section>
+
+          <!-- Chapter 2 -->
+          <section class="section" id="c2">
+            <h2>Chapter 2 · AI 为什么放大治理风险</h2>
+            <p class="lead">
+              AI 的价值是加速行动，但它同时加速失控：当系统允许 AI 直接写入业务数据、直接调用内部实现、直接绕过权限墙，
+              你得到的不是“智能”，而是<strong>不可追责的自动化</strong>。
+            </p>
+
+            <h3>AI 的三类放大效应</h3>
+            <div class="grid two">
+              <div class="card">
+                <div class="tag">Multiplier</div>
+                <h4>速度放大</h4>
+                <p>AI 让“错误的决策链”更快落地：一次错误意图可能触发批量执行与批量导出。</p>
+              </div>
+              <div class="card">
+                <div class="tag">Multiplier</div>
+                <h4>路径放大</h4>
+                <p>AI 更容易走捷径：如果系统存在绕行入口，AI 会自然学会绕过最严格的路径。</p>
+              </div>
+              <div class="card">
+                <div class="tag">Multiplier</div>
+                <h4>解释放大</h4>
+                <p>没有审计与解释边界，AI 会用“合理化叙述”替代真实因果链，导致治理层失明。</p>
+              </div>
+              <div class="card">
+                <div class="tag">Multiplier</div>
+                <h4>责任放大</h4>
+                <p>事故发生时，若没有“制度裁决证据链”，组织无法证明权限、流程与结果的合法性。</p>
+              </div>
+            </div>
+
+            <div class="callout">
+              <b>SynOSX 的底线：</b>
+              <p>
+                AI 可以提出意图，但<strong>不能越权裁决</strong>；AI 可以生成建议，但<strong>不能替代审计证据</strong>；
+                AI 可以参与交互，但<strong>必须经过被制度认可的入口</strong>。
+              </p>
+            </div>
+          </section>
+
+          <!-- Chapter 3 -->
+          <section class="section" id="c3">
+            <h2>Chapter 3 · 为什么功能不等于治理</h2>
+            <p class="lead">
+              治理不是“更多按钮”，而是<strong>更少不可证明的行为</strong>。当系统用功能堆叠替代制度建设，
+              你会得到越来越多的例外逻辑、越来越多的“临时授权”、以及越来越难定位的责任边界。
+            </p>
+
+            <h3>治理与功能的区别</h3>
+            <div class="code-block">功能（Feature）
+- 做到某个结果（能导出、能开票、能生成视频）
+- 关注“能不能做”
+- 容易绕开边界以求效率
+
+治理（Governance）
+- 证明某个结果为何成立（谁发起、谁裁决、谁执行、证据是什么）
+- 关注“是否被允许、如何被证明”
+- 把效率建立在可验证机制上</div>
+
+            <div class="callout">
+              <b>一句话：</b>
+              <p>
+                治理的目标不是“阻止行动”，而是让行动<strong>可审计、可回放、可追责、可进化</strong>。
+              </p>
+            </div>
+          </section>
+
+          <!-- Chapter 4 -->
+          <section class="section" id="c4">
+            <h2>Chapter 4 · Contracts-first：把判断权制度化</h2>
+            <p class="lead">
+              SynOSX 的方法是 <strong>Contracts-first</strong>：把规则写成可校验的契约，
+              把裁决变成可证明的链路，把演进变成可控制的版本对齐。
+            </p>
+
+            <h3>三铁律（治理系统的最低宪法）</h3>
+            <div class="grid two">
+              <div class="card">
+                <div class="tag">Law</div>
+                <h4>Traceability（可追溯）</h4>
+                <p>每一次关键行为都必须带 trace_id，能定位、能回放、能复盘。</p>
+              </div>
+              <div class="card">
+                <div class="tag">Law</div>
+                <h4>Expressibility（可表达）</h4>
+                <p>规则与意图必须能被写成可校验的契约，制度有唯一真源，不接受口头约定。</p>
+              </div>
+              <div class="card">
+                <div class="tag">Law</div>
+                <h4>Growth（可进化）</h4>
+                <p>系统必须能长期成长而不腐烂：边界清晰、依赖合法、坏边可被裁决并阻断。</p>
+              </div>
+              <div class="card">
+                <div class="tag">Law</div>
+                <h4>Zero-Reduction（零降维）</h4>
+                <p>任何“为了进度的绕行”都必须被识别、记录与裁决；不得把制度降成口号。</p>
+              </div>
+            </div>
+
+            <div class="callout">
+              <b>白皮书提醒：</b>
+              <p>
+                白皮书解释“为什么需要这些机制”；真正的<strong>规则条文</strong>与<strong>裁决边界</strong>以
+                <a href="manifest.html" style="text-decoration: underline; color:#cfe0ff; font-weight:900;">Manifest</a> 为准。
+              </p>
+            </div>
+          </section>
+
+          <!-- Chapter 5 -->
+          <section class="section" id="c5">
+            <h2>Chapter 5 · 裁决链路：Intent → Firewall → Audit</h2>
+            <p class="lead">
+              SynOSX 的核心不是“让系统更会做事”，而是让系统<strong>更会裁决</strong>。
+              裁决链路保证：外部请求（人或 AI）永远先被解释为意图，再被权限墙裁决，随后被审计记录，最后才进入执行单元。
+            </p>
+
+            <div class="steps" aria-label="decision flow">
+              <span class="step">自然语言 / 外部请求</span>
+              <span class="arrow">→</span>
+              <span class="step">Intent 生成（可校验）</span>
+              <span class="arrow">→</span>
+              <span class="step">Firewall 权限裁决</span>
+              <span class="arrow">→</span>
+              <span class="step">Audit 记录证据链</span>
+              <span class="arrow">→</span>
+              <span class="step">业务执行单元</span>
+              <span class="arrow">→</span>
+              <span class="step">Report / 回放</span>
+            </div>
+
+            <h3>链路意义（把角色分离到不可越界）</h3>
+            <div class="grid two">
+              <div class="card">
+                <div class="tag">Role</div>
+                <h4>解释者（Intent）</h4>
+                <p>把“想做什么”结构化成可校验意图；禁止直接执行、禁止绕过入口。</p>
+              </div>
+              <div class="card">
+                <div class="tag">Role</div>
+                <h4>裁决者（Firewall）</h4>
+                <p>谁能做、能做多少、在什么上下文可被允许；拒绝越权请求。</p>
+              </div>
+              <div class="card">
+                <div class="tag">Role</div>
+                <h4>记录者（Audit）</h4>
+                <p>把事实写入证据链：请求、裁决、执行结果、差异与 trace_id。</p>
+              </div>
+              <div class="card">
+                <div class="tag">Role</div>
+                <h4>执行者（Modules）</h4>
+                <p>只执行“被允许的请求”；不解释制度，不绕行权限，不隐形写入。</p>
+              </div>
+            </div>
+
+            <div class="callout">
+              <b>底线声明：</b>
+              <p>
+                系统不接受匿名、越权或未被认可的发声源；
+                外部系统仅能通过被制度认可的入口提出意图；
+                治理中枢负责裁决与记录，执行单元只执行被允许的请求。
+              </p>
+            </div>
+          </section>
+
+          <!-- Chapter 6 -->
+          <section class="section" id="c6">
+            <h2>Chapter 6 · 运行时治理（S0–S6）</h2>
+            <p class="lead">
+              S0–S6 是职责明确的治理器官：它们不是“功能模块列表”，而是把系统的关键权力拆分到可审核的边界上，
+              防止隐形路径与结构腐蚀。
+            </p>
+
+            <div class="grid two">
+              <div class="card">
+                <div class="tag">S0</div>
+                <h4>SynShell</h4>
+                <p>运行环境与结构自检：保证底座一致性、可诊断性与治理链路的可执行前提。</p>
+              </div>
+              <div class="card">
+                <div class="tag">S1</div>
+                <h4>Intent Hub</h4>
+                <p>意图契约入口：把“想做什么”变成可校验请求，禁止绕过入口与隐形路径。</p>
+              </div>
+              <div class="card">
+                <div class="tag">S2</div>
+                <h4>Firewall</h4>
+                <p>权限墙裁决：用户/角色/上下文/范围的强约束，拒绝越权与越界访问。</p>
+              </div>
+              <div class="card">
+                <div class="tag">S3</div>
+                <h4>Audit</h4>
+                <p>证据链记录：为回放、复盘、合规与反思引擎提供事实基础。</p>
+              </div>
+              <div class="card">
+                <div class="tag">S4</div>
+                <h4>Domain Dictionary</h4>
+                <p>术语与领域边界：统一词义与实体边界，降低“同名不同义”的结构腐蚀。</p>
+              </div>
+              <div class="card">
+                <div class="tag">S5–S6</div>
+                <h4>NLP / Persona</h4>
+                <p>自然语言→Intent；人格只决定表达与交互，不越权处理领域数据。</p>
+              </div>
+            </div>
+
+            <div class="code-block">实践建议（白皮书层面）
+- 把“入口”视为宪法：所有请求必须经过意图层
+- 把“权限”视为裁决：任何越权都要可见、可阻断
+- 把“审计”视为事实：宁可慢一点，也不要不可回放</div>
+          </section>
+
+          <!-- Chapter 7 -->
+          <section class="section" id="c7">
+            <h2>Chapter 7 · 落地：判例 · VoiceWall · SynOSX Video</h2>
+            <p class="lead">
+              Whitepaper 不替代实现，但必须回答“如何落地”。这里给出三类可验证场景：输出治理、可信发声边界（VoiceWall）、
+              以及高复杂度生成系统（SynOSX Video）如何被制度约束。
+            </p>
+
+            <h3>场景 A：发票 / 导出治理（输出即风险）</h3>
+            <div class="grid two">
+              <div class="card">
+                <div class="tag">Use Case</div>
+                <h4>导出必须带裁决证据</h4>
+                <p>导出/开票必须携带 intent、权限裁决结果、审计打点与 trace_id，避免“节前临时绕过”形成隐形后门。</p>
+              </div>
+              <div class="card">
+                <div class="tag">Use Case</div>
+                <h4>违规路径自动可见</h4>
+                <p>任何绕过入口或权限墙的调用都应被识别为违宪边：可见、可阻断、可追责，而不是“靠人自觉”。</p>
+              </div>
+            </div>
+
+            <h3>场景 B：VoiceWall（可信发声边界）</h3>
+            <p>
+              VoiceWall 的目标不是“更会说话”，而是让系统能回答：<strong>这句话是谁说的、是否被允许、是否可追责</strong>。
+              在有 AI 参与的系统里，表达本身是一种风险面：当“声音”可以伪造、授权可以漂移，治理必须先建立发声边界。
+            </p>
+            <div class="callout">
+              <b>VoiceWall 的白皮书级声明：</b>
+              <p>
+                系统不接受匿名、越权或未被认可的发声源；任何 AI/外部系统的表达必须经过被制度认可的入口与权限裁决，
+                并附带审计证据链（trace_id）。
+              </p>
+            </div>
+
+            <h3>场景 C：SynOSX Video（高复杂度生成系统的“判例”）</h3>
+            <p>
+              生成式视频系统的核心风险是“一致性失控”：角色漂移、场景漂移、参数不可回放、输出不可追责。
+              SynOSX Video 把“角色资产、场景资产、风格资产、版本审计、权限边界”纳入同一条治理链路，
+              让生成不再是一次性结果，而是可回放的制度过程。
+            </p>
+
+            <div class="code-block">判例要点（制度视角）
+- 资产必须可被锁定：角色 / 场景 / 风格 / 声音
+- 生成必须可回放：参数、模型调用、版本号、审计记录
+- 访问必须可裁决：谁能生成、谁能发布、谁能复用资产
+- 结果必须可解释：来源、依据、规则、例外、结果（证据链）</div>
+
+            <div class="callout">
+              <b>提示：</b>
+              <p>
+                上述场景的“规则条文”与“边界定义”应以 Manifest 为准；白皮书只解释其必要性与落地意义。
+              </p>
+            </div>
+          </section>
+
+          <!-- Chapter 8 -->
+          <section class="section" id="c8">
+            <h2>Chapter 8 · 如何阅读 Manifest & 路线图</h2>
+            <p class="lead">
+              如果 Whitepaper 让你理解“为什么要治理”，那么 Manifest 会回答“治理到底怎么写、怎么裁决、怎么生效”。
+              建议按“从抽象到条文”的方式阅读。
+            </p>
+
+            <h3>推荐阅读顺序</h3>
+            <div class="steps">
+              <span class="step">先读：三铁律与依赖宪法</span>
+              <span class="arrow">→</span>
+              <span class="step">再读：裁决流程与边界</span>
+              <span class="arrow">→</span>
+              <span class="step">最后读：各章条文与判例</span>
+            </div>
+
+            <h3>最小可落地路线图（Whitepaper 级）</h3>
+            <div class="grid two">
+              <div class="card">
+                <div class="tag">Phase 1</div>
+                <h4>先立宪：入口 + 权限 + 审计</h4>
+                <p>把所有关键写操作与导出纳入 Intent / Firewall / Audit；先保证可追溯与可阻断，再谈扩展能力。</p>
+              </div>
+              <div class="card">
+                <div class="tag">Phase 2</div>
+                <h4>再扩展：领域字典与语义入口</h4>
+                <p>建立术语一致性与领域边界；把自然语言请求稳定映射为可校验意图，避免“表达漂移”导致执行漂移。</p>
+              </div>
+              <div class="card">
+                <div class="tag">Phase 3</div>
+                <h4>最后判例化：Video / VoiceWall</h4>
+                <p>以高风险场景作为判例，固化资产治理、发声边界与回放机制，让系统具备长期演进的可控性。</p>
+              </div>
+              <div class="card">
+                <div class="tag">Rule</div>
+                <h4>永远不做：为了速度绕行</h4>
+                <p>任何临时绕过都必须可见、可裁决、可复盘；否则就是零降维被破坏的开始。</p>
+              </div>
+            </div>
+
+            <div class="callout">
+              <b>Whitepaper 的最后一句话：</b>
+              <p>
+                治理不是把系统变慢，而是把系统变得<strong>可证明</strong>。当你能回放每一次判断与执行，你才能真正放心让系统变快。
+              </p>
+            </div>
+          </section>
+
+          <!-- Links -->
+          <section class="section" id="links">
+            <h2>快速入口</h2>
+            <p class="lead">把 Whitepaper 当作解释入口，把 Manifest 当作权威规则。你可以从这里跳转。</p>
+            <div class="mini-links">
+              <a href="index.html">返回官网首页</a>
+              <a href="manifest.html">阅读 Manifest（治理法典）</a>
+              <a href="#c5">跳到裁决链路</a>
+              <a href="#c7">跳到 Video / VoiceWall 判例</a>
+            </div>
+
+            <div class="code-block">声明
+- 本 Whitepaper 为解释性文本：用于说明为什么需要可验证治理，以及治理如何落地。
+- 任何规则条文、边界定义与裁决口径，以 Manifest 为唯一权威来源。</div>
+          </section>
+
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      © 2026 SynOSX · Whitepaper — Verifiable Governance ·
+      <a href="manifest.html" style="text-decoration: underline; color:#9fc3ff; font-weight:900;">Manifest / Governance Constitution</a>
+    </div>
+  </footer>
+
+  <script>
+    // Navbar shadow
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 12) navbar.classList.add('scrolled');
+      else navbar.classList.remove('scrolled');
+    });
+
+    // Reveal animations
+    const reveals = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => io.observe(el));
+
+    // TOC scrollspy
+    const toc = document.getElementById('toc');
+    const tocLinks = toc.querySelectorAll('a[href^="#"]');
+    const sections = Array.from(tocLinks)
+      .map(a => document.querySelector(a.getAttribute('href')))
+      .filter(Boolean);
+
+    const spy = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        tocLinks.forEach(a => {
+          a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+        });
+      });
+    }, { rootMargin: '-40% 0px -55% 0px', threshold: 0.01 });
+
+    sections.forEach(s => spy.observe(s));
+  </script>
+
+  <!--
+    Self-Audit:
+    1) Whitepaper 只负责解释“为什么与怎么落地”，不写工程实现细节，不泄露 repo 结构。
+    2) Manifest 为唯一权威规则：白皮书多次明确指向 manifest.html。
+    3) VoiceWall / SynOSX Video 在 Whitepaper 中以“制度位置/判例”出现，不承诺具体实现进度。
+  -->
+</body>
+</html>

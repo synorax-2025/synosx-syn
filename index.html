@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -5,6 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SynOSX — Governance OS · 全契约治理引擎</title>
   <meta name="description" content="SynOSX 是一套全契约治理引擎（Governance OS）：以制度契约为唯一真源，通过独立执行层的校验/适配/报告，以及治理运行时 S0–S6 家族治理链路，构建可追溯、可表达、可进化（零降维）的复杂系统。" />
+
+  <!-- System Status Bar 指纹位（手动改这里即可） -->
+  <meta name="sx-build-date" content="2026-01-13" />
+  <meta name="sx-version" content="v1.0.4-Stable" />
+  <meta name="sx-commit" content="ba...227" />
+
   <style>
     :root {
       --bg: #0a0e1a;
@@ -20,6 +27,7 @@
       --shadow-md: 0 16px 40px -20px rgba(0, 0, 0, 0.45);
       --radius: 24px;
       --max: 1200px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -30,6 +38,7 @@
       color: var(--text);
       overflow-x: hidden;
       line-height: 1.65;
+      padding-bottom: 56px; /* 给底部 Status Bar 留空间 */
     }
     a { color: inherit; text-decoration: none; }
 
@@ -227,44 +236,58 @@
       margin-top: 6px;
     }
 
+    .manifest-ref {
+      margin-top: 28px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-left: 4px solid var(--accent-blue);
+      border-radius: 14px;
+      background: linear-gradient(90deg, rgba(59, 130, 246, 0.08) 0%, rgba(255,255,255,0.03) 100%);
+      position: relative;
+    }
+    .manifest-ref::after {
+      content: "VERIFIED SOURCE";
+      position: absolute;
+      top: 12px; right: 16px;
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--accent-blue);
+      letter-spacing: 1px;
+      opacity: 0.6;
+    }
+
+    .manifest-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9fc3ff;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .manifest-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    .manifest-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: #9fc3ff;
+      text-decoration: underline;
+    }
+
     .hero-stats {
       display: flex;
       gap: 20px;
       margin-top: 26px;
       flex-wrap: wrap;
     }
-    
-    .manifest-ref {
-  margin-top: 28px;
-  padding: 16px 20px;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px;
-  background: rgba(255,255,255,0.03);
-}
-
-.manifest-title {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #9fc3ff;
-  margin-bottom: 6px;
-}
-
-.manifest-desc {
-  font-size: 13px;
-  color: var(--text-muted);
-  line-height: 1.7;
-  margin-bottom: 8px;
-}
-
-.manifest-link {
-  font-size: 13px;
-  font-weight: 600;
-  color: #9fc3ff;
-  text-decoration: underline;
-}
-
 
     .stat-item {
       padding: 12px 14px;
@@ -335,21 +358,33 @@
     }
     .trace {
       display: flex;
+      flex-direction: column;
       gap: 10px;
-      align-items: center;
       margin-top: 10px;
       color: var(--text-muted);
       font-size: 12px;
     }
     .trace code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      cursor: pointer;
+      position: relative;
+      font-family: var(--mono);
       font-size: 12px;
       color: #d8e2ff;
       background: rgba(99, 102, 241, 0.10);
       border: 1px solid rgba(99, 102, 241, 0.18);
-      padding: 6px 8px;
+      padding: 8px 12px;
       border-radius: 10px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
+    .trace code:hover {
+      background: rgba(99, 102, 241, 0.20);
+      border-color: var(--accent-blue);
+      transform: scale(1.02);
+    }
+    .trace code:active { transform: scale(0.98); }
 
     section { padding: 100px 0; }
     .section-header {
@@ -460,17 +495,53 @@
     }
     .law-content h4 { font-size: 13px; margin-bottom: 6px; color: #9fc3ff; }
     .law-content p { color: var(--text-muted); line-height: 1.8; font-size: 13.5px; }
+
     .code-block {
-      background: rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px dashed rgba(59, 130, 246, 0.3);
       border-radius: 16px;
       padding: 18px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-family: var(--mono);
       font-size: 13px;
       color: #a9c8ff;
       line-height: 1.85;
       overflow-x: auto;
       white-space: pre;
+      position: relative;
+    }
+    .code-block::before {
+      content: "DAG CONSTITUTION";
+      position: absolute;
+      top: 8px; right: 12px;
+      font-size: 9px; color: #4ade80; opacity: 0.55; font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    /* 语义入口：不进入 DAG，用注解条表达 */
+    .semantic-note {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      color: var(--text-muted);
+      font-size: 13.5px;
+      line-height: 1.8;
+    }
+    .semantic-note b { color: #dbe7ff; }
+    .semantic-chip {
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(59,130,246,0.30);
+      background: rgba(59,130,246,0.12);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #9fc3ff;
+      margin-right: 8px;
+      white-space: nowrap;
     }
 
     .rules {
@@ -486,6 +557,10 @@
       border-radius: 20px;
       padding: 22px;
     }
+    .rule-card.warning {
+      border-color: rgba(239, 68, 68, 0.2);
+      background: linear-gradient(135deg, rgba(26, 32, 54, 0.55), rgba(43, 18, 18, 0.4));
+    }
     .rule-card h4{
       font-size: 14px;
       margin-bottom: 10px;
@@ -495,7 +570,7 @@
       gap:10px;
     }
     .badge {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-family: var(--mono);
       font-size: 11px;
       padding: 4px 8px;
       border-radius: 999px;
@@ -519,6 +594,7 @@
       left:0;
       color: rgba(159, 179, 255, 0.9);
     }
+    .rule-card.warning li:before { color: #ef4444; }
 
     .flow-card{
       margin-top: 18px;
@@ -601,20 +677,173 @@
       font-size: 13px;
     }
 
+    /* 审计日志抽屉组件 */
+    #audit-drawer {
+      display: none;
+      position: fixed;
+      bottom: 72px;
+      right: 24px;
+      width: 320px;
+      background: #000;
+      border: 1px solid var(--accent-blue);
+      border-radius: 16px;
+      padding: 20px;
+      font-family: var(--mono);
+      font-size: 11px;
+      z-index: 2000;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+    .log-line { margin-bottom: 6px; color: #a9c8ff; border-left: 2px solid transparent; padding-left: 8px; transition: 0.2s; }
+    .log-line.ok { border-color: #4ade80; }
+    .log-line.warn { border-color: #facc15; }
+
+    /* System Status Bar */
+    .statusbar {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 2500;
+      background: rgba(0,0,0,0.70);
+      border-top: 1px solid rgba(59,130,246,0.22);
+      backdrop-filter: blur(14px);
+    }
+    .statusbar-inner{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: rgba(232,236,245,0.86);
+      letter-spacing: 0.02em;
+    }
+    .sb-left, .sb-right{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .sb-pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      white-space: nowrap;
+    }
+    .sb-key { color: rgba(159,195,255,0.9); font-weight: 800; }
+    .sb-val { color: rgba(232,236,245,0.90); }
+    .engine-dot{
+      width: 8px; height: 8px;
+      border-radius: 999px;
+      background: #4ade80;
+      box-shadow: 0 0 10px rgba(74,222,128,0.6);
+      animation: breathe 1.6s ease-in-out infinite;
+    }
+    @keyframes breathe{
+      0%,100% { opacity: 0.35; transform: scale(0.92); box-shadow: 0 0 8px rgba(74,222,128,0.35); }
+      50% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 18px rgba(74,222,128,0.75); }
+    }
+    .sb-muted { color: rgba(147,160,189,0.92); }
+    .sb-link{
+      color: rgba(159,195,255,0.92);
+      text-decoration: underline;
+    }
+    .sb-copy{
+      cursor: pointer;
+      user-select: none;
+      border-color: rgba(59,130,246,0.24);
+      background: rgba(59,130,246,0.08);
+      transition: 0.2s ease;
+    }
+    .sb-copy:hover{
+      transform: translateY(-1px);
+      border-color: rgba(59,130,246,0.40);
+      background: rgba(59,130,246,0.12);
+    }
+
     @media (max-width: 980px) {
       .hero-content { grid-template-columns: 1fr; gap: 22px; }
       .nav-links { display: none; }
       .constitution-grid { grid-template-columns: 1fr; }
       .contact-grid { grid-template-columns: 1fr; }
       .rule-card { grid-column: span 12; }
+      .statusbar-inner { justify-content: center; text-align: center; }
     }
 
     @media (prefers-reduced-motion: reduce){
       * { animation: none !important; transition: none !important; }
+      .engine-dot{ animation: none !important; opacity: 1; }
     }
 
     .reveal { opacity: 0; transform: translateY(20px); transition: 0.7s ease; }
     .reveal.active { opacity: 1; transform: translateY(0); }
+
+    /* ===== Terminal DAG Card (Compact) ===== */
+.term-card{
+  margin-top: 10px;
+  border-radius: 18px;
+  border: 1px solid rgba(59,130,246,0.22);
+  background: rgba(0,0,0,0.45);
+  overflow: hidden;
+  box-shadow: 0 26px 70px rgba(0,0,0,0.35);
+}
+.term-top{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.03);
+}
+.term-dots{
+  display:flex; align-items:center; gap:8px;
+}
+.term-dot{
+  width: 8px; height: 8px; border-radius: 999px;
+  background: #4ade80;
+  box-shadow: 0 0 12px rgba(74,222,128,0.45);
+}
+.term-title{
+  font-family: var(--mono);
+  font-size: 11px;
+  color: rgba(232,236,245,0.85);
+  letter-spacing: 0.04em;
+}
+.term-badges{
+  display:flex; align-items:center; gap:10px; flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: rgba(232,236,245,0.85);
+}
+.term-badge{
+  display:inline-flex; align-items:center; gap:8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.22);
+  white-space: nowrap;
+}
+.term-badge b{ color: rgba(159,195,255,0.92); }
+.term-body{
+  padding: 16px 14px 14px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.85;
+  color: rgba(232,236,245,0.88);
+}
+.term-line{ margin: 2px 0; }
+.term-k1{ color:#4ade80; font-weight: 900; }
+.term-k2{ color:#6366f1; font-weight: 900; }
+.term-k3{ color:#3b82f6; font-weight: 900; }
+.term-k4{ color:#93a0bd; font-weight: 900; }
+.term-arrow{ color: rgba(159,179,255,0.9); font-weight: 900; }
+
   </style>
 </head>
 
@@ -647,7 +876,7 @@
           <p class="subtitle">
             SynOSX 是一套全契约治理引擎（Governance OS）：以<strong>制度契约</strong>为唯一真源，通过
             <strong>独立执行层</strong>的校验/适配/报告，以及<strong>治理运行时</strong>的 S0–S6 家族治理链路，
-            将业务与 AI 的每一次行为纳入 <b>Intent · Firewall · Audit</b> 的可回放轨迹，实现 <b>零降维</b> 的长期演进。
+            将业务与 AI 的每一次行为纳入 <b>Intent · Firewall · Audit</b> 的可回放轨迹。
           </p>
 
           <div class="hero-buttons">
@@ -656,27 +885,25 @@
           </div>
 
           <div class="manifest-ref">
-            <p class="manifest-title">Governance Constitution</p>
+            <p class="manifest-title">§ Governance Constitution</p>
             <p class="manifest-desc">
-          本系统的完整治理规则与裁决原则，已形成独立法典文本。
-           </p>
-           <a href="manifest.html" class="manifest-link">
-           阅读《SynOSX Manifest》
-           </a>
+              本系统的完整治理规则与裁决原则已形成独立法典文本。所有技术行为与治理裁决逻辑均以此为唯一公理真源。
+            </p>
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <a href="manifest.html" class="manifest-link">阅读《SynOSX Manifest》</a>
+              <span id="sx-version-badge" style="font-family: var(--mono); font-size: 11px; color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 999px; border:1px solid rgba(255,255,255,0.08);">v1.0.4-Stable</span>
+              <span style="font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.65); background: rgba(255,255,255,0.03); padding: 2px 8px; border-radius: 999px; border:1px solid rgba(255,255,255,0.06);">INTERNAL PREVIEW</span>
+            </div>
           </div>
 
           <div class="hero-stats">
             <div class="stat-item">
               <div class="stat-number">Trace ID 驱动</div>
-              <div class="stat-label">每一次关键行为都带 trace_id，可定位、可回放、可复盘。</div>
+              <div class="stat-label">每一次关键行为都带唯一 trace_id，可定位、可回放。</div>
             </div>
             <div class="stat-item">
               <div class="stat-number">DAG 依赖宪法</div>
-              <div class="stat-label">制度层 → 校验与裁决层 → 治理运行时 → 业务执行单元 → 语义入口 不可绕过。</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number">S0–S6 家族治理</div>
-              <div class="stat-label">入口/权限/审计/语义分权，避免隐形路径与结构腐蚀。</div>
+              <div class="stat-label">制度层 → 校验与裁决层 → 运行时 → 业务单元 不可绕过。</div>
             </div>
           </div>
         </div>
@@ -700,12 +927,21 @@
           </div>
 
           <div class="trace">
-            Trace ID 示例 <code>rc_2026-01-12T0730Z_0001</code>
+            <span style="font-size: 11px; opacity: 0.8;">Trace ID 交互示例（点击模拟回放）</span>
+            <code id="trace-node" onclick="runAuditSimulation()">
+              rc_2026-01-12T0730Z_0001
+              <span id="trace-pulse" style="width:8px; height:8px; border-radius:50%; background:#4ade80; display:inline-block; margin-left:8px; box-shadow: 0 0 10px #4ade80;"></span>
+            </code>
           </div>
         </aside>
       </div>
     </div>
   </section>
+
+  <div id="audit-drawer">
+    <div style="color:var(--accent-blue); margin-bottom:12px; font-weight:900; border-bottom:1px solid #333; padding-bottom:6px;">> AUDIT ENGINE ANALYZING...</div>
+    <div id="log-container"></div>
+  </div>
 
   <section id="why">
     <div class="container">
@@ -719,7 +955,7 @@
         <div class="feature-card reveal">
           <div class="feature-icon">🔍</div>
           <h3>隐形依赖</h3>
-          <p>为了效率绕过入口与意图校验，形成“看不见的路径”。最致命的是：它不会立即爆炸，只会慢慢腐蚀系统。</p>
+          <p>为了效率绕过入口与意图校验，形成“看不见的路径”。它不会立即爆炸，只会慢慢腐蚀系统。</p>
         </div>
         <div class="feature-card reveal">
           <div class="feature-icon">🛡️</div>
@@ -745,13 +981,13 @@
 
       <div class="constitution-grid">
         <div class="constitution-card reveal">
-          <h3>三铁律（必须出现）</h3>
+          <h3>三铁律（核心契约）</h3>
 
           <div class="law-item">
             <div class="law-dot"></div>
             <div class="law-content">
               <h4>Traceability（可追溯）</h4>
-              <p>每一步都有记录：能定位、能回放、能复盘。不是口号，而是 trace_id + 审计链路。</p>
+              <p>每一步都有记录：能定位、能回放、能复盘。依靠 trace_id + 审计链路闭环。</p>
             </div>
           </div>
 
@@ -759,7 +995,7 @@
             <div class="law-dot"></div>
             <div class="law-content">
               <h4>Expressibility（可表达）</h4>
-              <p>规则与意图能被写成可校验的契约，不靠口头约定：制度有唯一真源。</p>
+              <p>规则与意图被写成可校验的契约，不靠口头约定：制度有唯一公理真源。</p>
             </div>
           </div>
 
@@ -772,19 +1008,44 @@
           </div>
         </div>
 
+        <!-- ✅ 这里是你要的“最合理版本”：DAG 只保留权力链；语义入口移出 DAG 作为注解 -->
         <div class="constitution-card reveal">
-          <h3>依赖宪法（DAG）</h3>
-          <div class="code-block">契约制度层（唯一真源）
-↓
-独立校验与裁决层（validators / adapters / report）
-↓
-治理运行时（S0–S6）
-↓
-业务执行单元（invoice / sales / inventory …）
-↓
-语义入口（人 / AI）：NL → intent → 治理分发</div>
-          <p style="margin-top: 14px; color: var(--text-muted); font-size: 13.5px; line-height: 1.8;">
-            任何“方便”的绕行（例如绕过裁决链路，或绕过 Intent/Firewall）都被视为违宪边。
+          <h3>依赖宪法（DAG 层级）</h3>
+
+         <div class="term-card" aria-label="DAG Constitution Terminal Card">
+  <div class="term-top">
+    <div class="term-dots">
+      <span class="term-dot" aria-hidden="true"></span>
+      <span class="term-title">DAG CONSTITUTION</span>
+    </div>
+
+    <div class="term-badges" aria-label="runtime statuses">
+      <span class="term-badge"><b>DAG</b>: OK</span>
+      <span class="term-badge"><b>FIREWALL</b>: ARMED</span>
+      <span class="term-badge"><b>AUDIT</b>: ON</span>
+    </div>
+  </div>
+
+  <div class="term-body">
+    <div class="term-line"><span class="term-k1">CONTRACT SOURCE</span>（制度契约层 · 唯一真源）</div>
+    <div class="term-line term-arrow">↓</div>
+    <div class="term-line"><span class="term-k2">VALIDATION / JUDGEMENT</span>（validators · adapters · reports）</div>
+    <div class="term-line term-arrow">↓</div>
+    <div class="term-line"><span class="term-k3">GOVERNANCE RUNTIME</span>（S0–S6 · Intent / Firewall / Audit …）</div>
+    <div class="term-line term-arrow">↓</div>
+    <div class="term-line"><span class="term-k4">EXECUTION UNITS</span>（invoice / sales / inventory …）</div>
+  </div>
+</div>
+
+
+          <div class="semantic-note">
+            <span class="semantic-chip">SEMANTIC ENTRY</span>
+            语义入口（<b>Human / AI</b>）：NL → Intent → 治理分发。<br/>
+            <b>入口只表达意图，不拥有执行权</b>（不可绕过 Validator / Firewall）。
+          </div>
+
+          <p style="margin-top: 12px; color: var(--text-muted); font-size: 13.5px; line-height: 1.8;">
+            任何绕过治理中枢（Validator / Firewall）的“方便绕行”，均被视为<strong>违宪边（Violation Edge）</strong>并被实时裁决。
           </p>
         </div>
       </div>
@@ -794,16 +1055,16 @@
           <h4><span class="badge must">MUST</span> 宪法级硬约束</h4>
           <ul>
             <li>所有关键行为必须带 <b>intent</b> 与 <b>audit trace_id</b>，并可回放。</li>
-            <li>制度契约是唯一真源：规则先行，执行层只“解释与校验”。</li>
-            <li>依赖链必须保持 DAG：任何绕过治理链路的路径都应被工具裁决。</li>
+            <li>制度契约是唯一真源：规则先行，执行层只负责校验与解释。</li>
+            <li>依赖链必须保持 DAG：任何绕过治理链路的路径都应被自动化裁决。</li>
           </ul>
         </div>
-        <div class="rule-card reveal">
-          <h4><span class="badge not">MUST NOT</span> 违宪路径（典型腐蚀点）</h4>
+        <div class="rule-card reveal warning">
+          <h4><span class="badge not">MUST NOT</span> 违宪路径（腐蚀风险）</h4>
           <ul>
-            <li>业务模块绕过入口直接调用旧函数/内部实现（隐形路径）。</li>
-            <li>为赶进度“临时魔改”绕过 Intent/Firewall，且缺失审计打点。</li>
-            <li>把“可信”当成宣传语，而不是可验证的机制与证据链。</li>
+            <li>业务模块绕过入口直接调用内部实现（形成 Invisible Path）。</li>
+            <li>为赶进度“临时魔改”绕过 Intent/Firewall，导致审计证据链断裂。</li>
+            <li>把“可信”当成口头承诺，而非通过证据链进行技术化验证。</li>
           </ul>
         </div>
       </div>
@@ -820,17 +1081,14 @@
           <span class="arrow">→</span>
           <span class="step">Firewall 权限裁决</span>
           <span class="arrow">→</span>
-          <span class="step">Audit 记录证据链</span>
+          <span class="step">Audit 证据记录</span>
           <span class="arrow">→</span>
           <span class="step">业务模块执行</span>
           <span class="arrow">→</span>
-          <span class="step">Report / 回放</span>
+          <span class="step">Report / 可回放报告</span>
         </div>
         <p class="flow-note">
-            系统不接受匿名、越权或未被认可的发声源；  
-            AI 与外部系统仅能通过被制度认可的入口提出意图；  
-            治理中枢负责裁决与记录，业务模块只执行被允许的请求。  
-            解释者、裁决者、执行者从不越界——系统因此可长期演进。
+            系统不接受匿名、越权或未被认可的发声源； AI 与外部系统仅能通过被制度认可的入口提出意图； 治理中枢负责裁决与记录，业务模块只执行被允许的请求。 解释者、裁决者、执行者从不越界——系统因此可长期演进。
         </p>
       </div>
     </div>
@@ -848,7 +1106,7 @@
         <div class="feature-card reveal">
           <div class="feature-icon">🔧</div>
           <h3>SynShell（S0）</h3>
-          <p>系统自检与运行环境宪法：结构、runtime、health checks，保证底座一致性与可诊断性。</p>
+          <p>运行环境宪法：自检、runtime、health checks，保证底座一致性。</p>
         </div>
         <div class="feature-card reveal">
           <div class="feature-icon">🎯</div>
@@ -860,11 +1118,10 @@
           <h3>Firewall（S2）</h3>
           <p>权限墙与边界守卫：谁能做、能做多少、在什么上下文可被允许。</p>
         </div>
-
         <div class="feature-card reveal">
           <div class="feature-icon">🧾</div>
           <h3>Audit（S3）</h3>
-          <p>事实记录与证据链：为回放、复盘、RefleX 与合规准备基础。</p>
+          <p>事实记录与证据链：为回放、复盘、RefleX 与合规准备基础数据。</p>
         </div>
         <div class="feature-card reveal">
           <div class="feature-icon">📚</div>
@@ -881,51 +1138,46 @@
   </section>
 
   <section id="usecases">
-  <div class="container">
-    <div class="section-header reveal">
-      <span class="section-tag">Use Cases</span>
-      <h2 class="section-title">落地场景（可验证）</h2>
-      <p class="section-subtitle">不是“我们能做什么”，而是“我们如何让行为可证明、可回放”。</p>
-    </div>
-
-    <div class="grid features-grid">
-      <div class="feature-card reveal">
-        <div class="feature-icon">🧾</div>
-        <h3>发票合规 & 输出治理</h3>
-        <p>导出/开票必须携带 intent + 权限裁决 + 审计打点，避免“节前临时绕过”留下隐形后门。</p>
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Use Cases</span>
+        <h2 class="section-title">落地场景（可验证）</h2>
+        <p class="section-subtitle">不是“我们能做什么”，而是“我们如何让行为可证明、可回放”。</p>
       </div>
-      <div class="feature-card reveal">
-        <div class="feature-icon">🚪</div>
-        <h3>权限墙（Firewall）</h3>
-        <p>把“门”变成制度：任何导出、跨域访问都必须通过守卫与审计，违宪路径自动可见、可阻断。</p>
+
+      <div class="grid features-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon">🧾</div>
+          <h3>开票合规 & 输出治理</h3>
+          <p>导出/开票必须携带 intent + 权限裁决 + 审计打点，避免“节前临时绕过”留下隐形后门。</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">🚪</div>
+          <h3>权限墙（Firewall）</h3>
+          <p>把“门”变成制度：任何导出、跨域访问都必须通过守卫与审计，违宪路径自动可见、可阻断。</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon">🗺️</div>
+          <h3>AI 语义入口</h3>
+          <p>AI 不直接写业务数据：只生成 intent；治理中枢负责裁决与记录；模块只执行合法请求。</p>
+        </div>
       </div>
-      <div class="feature-card reveal">
-        <div class="feature-icon">🗺️</div>
-        <h3>AI 语义入口（NL → Intent）</h3>
-        <p>AI 不直接写业务数据：只生成 intent；治理中枢负责裁决与记录；模块只执行合法请求。</p>
+
+      <div style="margin-top:48px; text-align:center;">
+        <a href="cases.html" class="cta-button">查看治理判例（Cases）</a>
+        <p style="margin-top:12px; font-size:13px; color:#93a0bd;">
+          通过真实判例，理解系统如何裁决、阻断并记录高风险行为
+        </p>
       </div>
     </div>
-
-    <!-- ✅ Use Cases 总入口（替换原 Video 直链） -->
-    <div style="margin-top:48px; text-align:center;">
-      <a href="cases.html" class="cta-button">
-        查看治理判例（Cases）
-      </a>
-      <p style="margin-top:12px; font-size:13px; color:#93a0bd;">
-        通过多个真实判例，理解系统如何裁决、阻断并记录高风险行为
-      </p>
-    </div>
-    <!-- ✅ 到这里结束 -->
-
-  </div>
-</section>
+  </section>
 
   <section id="contact">
     <div class="container">
       <div class="section-header reveal">
         <span class="section-tag">Contact</span>
-        <h2 class="section-title">预约一次技术对话</h2>
-        <p class="section-subtitle">只讨论边界、证据链、依赖合法性与可落地的治理路线图（不卖概念）。</p>
+        <h2 class="section-title">预约技术对话</h2>
+        <p class="section-subtitle">只讨论边界、证据链、依赖合法性与可落地的治理路线图。</p>
       </div>
 
       <div class="contact-grid">
@@ -933,11 +1185,11 @@
           <h3>预约方式</h3>
           <p>你只需要描述：当前系统痛点、风险点、以及你最担心的“不可回放时刻”。</p>
           <p><b>Email：</b> hello@synosx.example</p>
-          <p><b>主题建议：</b>「SynOSX · 治理评估 / 权限墙 / 审计回放」</p>
+          <p><b>主题：</b>「SynOSX · 治理评估 / 权限墙 / 审计回放」</p>
         </div>
         <div class="contact-card reveal">
           <h3>我们承诺</h3>
-          <p>不夸张承诺，不用“AI 很强”糊弄复杂度。我们用机制、边界与证据链说话。</p>
+          <p>不夸张承诺，不用“AI”糊弄复杂度。我们用机制、边界与证据链说话。</p>
           <p>你会带走一份可执行的治理路线图（占位）。</p>
         </div>
       </div>
@@ -945,34 +1197,145 @@
   </section>
 
   <footer>
-  <div class="container">
-    © 2026 SynOSX · Governance OS — Contracts-first · Zero-Reduction ·
-    <a href="manifest.html">Manifest / Governance Constitution</a>
-  </div>
-</footer>
+    <div class="container">
+      © 2026 SynOSX · Governance OS — Contracts-first · Zero-Reduction ·
+      <a class="sb-link" href="manifest.html">Manifest / Governance Constitution</a>
+    </div>
+  </footer>
 
+  <!-- System Status Bar（硬核页脚指纹条） -->
+  <div class="statusbar" role="contentinfo" aria-label="System Status Bar">
+    <div class="statusbar-inner">
+      <div class="sb-left">
+        <span class="sb-pill">
+          <span class="engine-dot" aria-hidden="true"></span>
+          <span class="sb-key">ENGINE</span>
+          <span class="sb-val">ACTIVE</span>
+        </span>
+
+        <span class="sb-pill">
+          <span class="sb-key">BUILD</span>
+          <span class="sb-val" id="sb-build">2026-01-13</span>
+        </span>
+
+        <span class="sb-pill">
+          <span class="sb-key">VERSION</span>
+          <span class="sb-val" id="sb-version">v1.0.4-Stable</span>
+        </span>
+
+        <span class="sb-pill sb-copy" id="sb-commit-pill" title="Click to copy commit fingerprint">
+          <span class="sb-key">COMMIT</span>
+          <span class="sb-val" id="sb-commit">ba...227</span>
+          <span class="sb-muted">⧉</span>
+        </span>
+      </div>
+
+      <div class="sb-right">
+        <span class="sb-pill">
+          <span class="sb-key">MODE</span>
+          <span class="sb-val">INTERNAL PREVIEW</span>
+        </span>
+        <span class="sb-pill">
+          <span class="sb-muted">Policy:</span>
+          <a class="sb-link" href="#constitution">DAG Constitution</a>
+        </span>
+      </div>
+    </div>
+  </div>
 
   <script>
+    // 导航栏滚动效果
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
       if (window.scrollY > 12) navbar.classList.add('scrolled');
       else navbar.classList.remove('scrolled');
     });
 
+    // 元素入场动画
     const reveals = document.querySelectorAll('.reveal');
     const io = new IntersectionObserver((entries) => {
       entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
     }, { threshold: 0.12 });
     reveals.forEach(el => io.observe(el));
-  </script>
 
-  <!--
-  Self-Audit:
-  1) 主动克制：移除 cursor follower 与强动效，避免“模板站感”稀释可信度。
-  2) 主动克制：删除“100% 可追溯”等绝对化承诺，改用 trace_id + audit 机制语言表达可验证性。
-  3) 主动克制：不依赖外链字体（Google Fonts），避免企业/内网环境拦截导致的展示不确定性。
-  拒绝的潮流设计趋势：大面积 Glassmorphism 堆叠 + 高噪光污染动效（可读性与专业感下降）。
-  关键原因：用“依赖宪法 + MUST/MUST NOT + 裁决流程”组织信息，更像真实治理系统团队。
-  -->
+    // 审计模拟回放
+    function runAuditSimulation() {
+      const drawer = document.getElementById('audit-drawer');
+      const container = document.getElementById('log-container');
+      const pulse = document.getElementById('trace-pulse');
+
+      drawer.style.display = 'block';
+      container.innerHTML = "";
+      pulse.style.background = "#3b82f6";
+      pulse.style.boxShadow = "0 0 15px #3b82f6";
+
+      const logs = [
+        { msg: "IDENTIFYING TRACE: rc_2026-01-12...0001", type: "ok" },
+        { msg: "FETCHING INTENT: [EXPORT_BILLING_DATA]", type: "ok" },
+        { msg: "VERIFYING DAG CONSTITUTION... OK", type: "ok" },
+        { msg: "CONSULTING FIREWALL (S2)... GRANTED", type: "ok" },
+        { msg: "RECORDING EVIDENCE (S3)... HASHED", type: "ok" },
+        { msg: "EXECUTION BY BUSINESS_MODULE... DONE", type: "ok" },
+        { msg: "GENERATE AUDIT REPORT... SUCCESS", type: "ok" }
+      ];
+
+      let i = 0;
+      const interval = setInterval(() => {
+        const line = document.createElement('div');
+        line.className = `log-line ${logs[i].type}`;
+        line.innerText = `> ${logs[i].msg}`;
+        container.appendChild(line);
+        i++;
+
+        if (i >= logs.length) {
+          clearInterval(interval);
+          setTimeout(() => {
+            drawer.style.display = 'none';
+            pulse.style.background = "#4ade80";
+            pulse.style.boxShadow = "0 0 10px #4ade80";
+          }, 4000);
+        }
+      }, 500);
+    }
+    window.runAuditSimulation = runAuditSimulation;
+
+    // Status Bar：从 meta 读取 Build / Version / Commit，并支持复制 Commit
+    (function bootStatusBar(){
+      const getMeta = (name) => {
+        const el = document.querySelector(`meta[name="${name}"]`);
+        return el ? el.getAttribute("content") : "";
+      };
+
+      const build = getMeta("sx-build-date") || "unknown";
+      const version = getMeta("sx-version") || "unknown";
+      const commit = getMeta("sx-commit") || "unknown";
+
+      const sbBuild = document.getElementById("sb-build");
+      const sbVersion = document.getElementById("sb-version");
+      const sbCommit = document.getElementById("sb-commit");
+      const versionBadge = document.getElementById("sx-version-badge");
+
+      if (sbBuild) sbBuild.textContent = build;
+      if (sbVersion) sbVersion.textContent = version;
+      if (sbCommit) sbCommit.textContent = commit;
+      if (versionBadge) versionBadge.textContent = version;
+
+      const pill = document.getElementById("sb-commit-pill");
+      if (!pill) return;
+
+      pill.addEventListener("click", async () => {
+        try{
+          await navigator.clipboard.writeText(commit);
+          const hint = pill.querySelector(".sb-muted");
+          hint.textContent = "COPIED";
+          setTimeout(()=> hint.textContent = "⧉", 1200);
+        }catch(e){
+          const hint = pill.querySelector(".sb-muted");
+          hint.textContent = "COPY?";
+          setTimeout(()=> hint.textContent = "⧉", 1200);
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

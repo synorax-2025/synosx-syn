@@ -53,6 +53,21 @@
       padding: 110px 0 70px;
     }
 
+    /* ===== Governance Back Link ===== */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #9fc3ff;
+      opacity: .85;
+      margin-bottom: 28px;
+    }
+    .back-link:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
     .kicker {
       display: inline-block;
       padding: 8px 14px;
@@ -158,12 +173,18 @@
 
 <header>
   <div class="container">
+
+    <!-- 返回首页（显性导航） -->
+    <a href="index.html" class="back-link">
+      ← 返回首页
+    </a>
+
     <span class="kicker">GOVERNANCE CASES</span>
     <h1>可验证的治理判例</h1>
     <p class="subtitle">
       这些不是 Demo，也不是功能展示。  
-      每一个 Case，都是在真实制度约束下，
-      展示 **“系统如何裁决、如何阻断、如何被追责”** 的判例。
+      每一个 Case，都是在真实制度约束下，  
+      展示 <strong>“系统如何裁决、如何阻断、如何被追责”</strong> 的判例。
     </p>
   </div>
 </header>
@@ -172,43 +193,36 @@
   <div class="container">
     <div class="grid">
 
-      <!-- Case: Video -->
       <div class="card">
         <span class="badge">CASE · VIDEO</span>
         <h2>SynOSX Video</h2>
         <p>
           一个高复杂度 AI 视频系统，  
-          在多角色、多资产、多生成步骤下，
+          在多角色、多资产、多生成步骤下，  
           如何通过制度裁决保持一致性、权限与可回放。
         </p>
         <p>
           重点不在“生成能力”，  
-          而在 **场景、角色、行为是否可被制度约束**。
+          而在 <strong>场景、角色、行为是否可被制度约束</strong>。
         </p>
-        <a href="case-video.html" class="link">
-          阅读判例 →
-        </a>
+        <a href="case-video.html" class="link">阅读判例 →</a>
       </div>
 
-      <!-- Case: VoiceWall -->
       <div class="card">
         <span class="badge">CASE · VOICE</span>
         <h2>VoiceWall</h2>
         <p>
           在 AI 时代，“表达”本身就是高风险行为。  
-          VoiceWall 判例展示了：
+          VoiceWall 判例展示了：  
           谁可以发声、以谁的身份、是否可追责。
         </p>
         <p>
-          没有身份、没有授权、没有 trace 的发声，
+          没有身份、没有授权、没有 trace 的发声，  
           一律被制度阻断。
         </p>
-        <a href="case-voicewall.html" class="link">
-          阅读判例 →
-        </a>
+        <a href="case-voicewall.html" class="link">阅读判例 →</a>
       </div>
 
-      <!-- Placeholder for future cases -->
       <div class="card">
         <span class="badge">COMING SOON</span>
         <h2>Export / Invoice Governance</h2>

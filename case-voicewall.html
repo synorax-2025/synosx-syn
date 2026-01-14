@@ -41,6 +41,40 @@
       pointer-events: none;
     }
 
+    /* ===== Governance Nav ===== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      background: rgba(10,14,26,0.72);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-title {
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 18px;
+      font-size: 13px;
+    }
+    .nav-links a {
+      color: #9fc3ff;
+    }
+    .nav-links a.secondary {
+      opacity: .7;
+    }
+
     .container {
       max-width: var(--max);
       margin: 0 auto;
@@ -159,13 +193,24 @@
 <body>
 <div class="bg"></div>
 
+<!-- Governance Navigation -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-title">SynOSX · Governance OS</div>
+    <div class="nav-links">
+      <a href="cases.html">← 返回判例目录</a>
+      <a href="index.html" class="secondary">返回宪法首页</a>
+    </div>
+  </div>
+</nav>
+
 <header>
   <div class="container">
     <span class="kicker">CASE STUDY · GOVERNANCE</span>
     <h1>VoiceWall<br/>可验证的发声治理</h1>
     <p class="subtitle">
       在 AI 时代，最危险的不是模型“说错话”，  
-      而是系统**无法证明是谁在什么授权下发声**。  
+      而是系统<strong>无法证明是谁在什么授权下发声</strong>。  
       VoiceWall 是 SynOSX 中用于裁决「谁可以说话、以谁的身份、是否可追责」的治理判例。
     </p>
   </div>
@@ -173,6 +218,7 @@
 
 <section>
   <div class="container">
+
     <div class="card">
       <h2>问题：不可追责的表达</h2>
       <p>
@@ -192,8 +238,8 @@
         它只裁决三件事：
       </p>
       <p>
-        1) 谁在发声  
-        2) 以什么身份发声  
+        1) 谁在发声<br/>
+        2) 以什么身份发声<br/>
         3) 是否可被追责
       </p>
     </div>
@@ -245,9 +291,10 @@ Audit: rc_2026-02-voicewall-0042
       </p>
       <p>
         这是 SynOSX 治理体系中的一个核心判例：  
-        **表达本身，就是一种高风险行为。**
+        <strong>表达本身，就是一种高风险行为。</strong>
       </p>
     </div>
+
   </div>
 </section>
 

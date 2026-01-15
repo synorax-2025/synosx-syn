@@ -1,0 +1,63 @@
+{
+  "$schema": "./replay.registry.schema.json",
+  "version": "v1.0.0",
+  "policy": "AUDIT_REPLAY_CONSTITUTION",
+  "description": "SynOSX Audit Replay Registry",
+  "updated_at": "2026-01-15T00:00:00Z",
+  "entries": {
+    "rc_brand_15s_v1": {
+      "trace_id": "rc_brand_15s_v1",
+      "intent": "BRAND_FILM_PLAYBACK",
+      "actor": "site@sx",
+      "dag": "OK",
+      "firewall": "GRANTED",
+      "audit": "HASHED",
+      "verdict": "VERIFIED",
+      "evidence_hash": "sha256:brand-demo-placeholder",
+      "recorded_at": "2026-01-15T00:00:00Z",
+      "media": {
+        "type": "video/mp4",
+        "src": "replay/rc_brand_15s_v1.mp4",
+        "poster": "replay/rc_brand_15s_v1.jpg",
+        "duration_sec": 15
+      },
+      "notes": "SynOSX 品牌短片（15s）。用于官网演示 Replay Runtime 能力。"
+    },
+
+    "rc_2026-01-12T0730Z_0001": {
+      "trace_id": "rc_2026-01-12T0730Z_0001",
+      "intent": "EXPORT_BILLING_DATA",
+      "actor": "human@sx-console",
+      "dag": "OK",
+      "firewall": "GRANTED",
+      "audit": "HASHED",
+      "verdict": "VERIFIED",
+      "evidence_hash": "sha256:9a3f...c0de",
+      "recorded_at": "2026-01-12T07:30:00Z",
+      "media": {
+        "type": "video/mp4",
+        "src": "replay/rc_2026-01-12T0730Z_0001.mp4",
+        "poster": "replay/rc_2026-01-12T0730Z_0001.jpg"
+      },
+      "notes": "一次已通过 Intent → Firewall → Audit 的导出行为回放（示例）。"
+    },
+
+    "rc_2026-01-15T0210Z_0002": {
+      "trace_id": "rc_2026-01-15T0210Z_0002",
+      "intent": "CROSS_DOMAIN_READ",
+      "actor": "ai@sx-entry",
+      "dag": "OK",
+      "firewall": "DENIED",
+      "audit": "HASHED",
+      "verdict": "BLOCKED",
+      "evidence_hash": "sha256:7b1e...dead",
+      "recorded_at": "2026-01-15T02:10:00Z",
+      "media": {
+        "type": "video/mp4",
+        "src": "replay/rc_2026-01-15T0210Z_0002.mp4",
+        "poster": "replay/rc_2026-01-15T0210Z_0002.jpg"
+      },
+      "notes": "一次违宪边触发：语义入口提出跨域读取意图，被 Firewall 阻断并留下证据（示例）。"
+    }
+  }
+}

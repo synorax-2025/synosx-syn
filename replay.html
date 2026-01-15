@@ -1,0 +1,793 @@
+<!-- replay.html  (SynOSX Audit Replay Runtime)
+     用法示例：
+     replay.html?trace=rc_2026-01-12T0730Z_0001
+     replay.html?trace=rc_2026-01-15T0210Z_0002
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SynOSX — Audit Replay Runtime</title>
+  <meta name="description" content="SynOSX Audit Replay Runtime：以 trace_id 为入口，回放已被治理链路裁决并审计的行为证据。" />
+
+  <style>
+    :root{
+      --bg:#0a0e1a;
+      --surface: rgba(26, 32, 54, 0.72);
+      --surface2: rgba(18, 23, 43, 0.55);
+      --text:#e8ecf5;
+      --text-muted:#93a0bd;
+      --accent-blue:#3b82f6;
+      --accent-indigo:#6366f1;
+      --gradient-1: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+      --shadow-lg: 0 25px 60px -18px rgba(0, 0, 0, 0.55);
+      --radius: 24px;
+      --max: 1100px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+
+      /* ✅ 制度变量：fixed nav 高度（遮挡修复的唯一真源） */
+      --replay-nav-h: 74px;
+    }
+
+    *{ margin:0; padding:0; box-sizing:border-box; }
+    body{
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC",
+                   "Hiragino Sans GB", "Microsoft YaHei", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      overflow-x: hidden;
+      padding-bottom: 56px;
+    }
+    a{ color:inherit; text-decoration:none; }
+
+    .bg-gradient{
+      position: fixed;
+      top: -35%;
+      left: -35%;
+      width: 170%;
+      height: 170%;
+      background:
+        radial-gradient(circle at 20% 40%, rgba(59, 130, 246, 0.12) 0%, transparent 55%),
+        radial-gradient(circle at 78% 70%, rgba(99, 102, 241, 0.12) 0%, transparent 55%),
+        radial-gradient(circle at 42% 10%, rgba(37, 99, 235, 0.08) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+      transform: translate3d(0,0,0);
+    }
+
+    .container{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ✅ fixed nav：明确高度 + 防遮挡制度 */
+    nav{
+      position: fixed;
+      top:0; left:0; right:0;
+      height: var(--replay-nav-h);
+      z-index: 100;
+      backdrop-filter: blur(18px);
+      background: rgba(10, 14, 26, 0.82);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-content{
+      height: var(--replay-nav-h);
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    /* ✅ 运行时入口容器：统一避让 fixed nav（遮挡彻底解决） */
+    .replay-main{
+      padding-top: calc(var(--replay-nav-h) + 24px);
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      font-size: 16px;
+    }
+    .logo-icon{
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      background: var(--gradient-1);
+      display:grid; place-items:center;
+      color:#071022; font-weight: 900;
+      box-shadow: 0 10px 24px rgba(59,130,246,0.22);
+    }
+    .logo b{
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .btn{
+      cursor:pointer;
+      user-select:none;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: rgba(232,236,245,0.92);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      transition: 0.2s ease;
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(59,130,246,0.40);
+      background: rgba(59,130,246,0.10);
+    }
+    .btn.primary{
+      background: rgba(59,130,246,0.18);
+      border-color: rgba(59,130,246,0.55);
+      color: #dbe7ff;
+    }
+
+    /* ✅ header 不再负责“顶开 nav”，避免魔法数字漂移 */
+    header{
+      padding-top: 0;
+      padding-bottom: 26px;
+    }
+
+    .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      color: #b8c5e6;
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+    .dot{
+      width: 8px; height: 8px;
+      border-radius: 999px;
+      background: #4ade80;
+      box-shadow: 0 0 14px rgba(74,222,128,0.45);
+      animation: breathe 1.6s ease-in-out infinite;
+    }
+    @keyframes breathe{
+      0%,100% { opacity: 0.35; transform: scale(0.92); box-shadow: 0 0 8px rgba(74,222,128,0.35); }
+      50% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 18px rgba(74,222,128,0.75); }
+    }
+
+    .title{
+      font-size: clamp(28px, 4vw, 46px);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #fff 0%, #bcd6ff 45%, var(--accent-blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    .subtitle{
+      color: var(--text-muted);
+      font-size: 14.5px;
+      line-height: 1.9;
+      max-width: 85ch;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 18px;
+      align-items:start;
+      padding-bottom: 70px;
+    }
+
+    .card{
+      background: linear-gradient(135deg, var(--surface), var(--surface2));
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow-lg);
+    }
+    .card h3{
+      font-size: 14px;
+      color: #dbe7ff;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(59,130,246,0.30);
+      background: rgba(59,130,246,0.12);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #9fc3ff;
+      white-space: nowrap;
+    }
+
+    /* ✅ 状态色灯（UNVERIFIED / VERIFIED / BLOCKED） */
+    .status-pack{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .status-led{
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(239,68,68,0.9);
+      box-shadow: 0 0 14px rgba(239,68,68,0.35);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .status-led.verified{
+      background: rgba(74,222,128,0.95);
+      box-shadow: 0 0 16px rgba(74,222,128,0.45);
+    }
+    .status-led.blocked{
+      background: rgba(250,204,21,0.95);
+      box-shadow: 0 0 16px rgba(250,204,21,0.40);
+    }
+    .status-led.unverified{
+      background: rgba(239,68,68,0.95);
+      box-shadow: 0 0 16px rgba(239,68,68,0.40);
+    }
+
+    .meta{
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(232,236,245,0.88);
+      line-height: 1.9;
+      background: rgba(0,0,0,0.28);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 14px;
+      overflow-x: auto;
+    }
+    .kv{ color: rgba(159,195,255,0.95); font-weight: 900; }
+    .muted{ color: rgba(147,160,189,0.92); }
+
+    .semantic-note{
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      color: var(--text-muted);
+      font-size: 13.5px;
+      line-height: 1.8;
+    }
+    .semantic-note b{ color:#dbe7ff; }
+
+    .video-frame{
+      margin-top: 10px;
+      border-radius: 18px;
+      overflow:hidden;
+      border: 1px solid rgba(59,130,246,0.22);
+      background: rgba(0,0,0,0.45);
+    }
+    video{
+      width: 100%;
+      height: auto;
+      display:block;
+      background:#000;
+    }
+
+    .row{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    /* Audit Drawer */
+    #audit-drawer{
+      display:none;
+      position: fixed;
+      bottom: 72px;
+      right: 24px;
+      width: 340px;
+      background: #000;
+      border: 1px solid var(--accent-blue);
+      border-radius: 16px;
+      padding: 18px;
+      font-family: var(--mono);
+      font-size: 11px;
+      z-index: 2000;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+    .log-line{
+      margin-bottom: 6px;
+      color: #a9c8ff;
+      border-left: 2px solid transparent;
+      padding-left: 8px;
+      transition: 0.2s;
+      white-space: pre-wrap;
+    }
+    .log-line.ok{ border-color: #4ade80; }
+    .log-line.warn{ border-color: #facc15; }
+    .log-line.bad{ border-color: #ef4444; color: rgba(255,210,210,0.92); }
+
+    /* Statusbar */
+    .statusbar{
+      position: fixed;
+      left:0; right:0; bottom:0;
+      z-index: 2500;
+      background: rgba(0,0,0,0.70);
+      border-top: 1px solid rgba(59,130,246,0.22);
+      backdrop-filter: blur(14px);
+    }
+    .statusbar-inner{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 10px 18px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: rgba(232,236,245,0.86);
+    }
+    .sb-left, .sb-right{ display:flex; gap: 10px; flex-wrap: wrap; align-items:center; }
+    .sb-pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      white-space: nowrap;
+    }
+    .sb-key{ color: rgba(159,195,255,0.9); font-weight: 800; }
+    .sb-val{ color: rgba(232,236,245,0.90); }
+    .sb-copy{ cursor:pointer; user-select:none; border-color: rgba(59,130,246,0.24); background: rgba(59,130,246,0.08); transition: 0.2s ease; }
+    .sb-copy:hover{ transform: translateY(-1px); border-color: rgba(59,130,246,0.40); background: rgba(59,130,246,0.12); }
+
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .statusbar-inner{ justify-content:center; text-align:center; }
+      #audit-drawer{ right: 12px; left: 12px; width: auto; }
+      .nav-content{ padding: 0 12px; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; }
+      .dot{ animation:none !important; opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-gradient" aria-hidden="true"></div>
+
+  <nav>
+    <div class="nav-content">
+      <div class="logo" aria-label="SynOSX">
+        <div class="logo-icon">SX</div>
+        <span><b>SynOSX</b> <span style="color:var(--text-muted); font-weight:800;">· Audit Replay</span></span>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <a class="btn" href="index.html">← BACK TO INDEX</a>
+        <button class="btn primary" id="btn-run-replay" type="button">▶ RUN REPLAY</button>
+        <button class="btn" id="btn-open-audit" type="button">OPEN AUDIT</button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="audit-drawer" aria-label="audit drawer">
+    <div style="color:var(--accent-blue); margin-bottom:10px; font-weight:900; border-bottom:1px solid #333; padding-bottom:6px;">
+      > AUDIT REPLAY RUNTIME
+    </div>
+    <div id="log-container"></div>
+  </div>
+
+  <main class="replay-main">
+    <header class="container">
+      <div class="kicker"><span class="dot"></span> 回放环境 · 以 trace_id 进入 · URL 即证据入口</div>
+      <div class="title">治理行为回放（Audit Replay）</div>
+      <div class="subtitle">
+        这是 SynOSX 的「回放运行时」。你不是在“看视频”，你是在回放一次已经被 <b>Intent → Firewall → Audit</b> 裁决并记录的行为证据。
+      </div>
+    </header>
+
+    <section class="container">
+      <div class="grid">
+        <section class="card" aria-label="trace meta">
+          <h3>
+            证据元数据
+            <span class="status-pack" aria-label="verdict status">
+              <span class="status-led unverified" id="led-verdict" title="VERDICT LED" aria-hidden="true"></span>
+              <span class="chip" id="chip-status">UNRESOLVED</span>
+            </span>
+          </h3>
+
+          <div class="meta" id="meta-block">
+            <span class="muted">Waiting for trace…</span>
+          </div>
+
+          <div class="row">
+            <button class="btn sb-copy" id="btn-copy-trace" type="button" title="Copy trace id">
+              <span class="sb-key">TRACE</span>
+              <span class="sb-val" id="sb-trace">—</span>
+              <span class="sb-val" style="opacity:.7;">⧉</span>
+            </button>
+
+            <button class="btn sb-copy" id="btn-copy-hash" type="button" title="Copy evidence hash">
+              <span class="sb-key">HASH</span>
+              <span class="sb-val" id="sb-hash">—</span>
+              <span class="sb-val" style="opacity:.7;">⧉</span>
+            </button>
+          </div>
+
+          <div class="semantic-note">
+            <span class="chip">REPLAY CONTRACT</span>
+            本页面通过 URL 参数 <b>?trace=...</b> 进入回放环境。<br/>
+            入口只指向“证据”，不创造“事实”。<br/>
+            若 trace 不存在或未被审核，系统将裁决为 <b>UNVERIFIED</b> 并拒绝播放。
+          </div>
+        </section>
+
+        <section class="card" aria-label="replay video">
+          <h3>
+            回放载体
+            <span class="chip" id="chip-media">MEDIA: NONE</span>
+          </h3>
+
+          <div class="video-frame">
+            <video id="replay-video" controls preload="metadata" playsinline></video>
+          </div>
+
+          <div class="semantic-note" id="media-note">
+            <span class="chip">NOTE</span>
+            载体尚未加载。请确认 URL 里包含有效 trace，例如：<br/>
+            <span style="font-family:var(--mono); color:#9fc3ff;">replay.html?trace=rc_2026-01-12T0730Z_0001</span>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div class="statusbar" role="contentinfo" aria-label="System Status Bar">
+    <div class="statusbar-inner">
+      <div class="sb-left">
+        <span class="sb-pill">
+          <span class="sb-key">RUNTIME</span>
+          <span class="sb-val">REPLAY</span>
+        </span>
+
+        <span class="sb-pill">
+          <span class="sb-key">TRACE</span>
+          <span class="sb-val" id="sb-trace2">—</span>
+        </span>
+
+        <span class="sb-pill" title="VERDICT">
+          <span class="status-led unverified" id="led-verdict2" aria-hidden="true"></span>
+          <span class="sb-key">VERDICT</span>
+          <span class="sb-val" id="sb-verdict">UNRESOLVED</span>
+        </span>
+      </div>
+
+      <div class="sb-right">
+        <span class="sb-pill">
+          <span class="sb-key">POLICY</span>
+          <span class="sb-val">AUDIT REPLAY CONSTITUTION</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ✅ 高阶方案核心：
+     * - replay.html?trace=xxx
+     * - JS 根据 trace 加载不同视频/元数据
+     * - URL 本身即“审计入口证据”
+     *
+     * ✅ 改造点：
+     * - registry 不再内置，改为 fetch: registry/replay.registry.json
+     * - replay.html 本身保持稳定（零新增行数爆炸）
+     */
+
+    // ✅ registry 位置（你要的 JSON 版本）
+    const REGISTRY_URL = "registry/replay.registry.json";
+
+    async function loadRegistry(){
+      const res = await fetch(REGISTRY_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error(`registry fetch failed: ${res.status}`);
+      const json = await res.json();
+      if (!json || typeof json !== "object") throw new Error("registry invalid: not object");
+      if (!json.entries || typeof json.entries !== "object") throw new Error("registry invalid: entries missing");
+      return json;
+    }
+
+    function getTraceFromUrl(){
+      const sp = new URLSearchParams(location.search);
+      return (sp.get("trace") || "").trim();
+    }
+
+    // ✅ 简单入口约束（仍允许 rc_brand_15s_v1 这类）
+    function isProbablyTraceId(v){
+      return v.startsWith("rc_") && v.length <= 120;
+    }
+
+    function openAudit(){
+      document.getElementById("audit-drawer").style.display = "block";
+    }
+    function closeAudit(){
+      document.getElementById("audit-drawer").style.display = "none";
+    }
+    function logLine(msg, type="ok"){
+      const c = document.getElementById("log-container");
+      const line = document.createElement("div");
+      line.className = `log-line ${type}`;
+      line.textContent = `> ${msg}`;
+      c.appendChild(line);
+      c.scrollTop = c.scrollHeight;
+    }
+    function resetAudit(){
+      document.getElementById("log-container").innerHTML = "";
+    }
+
+    async function copyText(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        return true;
+      }catch(e){
+        try{
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          return true;
+        }catch(e2){
+          return false;
+        }
+      }
+    }
+
+    // UI refs
+    const elMeta = document.getElementById("meta-block");
+    const chipStatus = document.getElementById("chip-status");
+    const chipMedia = document.getElementById("chip-media");
+    const mediaNote = document.getElementById("media-note");
+    const videoEl = document.getElementById("replay-video");
+
+    const sbTrace = document.getElementById("sb-trace");
+    const sbTrace2 = document.getElementById("sb-trace2");
+    const sbHash = document.getElementById("sb-hash");
+    const sbVerdict = document.getElementById("sb-verdict");
+
+    const led1 = document.getElementById("led-verdict");
+    const led2 = document.getElementById("led-verdict2");
+
+    function setLedClass(mode){
+      const all = ["verified","blocked","unverified"];
+      if (led1){ all.forEach(c=>led1.classList.remove(c)); led1.classList.add(mode); }
+      if (led2){ all.forEach(c=>led2.classList.remove(c)); led2.classList.add(mode); }
+    }
+
+    function setVerdict(v){
+      const vv = (v || "UNRESOLVED").toUpperCase();
+      sbVerdict.textContent = vv;
+      chipStatus.textContent = vv;
+
+      if (vv === "VERIFIED"){
+        setLedClass("verified");
+      }else if (vv === "BLOCKED"){
+        setLedClass("blocked");
+      }else{
+        setLedClass("unverified");
+      }
+
+      chipStatus.style.borderColor = (vv === "VERIFIED") ? "rgba(74,222,128,0.45)"
+                            : (vv === "BLOCKED") ? "rgba(250,204,21,0.45)"
+                            : "rgba(239,68,68,0.45)";
+      chipStatus.style.background = (vv === "VERIFIED") ? "rgba(74,222,128,0.10)"
+                           : (vv === "BLOCKED") ? "rgba(250,204,21,0.10)"
+                           : "rgba(239,68,68,0.10)";
+      chipStatus.style.color = (vv === "VERIFIED") ? "#bff7d6"
+                     : (vv === "BLOCKED") ? "#ffe9a8"
+                     : "#ffd2d2";
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function renderUnverified(trace, reason){
+      sbTrace.textContent = trace || "—";
+      sbTrace2.textContent = trace || "—";
+      sbHash.textContent = "—";
+      setVerdict("UNVERIFIED");
+
+      elMeta.innerHTML = `<span class="muted">Trace 不存在或未被注册：</span>
+<span class="kv">TRACE</span>: ${escapeHtml(trace || "(empty)")}
+<br/><span class="muted">裁决：</span><span class="kv">REJECT PLAYBACK</span>
+<br/><span class="muted">原因：</span>${escapeHtml(reason || "未找到可回放证据（不可创建事实，只能回放事实）。")}`;
+
+      chipMedia.textContent = "MEDIA: NONE";
+      mediaNote.innerHTML = `<span class="chip">NOTE</span>
+        未找到对应回放载体。请检查 trace 是否正确，或把该 trace 写入 <b>${escapeHtml(REGISTRY_URL)}</b>。`;
+
+      videoEl.pause();
+      videoEl.removeAttribute("poster");
+      while(videoEl.firstChild) videoEl.removeChild(videoEl.firstChild);
+    }
+
+    function renderMeta(entry){
+      const lines = [
+        `<span class="kv">TRACE_ID</span>: ${escapeHtml(entry.trace_id)}`,
+        `<span class="kv">INTENT</span>: ${escapeHtml(entry.intent)}`,
+        `<span class="kv">ACTOR</span>: ${escapeHtml(entry.actor)}`,
+        `<span class="kv">DAG</span>: ${escapeHtml(entry.dag)}`,
+        `<span class="kv">FIREWALL</span>: ${escapeHtml(entry.firewall)}`,
+        `<span class="kv">AUDIT</span>: ${escapeHtml(entry.audit)}`,
+        `<span class="kv">VERDICT</span>: ${escapeHtml(entry.verdict)}`,
+        `<span class="kv">EVIDENCE_HASH</span>: ${escapeHtml(entry.evidence_hash)}`,
+        `<span class="kv">RECORDED_AT</span>: ${escapeHtml(entry.recorded_at)}`
+      ];
+      elMeta.innerHTML = lines.join("<br/>");
+
+      sbTrace.textContent = entry.trace_id || "—";
+      sbTrace2.textContent = entry.trace_id || "—";
+      sbHash.textContent = entry.evidence_hash || "—";
+      setVerdict(entry.verdict || "UNRESOLVED");
+    }
+
+    function renderMedia(entry){
+      const m = entry.media;
+      if (!m || !m.src){
+        chipMedia.textContent = "MEDIA: NONE";
+        mediaNote.innerHTML = `<span class="chip">NOTE</span>
+          该 trace 已注册，但未配置 media.src。请在 registry 里补全回放载体路径。`;
+        return;
+      }
+
+      chipMedia.textContent = `MEDIA: ${m.type || "video/mp4"}`;
+      mediaNote.innerHTML = `<span class="chip">REPLAY</span>
+        <b>载体仅用于回放证据。</b> 若载体与 evidence_hash 不一致，应视为篡改风险并升级裁决。`;
+
+      while(videoEl.firstChild) videoEl.removeChild(videoEl.firstChild);
+
+      if (m.poster) videoEl.setAttribute("poster", m.poster);
+      const src = document.createElement("source");
+      src.src = m.src;
+      src.type = m.type || "video/mp4";
+      videoEl.appendChild(src);
+      videoEl.load();
+    }
+
+    async function runReplay(entry){
+      openAudit();
+      resetAudit();
+
+      logLine(`ENTER REPLAY RUNTIME`, "ok");
+      logLine(`TRACE RESOLUTION: ${entry.trace_id}`, "ok");
+      logLine(`FETCH INTENT: [${entry.intent}]`, "ok");
+      logLine(`VERIFY DAG CONSTITUTION... ${entry.dag}`, entry.dag === "OK" ? "ok" : "warn");
+
+      if (entry.firewall === "DENIED"){
+        logLine(`CONSULT FIREWALL (S2)... DENIED`, "warn");
+        logLine(`REPLAY POLICY: BLOCKED TRACE IS STILL REPLAYABLE (EVIDENCE ONLY)`, "ok");
+      }else{
+        logLine(`CONSULT FIREWALL (S2)... GRANTED`, "ok");
+      }
+
+      logLine(`VERIFY AUDIT (S3)... ${entry.audit}`, "ok");
+      logLine(`EVIDENCE HASH: ${entry.evidence_hash}`, "ok");
+
+      const m = entry.media;
+      if (!m || !m.src){
+        logLine(`MEDIA: NONE (cannot play)`, "bad");
+        return;
+      }
+
+      try{
+        await videoEl.play();
+        logLine(`MEDIA PLAYBACK: START`, "ok");
+      }catch(e){
+        logLine(`MEDIA PLAYBACK: BLOCKED BY BROWSER (user gesture required?)`, "warn");
+      }
+
+      const onEnded = () => {
+        logLine(`MEDIA PLAYBACK: END`, "ok");
+        logLine(`REPLAY COMPLETE`, "ok");
+        videoEl.removeEventListener("ended", onEnded);
+      };
+      videoEl.addEventListener("ended", onEnded);
+    }
+
+    (async function boot(){
+      const trace = getTraceFromUrl();
+
+      // 初始状态灯：默认 UNVERIFIED
+      setVerdict("UNVERIFIED");
+
+      if (!trace){
+        renderUnverified("", "缺少 ?trace=... 参数。");
+        return;
+      }
+
+      if (!isProbablyTraceId(trace)){
+        renderUnverified(trace, "trace 格式不合法（必须以 rc_ 开头）。");
+        return;
+      }
+
+      // ✅ 从 JSON 拉 registry
+      let registry;
+      try{
+        registry = await loadRegistry();
+      }catch(e){
+        openAudit();
+        resetAudit();
+        logLine(`REGISTRY LOAD FAILED: ${REGISTRY_URL}`, "bad");
+        logLine(String(e && e.message ? e.message : e), "warn");
+        renderUnverified(trace, "registry 加载失败（请使用本地静态服务器打开站点，而不是 file://）。");
+        return;
+      }
+
+      const entry = registry.entries?.[trace];
+      if (!entry){
+        renderUnverified(trace, "registry 中未找到该 trace。");
+        return;
+      }
+
+      renderMeta(entry);
+      renderMedia(entry);
+
+      document.getElementById("btn-run-replay").addEventListener("click", () => runReplay(entry));
+
+      document.getElementById("btn-open-audit").addEventListener("click", () => {
+        const d = document.getElementById("audit-drawer");
+        if (d.style.display === "block") closeAudit(); else openAudit();
+      });
+
+      document.getElementById("btn-copy-trace").addEventListener("click", async () => {
+        const ok = await copyText(entry.trace_id || trace);
+        openAudit();
+        logLine(ok ? `COPIED TRACE: ${entry.trace_id || trace}` : `COPY FAILED (TRACE)`, ok ? "ok" : "warn");
+      });
+
+      document.getElementById("btn-copy-hash").addEventListener("click", async () => {
+        const ok = await copyText(entry.evidence_hash || "");
+        openAudit();
+        logLine(ok ? `COPIED HASH: ${entry.evidence_hash}` : `COPY FAILED (HASH)`, ok ? "ok" : "warn");
+      });
+    })();
+  </script>
+</body>
+</html>

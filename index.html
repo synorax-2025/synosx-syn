@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -18,7 +17,10 @@
       --surface: rgba(26, 32, 54, 0.72);
       --surface2: rgba(18, 23, 43, 0.55);
       --text: #e8ecf5;
-      --text-muted: #93a0bd;
+
+      /* ✅ 对比度治理：制度变量统一生效（只改这一行） */
+      --text-muted: #a9c8ff;
+
       --accent-blue: #3b82f6;
       --accent-indigo: #6366f1;
       --gradient-1: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
@@ -696,6 +698,7 @@
     .log-line { margin-bottom: 6px; color: #a9c8ff; border-left: 2px solid transparent; padding-left: 8px; transition: 0.2s; }
     .log-line.ok { border-color: #4ade80; }
     .log-line.warn { border-color: #facc15; }
+    .log-line.err { border-color: #ef4444; }
 
     /* System Status Bar */
     .statusbar {
@@ -778,72 +781,143 @@
     @media (prefers-reduced-motion: reduce){
       * { animation: none !important; transition: none !important; }
       .engine-dot{ animation: none !important; opacity: 1; }
+      .dag-led{ animation: none !important; opacity: 1; }
     }
 
     .reveal { opacity: 0; transform: translateY(20px); transition: 0.7s ease; }
     .reveal.active { opacity: 1; transform: translateY(0); }
 
     /* ===== Terminal DAG Card (Compact) ===== */
-.term-card{
-  margin-top: 10px;
-  border-radius: 18px;
-  border: 1px solid rgba(59,130,246,0.22);
-  background: rgba(0,0,0,0.45);
-  overflow: hidden;
-  box-shadow: 0 26px 70px rgba(0,0,0,0.35);
-}
-.term-top{
-  display:flex;
-  align-items:center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  background: rgba(255,255,255,0.03);
-}
-.term-dots{
-  display:flex; align-items:center; gap:8px;
-}
-.term-dot{
-  width: 8px; height: 8px; border-radius: 999px;
-  background: #4ade80;
-  box-shadow: 0 0 12px rgba(74,222,128,0.45);
-}
-.term-title{
-  font-family: var(--mono);
-  font-size: 11px;
-  color: rgba(232,236,245,0.85);
-  letter-spacing: 0.04em;
-}
-.term-badges{
-  display:flex; align-items:center; gap:10px; flex-wrap: wrap;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: rgba(232,236,245,0.85);
-}
-.term-badge{
-  display:inline-flex; align-items:center; gap:8px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(0,0,0,0.22);
-  white-space: nowrap;
-}
-.term-badge b{ color: rgba(159,195,255,0.92); }
-.term-body{
-  padding: 16px 14px 14px;
-  font-family: var(--mono);
-  font-size: 13px;
-  line-height: 1.85;
-  color: rgba(232,236,245,0.88);
-}
-.term-line{ margin: 2px 0; }
-.term-k1{ color:#4ade80; font-weight: 900; }
-.term-k2{ color:#6366f1; font-weight: 900; }
-.term-k3{ color:#3b82f6; font-weight: 900; }
-.term-k4{ color:#93a0bd; font-weight: 900; }
-.term-arrow{ color: rgba(159,179,255,0.9); font-weight: 900; }
+    .term-card{
+      margin-top: 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(59,130,246,0.22);
+      background: rgba(0,0,0,0.45);
+      overflow: hidden;
+      box-shadow: 0 26px 70px rgba(0,0,0,0.35);
+    }
+    .term-top{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.03);
+    }
+    .term-dots{
+      display:flex; align-items:center; gap:8px;
+    }
+    .term-dot{
+      width: 8px; height: 8px; border-radius: 999px;
+      background: #4ade80;
+      box-shadow: 0 0 12px rgba(74,222,128,0.45);
+    }
+    .term-title{
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(232,236,245,0.85);
+      letter-spacing: 0.04em;
+    }
+    .term-badges{
+      display:flex; align-items:center; gap:10px; flex-wrap: wrap;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(232,236,245,0.85);
+    }
+    .term-badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.22);
+      white-space: nowrap;
+    }
+    .term-badge b{ color: rgba(159,195,255,0.92); }
+    .term-body{
+      padding: 16px 14px 14px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.85;
+      color: rgba(232,236,245,0.88);
+    }
+    .term-line{ margin: 2px 0; }
+    .term-k1{ color:#4ade80; font-weight: 900; }
+    .term-k2{ color:#6366f1; font-weight: 900; }
+    .term-k3{ color:#3b82f6; font-weight: 900; }
+    .term-k4{ color:#93a0bd; font-weight: 900; }
+    .term-arrow{ color: rgba(159,179,255,0.9); font-weight: 900; }
 
+    /* ✅ 移动端：终端卡 top 纵向（更稳） */
+    @media (max-width: 768px){
+      .term-top{ flex-direction: column; align-items: flex-start; }
+      .term-badges{ width:100%; justify-content:flex-start; }
+    }
+
+    /* =========================================================
+       ✅ 新增：DAG View Switch (Terminal / Concept)
+       ========================================================= */
+    .dag-switchbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      margin: 10px 0 14px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.22);
+    }
+    .dag-switch-left{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      color: rgba(232,236,245,0.88);
+      font-family: var(--mono);
+      font-size: 11.5px;
+    }
+    .dag-led{
+      width: 8px; height: 8px;
+      border-radius: 999px;
+      background: #4ade80;
+      box-shadow: 0 0 12px rgba(74,222,128,0.6);
+      animation: breathe 1.6s ease-in-out infinite;
+    }
+    .dag-switch-buttons{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .dag-btn{
+      cursor:pointer;
+      user-select:none;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: rgba(232,236,245,0.88);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      transition: 0.2s ease;
+    }
+    .dag-btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(59,130,246,0.40);
+      background: rgba(59,130,246,0.10);
+    }
+    .dag-btn.active{
+      border-color: rgba(59,130,246,0.55);
+      background: rgba(59,130,246,0.18);
+      color: #dbe7ff;
+    }
+    .dag-view{ display:none; }
+    .dag-view.active{ display:block; }
+
+    /* ✅ 移动端：dag switchbar 纵向（你要的） */
+    @media (max-width: 768px){
+      .dag-switchbar{ flex-direction: column; align-items: flex-start; gap: 10px; }
+      .dag-switch-buttons{ width: 100%; justify-content: center; }
+    }
   </style>
 </head>
 
@@ -882,6 +956,7 @@
           <div class="hero-buttons">
             <a href="whitepaper.html" class="cta-button">获取技术白皮书</a>
             <a href="#constitution" class="btn-secondary">探索系统宪法</a>
+            <a href="replay.html?trace=rc_brand_15s_v1" class="btn-secondary">▶ 观看品牌回放（15s）</a>
           </div>
 
           <div class="manifest-ref">
@@ -1008,45 +1083,89 @@
           </div>
         </div>
 
-        <!-- ✅ 这里是你要的“最合理版本”：DAG 只保留权力链；语义入口移出 DAG 作为注解 -->
-        <div class="constitution-card reveal">
+        <!-- ✅ DAG 双视图卡片（Terminal / Concept） -->
+        <div class="constitution-card reveal" id="dag-card">
           <h3>依赖宪法（DAG 层级）</h3>
 
-         <div class="term-card" aria-label="DAG Constitution Terminal Card">
-  <div class="term-top">
-    <div class="term-dots">
-      <span class="term-dot" aria-hidden="true"></span>
-      <span class="term-title">DAG CONSTITUTION</span>
-    </div>
+          <!-- 切换条 -->
+          <div class="dag-switchbar" role="tablist" aria-label="DAG View Switch">
+            <div class="dag-switch-left">
+              <span class="dag-led" aria-hidden="true"></span>
+              <span>VIEW:</span>
+              <span id="dag-view-label" style="color:#9fc3ff; font-weight:800;">TERMINAL</span>
+            </div>
+            <div class="dag-switch-buttons">
+              <button class="dag-btn active" id="btn-terminal" type="button" role="tab" aria-selected="true">
+                TERMINAL
+              </button>
+              <button class="dag-btn" id="btn-concept" type="button" role="tab" aria-selected="false">
+                CONCEPT
+              </button>
+            </div>
+          </div>
 
-    <div class="term-badges" aria-label="runtime statuses">
-      <span class="term-badge"><b>DAG</b>: OK</span>
-      <span class="term-badge"><b>FIREWALL</b>: ARMED</span>
-      <span class="term-badge"><b>AUDIT</b>: ON</span>
-    </div>
-  </div>
+          <!-- A: 终端态 -->
+          <div class="dag-view active" id="dag-terminal" role="tabpanel" aria-label="DAG Terminal View">
+            <div class="term-card" aria-label="DAG Constitution Terminal Card">
+              <div class="term-top">
+                <div class="term-dots">
+                  <span class="term-dot" aria-hidden="true"></span>
+                  <span class="term-title">DAG CONSTITUTION</span>
+                </div>
 
-  <div class="term-body">
-    <div class="term-line"><span class="term-k1">CONTRACT SOURCE</span>（制度契约层 · 唯一真源）</div>
-    <div class="term-line term-arrow">↓</div>
-    <div class="term-line"><span class="term-k2">VALIDATION / JUDGEMENT</span>（validators · adapters · reports）</div>
-    <div class="term-line term-arrow">↓</div>
-    <div class="term-line"><span class="term-k3">GOVERNANCE RUNTIME</span>（S0–S6 · Intent / Firewall / Audit …）</div>
-    <div class="term-line term-arrow">↓</div>
-    <div class="term-line"><span class="term-k4">EXECUTION UNITS</span>（invoice / sales / inventory …）</div>
-  </div>
-</div>
+                <div class="term-badges" aria-label="runtime statuses">
+                  <span class="term-badge"><b>DAG</b>: OK</span>
+                  <span class="term-badge"><b>FIREWALL</b>: ARMED</span>
+                  <span class="term-badge"><b>AUDIT</b>: ON</span>
+                </div>
+              </div>
 
+              <div class="term-body">
+                <div class="term-line"><span class="term-k1">CONTRACT SOURCE</span>（制度契约层 · 唯一真源）</div>
+                <div class="term-line term-arrow">↓</div>
+                <div class="term-line"><span class="term-k2">VALIDATION / JUDGEMENT</span>（validators · adapters · reports）</div>
+                <div class="term-line term-arrow">↓</div>
+                <div class="term-line"><span class="term-k3">GOVERNANCE RUNTIME</span>（S0–S6 · Intent / Firewall / Audit …）</div>
+                <div class="term-line term-arrow">↓</div>
+                <div class="term-line"><span class="term-k4">EXECUTION UNITS</span>（invoice / sales / inventory …）</div>
+              </div>
+            </div>
 
-          <div class="semantic-note">
-            <span class="semantic-chip">SEMANTIC ENTRY</span>
-            语义入口（<b>Human / AI</b>）：NL → Intent → 治理分发。<br/>
-            <b>入口只表达意图，不拥有执行权</b>（不可绕过 Validator / Firewall）。
+            <div class="semantic-note">
+              <span class="semantic-chip">SEMANTIC ENTRY</span>
+              语义入口（<b>Human / AI</b>）：NL → Intent → 治理分发。<br/>
+              <b>入口只表达意图，不拥有执行权</b>（不可绕过 Validator / Firewall）。
+            </div>
+          </div>
+
+          <!-- B: 教学态 -->
+          <div class="dag-view" id="dag-concept" role="tabpanel" aria-label="DAG Concept View">
+            <div class="code-block" aria-label="DAG Constitution Concept">
+契约制度层（唯一真源）
+↓
+独立校验与裁决层（validators / adapters / report）
+↓
+治理运行时（S0–S6）
+↓
+业务执行单元（invoice / sales / inventory …）
+↓
+语义入口（Human / AI）：NL → intent → 治理分发
+            </div>
           </div>
 
           <p style="margin-top: 12px; color: var(--text-muted); font-size: 13.5px; line-height: 1.8;">
             任何绕过治理中枢（Validator / Firewall）的“方便绕行”，均被视为<strong>违宪边（Violation Edge）</strong>并被实时裁决。
           </p>
+
+          <!-- ✅ index 只触发回放：写入 audit drawer + 跳转 replay.html -->
+          <div style="margin-top: 14px; display:flex; gap: 10px; flex-wrap: wrap;">
+            <button class="dag-btn" type="button" id="btn-replay-trace" aria-label="进入治理回放">
+              ▶ REPLAY TRACE
+            </button>
+            <span style="font-family: var(--mono); font-size: 11px; color: rgba(232,236,245,0.70); align-self:center;">
+              TRACE: <b style="color:#9fc3ff;">rc_2026-01-12T0730Z_0001</b>
+            </span>
+          </div>
         </div>
       </div>
 
@@ -1088,7 +1207,9 @@
           <span class="step">Report / 可回放报告</span>
         </div>
         <p class="flow-note">
-            系统不接受匿名、越权或未被认可的发声源； AI 与外部系统仅能通过被制度认可的入口提出意图； 治理中枢负责裁决与记录，业务模块只执行被允许的请求。 解释者、裁决者、执行者从不越界——系统因此可长期演进。
+          系统不接受匿名、越权或未被认可的发声源； AI 与外部系统仅能通过被制度认可的入口提出意图；
+          治理中枢负责裁决与记录，业务模块只执行被允许的请求。
+          解释者、裁决者、执行者从不越界——系统因此可长期演进。
         </p>
       </div>
     </div>
@@ -1165,7 +1286,7 @@
 
       <div style="margin-top:48px; text-align:center;">
         <a href="cases.html" class="cta-button">查看治理判例（Cases）</a>
-        <p style="margin-top:12px; font-size:13px; color:#93a0bd;">
+        <p style="margin-top:12px; font-size:13px; color:var(--text-muted);">
           通过真实判例，理解系统如何裁决、阻断并记录高风险行为
         </p>
       </div>
@@ -1258,7 +1379,36 @@
     }, { threshold: 0.12 });
     reveals.forEach(el => io.observe(el));
 
-    // 审计模拟回放
+    // ----------------------------
+    // ✅ Audit Drawer helpers (新增)
+    // ----------------------------
+    function auditOpen() {
+      const drawer = document.getElementById('audit-drawer');
+      const container = document.getElementById('log-container');
+      if (!drawer || !container) return;
+      drawer.style.display = 'block';
+      return { drawer, container };
+    }
+
+    function auditLine(msg, type = "ok") {
+      const ctx = auditOpen();
+      if (!ctx) return;
+      const line = document.createElement('div');
+      line.className = `log-line ${type}`;
+      line.innerText = `> ${msg}`;
+      ctx.container.appendChild(line);
+      ctx.container.scrollTop = ctx.container.scrollHeight;
+    }
+
+    function auditCloseLater(ms = 3500) {
+      const drawer = document.getElementById('audit-drawer');
+      if (!drawer) return;
+      setTimeout(() => { drawer.style.display = 'none'; }, ms);
+    }
+
+    // ----------------------------
+    // ✅ 审计模拟回放（原有）
+    // ----------------------------
     function runAuditSimulation() {
       const drawer = document.getElementById('audit-drawer');
       const container = document.getElementById('log-container');
@@ -1299,6 +1449,78 @@
     }
     window.runAuditSimulation = runAuditSimulation;
 
+    // -------------------------------------------------
+    // ✅ DAG View Switch: Terminal / Concept (新增)
+    // -------------------------------------------------
+    (function dagViewSwitch(){
+      const btnTerminal = document.getElementById("btn-terminal");
+      const btnConcept  = document.getElementById("btn-concept");
+      const viewTerminal = document.getElementById("dag-terminal");
+      const viewConcept  = document.getElementById("dag-concept");
+      const label = document.getElementById("dag-view-label");
+
+      if (!btnTerminal || !btnConcept || !viewTerminal || !viewConcept || !label) return;
+
+      const apply = (mode) => {
+        const isTerminal = mode === "terminal";
+
+        viewTerminal.classList.toggle("active", isTerminal);
+        viewConcept.classList.toggle("active", !isTerminal);
+
+        btnTerminal.classList.toggle("active", isTerminal);
+        btnConcept.classList.toggle("active", !isTerminal);
+
+        btnTerminal.setAttribute("aria-selected", String(isTerminal));
+        btnConcept.setAttribute("aria-selected", String(!isTerminal));
+
+        label.textContent = isTerminal ? "TERMINAL" : "CONCEPT";
+
+        // ✅ 把新增功能挂到 Audit Drawer（不 alert）
+        auditLine(`DAG_VIEW_SWITCH -> ${isTerminal ? "TERMINAL" : "CONCEPT"}`, "ok");
+
+        try { localStorage.setItem("sx_dag_view", mode); } catch(e) {}
+      };
+
+      // 恢复上次选择
+      let saved = "terminal";
+      try { saved = localStorage.getItem("sx_dag_view") || "terminal"; } catch(e) {}
+      // 首次不要刷屏：只设置状态不写日志
+      (function applySilent(mode){
+        const isTerminal = mode === "terminal";
+        viewTerminal.classList.toggle("active", isTerminal);
+        viewConcept.classList.toggle("active", !isTerminal);
+        btnTerminal.classList.toggle("active", isTerminal);
+        btnConcept.classList.toggle("active", !isTerminal);
+        btnTerminal.setAttribute("aria-selected", String(isTerminal));
+        btnConcept.setAttribute("aria-selected", String(!isTerminal));
+        label.textContent = isTerminal ? "TERMINAL" : "CONCEPT";
+      })(saved);
+
+      btnTerminal.addEventListener("click", () => apply("terminal"));
+      btnConcept.addEventListener("click",  () => apply("concept"));
+    })();
+
+    // -------------------------------------------------
+    // ✅ index 只负责触发回放：写日志 + 跳转 replay.html
+    // -------------------------------------------------
+    (function bindReplayButton(){
+      const btn = document.getElementById("btn-replay-trace");
+      if (!btn) return;
+
+      const trace = "rc_2026-01-12T0730Z_0001";
+
+      btn.addEventListener("click", () => {
+        auditLine(`REPLAY_REQUEST -> TRACE=${trace}`, "ok");
+        auditLine("POLICY: index.html is ENTRY ONLY (no media playback).", "ok");
+        auditLine("ROUTE -> replay.html (Audit Replay Runtime)", "ok");
+        auditCloseLater(900);
+
+        setTimeout(() => {
+          window.location.href = `replay.html?trace=${encodeURIComponent(trace)}`;
+        }, 420);
+      });
+    })();
+
     // Status Bar：从 meta 读取 Build / Version / Commit，并支持复制 Commit
     (function bootStatusBar(){
       const getMeta = (name) => {
@@ -1328,10 +1550,12 @@
           await navigator.clipboard.writeText(commit);
           const hint = pill.querySelector(".sb-muted");
           hint.textContent = "COPIED";
+          auditLine(`FINGERPRINT_COPIED -> COMMIT=${commit}`, "ok");
           setTimeout(()=> hint.textContent = "⧉", 1200);
         }catch(e){
           const hint = pill.querySelector(".sb-muted");
           hint.textContent = "COPY?";
+          auditLine("FINGERPRINT_COPY_FAILED -> clipboard denied (likely file:// or permission)", "warn");
           setTimeout(()=> hint.textContent = "⧉", 1200);
         }
       });

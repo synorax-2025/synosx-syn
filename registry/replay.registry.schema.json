@@ -1,0 +1,155 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://synosx.dev/schemas/replay.registry.schema.json",
+  "title": "SynOSX Audit Replay Registry",
+  "description": "Schema for governed audit replay registry. Only registered traces are allowed to be replayed as evidence.",
+  "type": "object",
+  "required": ["version", "policy", "entries"],
+
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional schema self-reference"
+    },
+
+    "version": {
+      "type": "string",
+      "pattern": "^v\\d+\\.\\d+\\.\\d+$",
+      "description": "Registry version"
+    },
+
+    "policy": {
+      "type": "string",
+      "enum": ["AUDIT_REPLAY_CONSTITUTION"],
+      "description": "Governing policy identifier"
+    },
+
+    "description": {
+      "type": "string"
+    },
+
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "entries": {
+      "type": "object",
+      "description": "Trace registry entries keyed by trace_id",
+      "additionalProperties": {
+        "$ref": "#/definitions/replayEntry"
+      }
+    }
+  },
+
+  "definitions": {
+    "replayEntry": {
+      "type": "object",
+      "required": [
+        "trace_id",
+        "intent",
+        "actor",
+        "dag",
+        "firewall",
+        "audit",
+        "verdict",
+        "recorded_at",
+        "media"
+      ],
+      "properties": {
+        "trace_id": {
+          "type": "string",
+          "pattern": "^rc_[a-zA-Z0-9_\\-]+$",
+          "description": "Unique trace identifier"
+        },
+
+        "intent": {
+          "type": "string",
+          "description": "Declared intent of the replayed action"
+        },
+
+        "actor": {
+          "type": "string",
+          "description": "Actor who initiated the action (human / ai / system)"
+        },
+
+        "dag": {
+          "type": "string",
+          "enum": ["OK", "BROKEN"],
+          "description": "DAG constitution verification result"
+        },
+
+        "firewall": {
+          "type": "string",
+          "enum": ["GRANTED", "DENIED"],
+          "description": "Firewall (permission) decision"
+        },
+
+        "audit": {
+          "type": "string",
+          "enum": ["HASHED", "MISSING"],
+          "description": "Audit evidence status"
+        },
+
+        "verdict": {
+          "type": "string",
+          "enum": ["VERIFIED", "BLOCKED", "UNVERIFIED"],
+          "description": "Final governance verdict"
+        },
+
+        "recorded_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the evidence was recorded"
+        },
+
+        "evidence_hash": {
+          "type": "string",
+          "description": "Hash of the evidence payload"
+        },
+
+        "media": {
+          "$ref": "#/definitions/media"
+        },
+
+        "notes": {
+          "type": "string"
+        }
+      },
+
+      "additionalProperties": false
+    },
+
+    "media": {
+      "type": "object",
+      "required": ["type", "src"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["video/mp4"],
+          "description": "Media MIME type"
+        },
+
+        "src": {
+          "type": "string",
+          "description": "Relative path to media asset"
+        },
+
+        "poster": {
+          "type": "string",
+          "description": "Optional poster image"
+        },
+
+        "duration_sec": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Duration in seconds"
+        }
+      },
+
+      "additionalProperties": false
+    }
+  },
+
+  "additionalProperties": false
+}

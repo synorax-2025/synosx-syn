@@ -1,254 +1,263 @@
-/* sx.statusbar.js — SynOSX shared statusbar (auto layout switch)
-   - Injects DOM (no per-page HTML needed)
-   - Auto chooses layout by page type
-   - Reads meta: sx-runtime, sx-build-date, sx-version, sx-commit, sx-policy
-   - Optional override meta: sx-statusbar-layout = release|governance
+/* sx.statusbar.js — shared statusbar runtime binder
+   ✅ Auto-detect runtime (or meta sx-runtime)
+   ✅ Auto-apply layout per runtime (INDEX / CASES / MANIFEST / REPLAY)
+   ✅ Binds meta -> pills (build/version/commit/policy/runtime)
+   ✅ REPLAY auto-fills trace from URL (?trace=...)
+   ✅ Optional verdict dot id="sb-dot" (class: verified/blocked/unverified)
+   ✅ Click-to-copy commit if commit pill has class "sb-copy"
+   ✅ Shared API: window.SX_STATUSBAR.*
 */
 
 (function sxStatusbarBoot(){
+  "use strict";
+
+  const $ = (id) => document.getElementById(id);
+
+  // -----------------------------
+  // Elements (optional-safe)
+  // -----------------------------
+  const elRuntime = $("sb-runtime");
+  const elTraceA  = $("sb-trace");    // optional (some pages put trace in a button)
+  const elTraceB  = $("sb-trace2");   // common in statusbar
+  const elVerdict = $("sb-verdict");
+  const elPolicy  = $("sb-policy");
+  const elBuild   = $("sb-build");
+  const elVersion = $("sb-version");
+  const elCommit  = $("sb-commit");
+  const elDot     = $("sb-dot");      // optional dot (engine-dot)
+
+  const bar = document.querySelector(".statusbar");
+  if (!bar && !elRuntime && !elTraceA && !elTraceB && !elVerdict && !elPolicy && !elBuild && !elVersion && !elCommit){
+    return;
+  }
+
+  // -----------------------------
+  // Meta helpers
+  // -----------------------------
   const getMeta = (name) => {
     const el = document.querySelector(`meta[name="${name}"]`);
-    return el ? (el.getAttribute("content") || "").trim() : "";
+    return el ? (el.getAttribute("content") || "") : "";
   };
-
-  const safeText = (v, fallback = "—") => (String(v || "").trim() || fallback);
 
   const getTraceFromUrl = () => {
     try{
       const sp = new URLSearchParams(location.search);
       return (sp.get("trace") || "").trim();
-    }catch(e){
+    }catch(_){
       return "";
     }
   };
 
+  // -----------------------------
+  // Runtime detection
+  // -----------------------------
   function detectRuntime(){
-    // explicit meta wins
-    const forced = getMeta("sx-runtime");
+    const forced = (getMeta("sx-runtime") || "").trim();
     if (forced) return forced.toUpperCase();
 
     const p = (location.pathname || "").toLowerCase();
-    const file = (p.split("/").pop() || "").toLowerCase();
+    const file = p.split("/").pop() || "";
 
     if (file === "replay.html" || file.includes("replay")) return "REPLAY";
-    if (file === "manifest.html" || file.includes("manifest")) return "MANIFEST";
-    if (file === "whitepaper.html" || file.includes("whitepaper")) return "WHITEPAPER";
-    if (file === "cases.html" || file.startsWith("case-") || file.includes("cases")) return "CASES";
-
+    if (file === "manifest.html" || file.includes("manifest") || file.includes("whitepaper")) return "MANIFEST";
+    if (file === "cases.html" || file.includes("cases") || file.startsWith("case-")) return "CASES";
     return "INDEX";
   }
 
-  function detectLayout(runtime){
-    // meta override wins
-    const forced = getMeta("sx-statusbar-layout").toLowerCase();
-    if (forced === "release" || forced === "governance") return forced;
-
-    // auto rule: replay/cases => governance; others => release
-    if (runtime === "REPLAY" || runtime === "CASES") return "governance";
-    return "release";
-  }
-
   function detectPolicy(){
-    return safeText(getMeta("sx-policy"), "DAG CONSTITUTION");
+    const v = (getMeta("sx-policy") || "").trim();
+    return v || "DAG CONSTITUTION";
   }
-
-  const runtime = detectRuntime();
-  const layout = detectLayout(runtime);
-
-  const build = safeText(getMeta("sx-build-date"), "unknown");
-  const version = safeText(getMeta("sx-version"), "unknown");
-  const commit = safeText(getMeta("sx-commit"), "unknown");
-  const policy = detectPolicy();
 
   // -----------------------------
-  // DOM inject
+  // Layout governance (per runtime)
+  // We only toggle pill visibility if the corresponding pill exists.
   // -----------------------------
-  function pillHTML(key, val, opts = {}){
-    const cls = ["sb-pill"];
-    if (opts.copy) cls.push("sb-copy");
-    const id = opts.id ? ` id="${opts.id}"` : "";
-    const title = opts.title ? ` title="${opts.title}"` : "";
-    const extra = opts.extraHTML || "";
-    const keyHTML = key ? `<span class="sb-key">${key}</span>` : "";
-    const valId = opts.valId ? ` id="${opts.valId}"` : "";
-    const valHTML = `<span class="sb-val"${valId}>${val}</span>`;
-    return `<span class="${cls.join(" ")}"${id}${title}>${keyHTML}${valHTML}${extra}</span>`;
+  function setDisplay(el, on){
+    if (!el) return;
+    el.style.display = on ? "" : "none";
   }
 
-  function enginePill(){
-    return `
-      <span class="sb-pill">
-        <span class="engine-dot" aria-hidden="true"></span>
-        <span class="sb-key">ENGINE</span>
-        <span class="sb-val">ACTIVE</span>
-      </span>
-    `.trim();
+  function findPillByValueEl(valueEl){
+    if (!valueEl) return null;
+    return valueEl.closest(".sb-pill");
   }
 
-  function policyPill(linkHref){
-    // release: allow link; governance: treat as evidence text
-    if (linkHref){
-      return `
-        <span class="sb-pill">
-          <span class="sb-muted">Policy:</span>
-          <a class="sb-link" href="${linkHref}">${policy}</a>
-        </span>
-      `.trim();
+  const pillRuntime = findPillByValueEl(elRuntime);
+  const pillTrace   = findPillByValueEl(elTraceB || elTraceA);
+  const pillVerdict = findPillByValueEl(elVerdict);
+  const pillPolicy  = findPillByValueEl(elPolicy);
+  const pillBuild   = findPillByValueEl(elBuild);
+  const pillVersion = findPillByValueEl(elVersion);
+  const pillCommit  = findPillByValueEl(elCommit);
+
+  function layoutFor(runtime){
+    // defaults
+    const show = {
+      runtime: true,
+      policy: true,
+      build: true,
+      version: true,
+      commit: true,
+      trace: false,
+      verdict: false,
+    };
+
+    if (runtime === "REPLAY"){
+      show.trace = true;
+      show.verdict = true;
     }
-    return pillHTML("POLICY", policy, { valId: "sb-policy" });
+
+    // MANIFEST/CASES/INDEX keep trace/verdict hidden by default
+    return show;
   }
 
-  function commitPill(){
-    // copy pill, unified
-    return `
-      <span class="sb-pill sb-copy" id="sb-commit-pill" title="Click to copy commit fingerprint">
-        <span class="sb-key">COMMIT</span>
-        <span class="sb-val" id="sb-commit">${commit}</span>
-        <span class="sb-muted" id="sb-commit-hint">⧉</span>
-      </span>
-    `.trim();
+  function applyLayout(runtime){
+    const r = String(runtime || "INDEX").toUpperCase();
+    const show = layoutFor(r);
+
+    setDisplay(pillRuntime, show.runtime);
+    setDisplay(pillPolicy, show.policy);
+    setDisplay(pillBuild, show.build);
+    setDisplay(pillVersion, show.version);
+    setDisplay(pillCommit, show.commit);
+    setDisplay(pillTrace, show.trace);
+    setDisplay(pillVerdict, show.verdict);
   }
-
-  function releaseLayoutHTML(){
-    // matches your earlier “前面的”语义
-    return `
-      <div class="statusbar" role="contentinfo" aria-label="System Status Bar" data-sx-layout="release">
-        <div class="statusbar-inner">
-          <div class="sb-left">
-            ${enginePill()}
-            ${pillHTML("BUILD", build, { valId: "sb-build" })}
-            ${pillHTML("VERSION", version, { valId: "sb-version" })}
-            ${commitPill()}
-          </div>
-
-          <div class="sb-right">
-            ${pillHTML("MODE", "INTERNAL PREVIEW")}
-            ${policyPill("#constitution")}
-          </div>
-        </div>
-      </div>
-    `.trim();
-  }
-
-  function governanceLayoutHTML(){
-    // matches your “后面的”治理语义
-    const trace = (runtime === "REPLAY") ? safeText(getTraceFromUrl(), "—") : "—";
-    return `
-      <div class="statusbar" role="contentinfo" aria-label="System Status Bar" data-sx-layout="governance">
-        <div class="statusbar-inner">
-          <div class="sb-left">
-            <span class="sb-pill">
-              <span class="engine-dot" aria-hidden="true"></span>
-              <span class="sb-key">RUNTIME</span>
-              <span class="sb-val" id="sb-runtime">${runtime}</span>
-            </span>
-
-            ${pillHTML("TRACE", trace, { valId: "sb-trace" })}
-          </div>
-
-          <div class="sb-right">
-            ${pillHTML("POLICY", policy, { valId: "sb-policy" })}
-            ${commitPill()}
-            ${pillHTML("VERDICT", safeText(getMeta("sx-verdict"), "UNRESOLVED"), { valId: "sb-verdict" })}
-          </div>
-        </div>
-      </div>
-    `.trim();
-  }
-
-  function inject(){
-    // prevent double-inject
-    if (document.querySelector(".statusbar[data-sx-layout]")) return;
-
-    const html = (layout === "governance") ? governanceLayoutHTML() : releaseLayoutHTML();
-    document.body.insertAdjacentHTML("beforeend", html);
-  }
-
-  inject();
 
   // -----------------------------
-  // Binder: fill meta -> dom
+  // Bind initial values
   // -----------------------------
-  const elBuild   = document.getElementById("sb-build");
-  const elVersion = document.getElementById("sb-version");
-  const elCommit  = document.getElementById("sb-commit");
-  const elPolicy  = document.getElementById("sb-policy");
-  const elRuntime = document.getElementById("sb-runtime");
-  const elTrace   = document.getElementById("sb-trace");
-  const elVerdict = document.getElementById("sb-verdict");
-
-  if (elBuild) elBuild.textContent = build;
-  if (elVersion) elVersion.textContent = version;
-  if (elCommit) elCommit.textContent = commit;
-  if (elPolicy) elPolicy.textContent = policy;
+  const runtime = detectRuntime();
   if (elRuntime) elRuntime.textContent = runtime;
 
-  // governance trace rule: only REPLAY shows actual trace; others show "—"
-  if (elTrace){
-    const trace = (runtime === "REPLAY") ? safeText(getTraceFromUrl(), "—") : "—";
-    elTrace.textContent = trace;
+  const policy = detectPolicy();
+  if (elPolicy) elPolicy.textContent = policy;
+
+  const buildDate = (getMeta("sx-build-date") || "").trim();
+  if (elBuild) elBuild.textContent = buildDate || "—";
+
+  const version = (getMeta("sx-version") || "").trim();
+  if (elVersion) elVersion.textContent = version || "—";
+
+  const commit = (getMeta("sx-commit") || "").trim();
+  if (elCommit) elCommit.textContent = commit || "—";
+
+  // trace: only REPLAY auto-fills from URL, others show —
+  if (elTraceA || elTraceB){
+    const t = (runtime === "REPLAY") ? getTraceFromUrl() : "";
+    const text = t ? t : "—";
+    if (elTraceA) elTraceA.textContent = text;
+    if (elTraceB) elTraceB.textContent = text;
   }
 
-  // verdict can be preset by meta (sx-verdict), default already filled
-  const presetVerdict = getMeta("sx-verdict");
-  if (presetVerdict && elVerdict) elVerdict.textContent = presetVerdict;
+  // verdict: default UNRESOLVED unless meta overrides
+  const presetVerdict = (getMeta("sx-verdict") || "").trim();
+  if (elVerdict) elVerdict.textContent = presetVerdict ? presetVerdict.toUpperCase() : (elVerdict.textContent || "UNRESOLVED");
 
-  // Commit copy behavior
-  (function bindCopyCommit(){
-    const pill = document.getElementById("sb-commit-pill");
-    if (!pill) return;
-
-    const hint = document.getElementById("sb-commit-hint");
-
-    pill.addEventListener("click", async () => {
-      try{
-        await navigator.clipboard.writeText(commit);
-        if (hint) hint.textContent = "COPIED";
-        if (window.SX_STATUSBAR && typeof window.SX_STATUSBAR.onCopy === "function"){
-          window.SX_STATUSBAR.onCopy({ ok: true, commit });
-        }
-        setTimeout(()=> { if (hint) hint.textContent = "⧉"; }, 1200);
-      }catch(e){
-        if (hint) hint.textContent = "COPY?";
-        if (window.SX_STATUSBAR && typeof window.SX_STATUSBAR.onCopy === "function"){
-          window.SX_STATUSBAR.onCopy({ ok: false, commit, error: String(e && e.message ? e.message : e) });
-        }
-        setTimeout(()=> { if (hint) hint.textContent = "⧉"; }, 1200);
-      }
-    });
-  })();
+  applyLayout(runtime);
 
   // -----------------------------
-  // Shared API (stable surface)
+  // Verdict dot governance
+  // -----------------------------
+  function setDot(mode){
+    if (!elDot) return;
+    const m = String(mode || "UNRESOLVED").toUpperCase();
+    elDot.classList.remove("verified","blocked","unverified");
+    if (m === "VERIFIED") elDot.classList.add("verified");
+    else if (m === "BLOCKED") elDot.classList.add("blocked");
+    else elDot.classList.add("unverified");
+  }
+
+  if (elVerdict) setDot(elVerdict.textContent);
+
+  // -----------------------------
+  // Click-to-copy commit (optional)
+  // Only if commit pill has class sb-copy
+  // -----------------------------
+  async function copyText(text){
+    const t = String(text || "");
+    if (!t) return false;
+
+    try{
+      await navigator.clipboard.writeText(t);
+      return true;
+    }catch(_){
+      try{
+        const ta = document.createElement("textarea");
+        ta.value = t;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        return true;
+      }catch(_2){
+        return false;
+      }
+    }
+  }
+
+  if (pillCommit && pillCommit.classList.contains("sb-copy")){
+    pillCommit.addEventListener("click", async () => {
+      const ok = await copyText(elCommit ? elCommit.textContent : commit);
+      if (!ok) return;
+      // subtle feedback
+      pillCommit.style.transform = "translateY(-1px)";
+      setTimeout(() => { pillCommit.style.transform = ""; }, 140);
+    });
+  }
+
+  // -----------------------------
+  // Shared API (single source)
   // -----------------------------
   window.SX_STATUSBAR = window.SX_STATUSBAR || {};
 
-  window.SX_STATUSBAR.setTrace = (t) => {
-    if (!elTrace) return;
-    elTrace.textContent = safeText(t, "—");
-  };
-
-  window.SX_STATUSBAR.setPolicy = (p) => {
-    // release layout has policy as link text in DOM without #sb-policy
-    // governance layout uses #sb-policy
-    const v = safeText(p, "DAG CONSTITUTION");
-    if (elPolicy) elPolicy.textContent = v;
-
-    // also update release policy link text if present
-    const link = document.querySelector('.statusbar[data-sx-layout="release"] .sb-link');
-    if (link) link.textContent = v;
+  window.SX_STATUSBAR.applyLayout = (r) => {
+    const t = String(r || "INDEX").toUpperCase();
+    applyLayout(t);
   };
 
   window.SX_STATUSBAR.setRuntime = (r) => {
-    if (!elRuntime) return;
-    elRuntime.textContent = safeText(r, "INDEX");
+    const t = String(r || "INDEX").toUpperCase();
+    if (elRuntime) elRuntime.textContent = t;
+    applyLayout(t);
+  };
+
+  window.SX_STATUSBAR.setPolicy = (p) => {
+    const t = (p || "").trim() || "DAG CONSTITUTION";
+    if (elPolicy) elPolicy.textContent = t;
+  };
+
+  window.SX_STATUSBAR.setBuildDate = (d) => {
+    const t = (d || "").trim() || "—";
+    if (elBuild) elBuild.textContent = t;
+  };
+
+  window.SX_STATUSBAR.setVersion = (v) => {
+    const t = (v || "").trim() || "—";
+    if (elVersion) elVersion.textContent = t;
+  };
+
+  window.SX_STATUSBAR.setCommit = (c) => {
+    const t = (c || "").trim() || "—";
+    if (elCommit) elCommit.textContent = t;
+  };
+
+  window.SX_STATUSBAR.setTrace = (trace) => {
+    const t = (trace || "").trim() || "—";
+    if (elTraceA) elTraceA.textContent = t;
+    if (elTraceB) elTraceB.textContent = t;
   };
 
   window.SX_STATUSBAR.setVerdict = (v) => {
-    if (!elVerdict) return;
-    elVerdict.textContent = safeText(v, "UNRESOLVED");
+    const t = String(v || "UNRESOLVED").trim().toUpperCase() || "UNRESOLVED";
+    if (elVerdict) elVerdict.textContent = t;
+    setDot(t);
+
+    // If verdict is being used, we typically want REPLAY layout,
+    // but we do NOT force runtime unless caller sets it.
   };
 
-  // Optional hook for pages (e.g. index audit drawer) to listen commit copy
-  // window.SX_STATUSBAR.onCopy = ({ok, commit}) => {}
 })();

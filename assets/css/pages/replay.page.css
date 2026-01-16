@@ -1,0 +1,361 @@
+/* pages/replay.page.css — Replay page-only styles
+   ✅ Page-only: replay layout / cards / drawer / video / buttons
+   ✅ Shared: tokens/bg/container/nav base/reveal/footer/statusbar => sx.core.css + sx.statusbar.css
+*/
+
+:root{
+  /* replay page layout */
+  --max: 1100px;
+  --replay-nav-h: 74px;
+
+  /* -----------------------------
+     Replay reading tone (override shared)
+     目的：回到“审计 / 证据”白灰态，而不是营销蓝
+     ----------------------------- */
+  --text: #e8ecf5;               /* 主文本：中性白 */
+  --text-muted: #93a0bd;         /* 正文 / 说明：中性灰（关键） */
+  --fg-muted: rgba(147,160,189,0.92);
+}
+
+/* -----------------------------
+   Fixed nav avoidance (constitution)
+   ----------------------------- */
+.replay-main{
+  padding-top: calc(var(--replay-nav-h) + 24px);
+}
+
+/* If your nav in replay has fixed height, enforce it here */
+nav{ height: var(--replay-nav-h); }
+.nav-content{
+  height: var(--replay-nav-h);
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 24px;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+/* -----------------------------
+   Brand block
+   ----------------------------- */
+.logo{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-size: 16px;
+  white-space: nowrap;
+  min-width: 0;
+}
+.logo-icon{
+  width: 36px; height: 36px;
+  border-radius: 12px;
+  background: var(--gradient-1);
+  display:grid;
+  place-items:center;
+  color:#071022;
+  font-weight: 900;
+  box-shadow: 0 10px 24px rgba(59,130,246,0.22);
+  flex: 0 0 auto;
+}
+.logo b{
+  background: var(--gradient-1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.logo-sub{
+  color: var(--text-muted);
+  font-weight: 800;
+}
+
+/* -----------------------------
+   Nav actions & replay buttons (replay-only button system)
+   ----------------------------- */
+.nav-actions{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap; /* buttons can wrap on mobile */
+  align-items:center;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.btn{
+  cursor:pointer;
+  user-select:none;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.04);
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  transition: 0.2s ease;
+  display:inline-flex;
+  align-items:center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(59,130,246,0.40);
+  background: rgba(59,130,246,0.10);
+}
+.btn.primary{
+  background: rgba(59,130,246,0.18);
+  border-color: rgba(59,130,246,0.55);
+  color: #dbe7ff;
+}
+
+/* -----------------------------
+   Header
+   ----------------------------- */
+header{ padding-bottom: 26px; }
+
+.kicker{
+  display:inline-flex;
+  align-items:center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
+  color: var(--text-muted); /* ✅ 不写死蓝/亮色，跟随阅读态 */
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.dot{
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  background: #4ade80;
+  box-shadow: 0 0 14px rgba(74,222,128,0.45);
+  animation: breathe 1.6s ease-in-out infinite;
+}
+@keyframes breathe{
+  0%,100% { opacity: 0.35; transform: scale(0.92); box-shadow: 0 0 8px rgba(74,222,128,0.35); }
+  50% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 18px rgba(74,222,128,0.75); }
+}
+
+.title{
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #fff 0%, #bcd6ff 45%, var(--accent-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+}
+.subtitle{
+  color: var(--text-muted);
+  font-size: 14.5px;
+  line-height: 1.9;
+  max-width: 85ch;
+}
+
+/* -----------------------------
+   Main grid / cards
+   ----------------------------- */
+.grid{
+  display:grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 18px;
+  align-items:start;
+  padding-bottom: 70px;
+}
+
+.card{
+  background: linear-gradient(135deg, var(--surface), var(--surface2));
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow-lg);
+}
+.card h3{
+  font-size: 14px;
+  color: #dbe7ff;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+/* ✅ chip 不再写死“营销蓝”，压回审计态（仍保留可辨识） */
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: rgba(219,231,255,0.92);
+  white-space: nowrap;
+}
+
+.status-pack{
+  display:inline-flex;
+  align-items:center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.status-led{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(239,68,68,0.9);
+  box-shadow: 0 0 14px rgba(239,68,68,0.35);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.status-led.verified{ background: rgba(74,222,128,0.95); box-shadow: 0 0 16px rgba(74,222,128,0.45); }
+.status-led.blocked{ background: rgba(250,204,21,0.95); box-shadow: 0 0 16px rgba(250,204,21,0.40); }
+.status-led.unverified{ background: rgba(239,68,68,0.95); box-shadow: 0 0 16px rgba(239,68,68,0.40); }
+
+.meta{
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.9;
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 14px;
+  overflow-x: auto;
+}
+
+/* ✅ KV 不要偏蓝，改成中性亮白（可读关键字） */
+.kv{ color: #dbe7ff; font-weight: 900; }
+
+.muted{ color: var(--text-muted); opacity: 0.9; }
+
+.semantic-note{
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  color: var(--text-muted);
+  font-size: 13.5px;
+  line-height: 1.8;
+}
+.semantic-note b{ color:#dbe7ff; }
+
+.video-frame{
+  margin-top: 10px;
+  border-radius: 18px;
+  overflow:hidden;
+  border: 1px solid rgba(59,130,246,0.22);
+  background: rgba(0,0,0,0.45);
+}
+video{
+  width: 100%;
+  height: auto;
+  display:block;
+  background:#000;
+}
+
+.row{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+/* copy buttons inside cards can reuse replay btn style */
+.card .btn.sb-copy{
+  border-color: rgba(59,130,246,0.24);
+  background: rgba(59,130,246,0.08);
+}
+.card .btn.sb-copy:hover{
+  border-color: rgba(59,130,246,0.40);
+  background: rgba(59,130,246,0.12);
+}
+
+/* Ensure inner sb-val truncates properly */
+.sb-key{
+  color: rgba(159,195,255,0.9);
+  font-weight: 800;
+  flex: 0 0 auto;
+}
+.sb-val{
+  color: #dbe7ff;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* -----------------------------
+   Audit drawer
+   ----------------------------- */
+#audit-drawer{
+  display:none;
+  position: fixed;
+
+  /* sits above statusbar (statusbar height is governed by sx.statusbar.css + body padding) */
+  bottom: calc(var(--sx-statusbar-h, 66px) + 12px);
+
+  right: 24px;
+  width: 340px;
+  background: #000;
+  border: 1px solid var(--accent-blue);
+  border-radius: 16px;
+  padding: 18px;
+  font-family: var(--mono);
+  font-size: 11px;
+  z-index: 2000;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+  max-height: 52vh;
+  overflow: auto;
+}
+
+.audit-title{
+  color: var(--accent-blue);
+  margin-bottom: 10px;
+  font-weight: 900;
+  border-bottom: 1px solid #333;
+  padding-bottom: 6px;
+}
+
+/* ✅ 日志行不写死营销蓝：跟随阅读态 */
+.log-line{
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  border-left: 2px solid transparent;
+  padding-left: 8px;
+  transition: 0.2s;
+  white-space: pre-wrap;
+}
+.log-line.ok{ border-color: #4ade80; }
+.log-line.warn{ border-color: #facc15; }
+.log-line.bad{ border-color: #ef4444; color: rgba(255,210,210,0.92); }
+
+/* -----------------------------
+   Responsive
+   ----------------------------- */
+@media (max-width: 980px){
+  .grid{ grid-template-columns: 1fr; }
+  #audit-drawer{ right: 12px; left: 12px; width: auto; }
+  .nav-content{ padding: 0 12px; }
+}
+
+@media (max-width: 420px){
+  .btn{ padding: 9px 10px; font-size: 11px; }
+  .logo{ font-size: 15px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation:none !important; transition:none !important; }
+  .dot{ animation:none !important; opacity: 1; }
+}

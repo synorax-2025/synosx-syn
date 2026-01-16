@@ -1,5 +1,6 @@
 /* sx.statusbar.css — SynOSX System Status Bar (shared)
    ✅ Mobile-safe + Safe-area governance + Gesture governance + Variable-level contrast
+   ✅ Verdict dot states (VERIFIED / BLOCKED / UNVERIFIED)
 */
 
 :root{
@@ -7,8 +8,8 @@
      Layout Constitution (shared)
      ----------------------------- */
 
-  /* 可被各页面覆盖的“制度变量” */
-  --sb-max: 1200px;
+  /* ✅ 跟随全站 --max（若页面未定义则回退 1200px） */
+  --sb-max: var(--max, 1200px);
 
   /* statusbar 视觉高度（页面让位的唯一真源） */
   --sx-statusbar-h: 66px;
@@ -16,7 +17,7 @@
   /* iOS / 系统安全区（制度外变量） */
   --sx-safe-bottom: env(safe-area-inset-bottom, 0px);
 
-  /* ✅ 抬高量：避免贴住 Home Indicator / 手势区（你确认 10px 可用） */
+  /* ✅ 抬高量：避免贴住 Home Indicator / 手势区 */
   --sx-statusbar-lift: 10px;
 
   /* 移动端：statusbar 单个 pill 最大宽度（配合省略号） */
@@ -148,15 +149,29 @@ body{
   text-underline-offset: 2px;
 }
 
-/* 可选：引擎灯 */
+/* ✅ 引擎灯（默认：UNVERIFIED，避免“没裁决却亮绿灯”） */
 .engine-dot{
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  background: rgba(74,222,128,0.95);
-  box-shadow: 0 0 14px rgba(74,222,128,0.45);
+  background: rgba(239,68,68,0.95);
+  box-shadow: 0 0 14px rgba(239,68,68,0.40);
   border: 1px solid rgba(255,255,255,0.12);
   flex: 0 0 auto;
+}
+
+/* Verdict dot states (used by sx.statusbar.js) */
+.engine-dot.verified{
+  background: rgba(74,222,128,0.95);
+  box-shadow: 0 0 14px rgba(74,222,128,0.45);
+}
+.engine-dot.blocked{
+  background: rgba(250,204,21,0.95);
+  box-shadow: 0 0 14px rgba(250,204,21,0.40);
+}
+.engine-dot.unverified{
+  background: rgba(239,68,68,0.95);
+  box-shadow: 0 0 14px rgba(239,68,68,0.40);
 }
 
 /* ✅ 小屏扩大 pill 宽度上限 */

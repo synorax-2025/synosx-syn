@@ -3,540 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>SynOSX Manifest / Whitepaper · 完整法典</title>
   <meta
     name="description"
     content="SynOSX Manifest / Whitepaper（完整法典）：制度先于实现、角色分离、S0–S6 治理运行时与证据链，构建可追溯、可表达、可进化（零降维）的治理系统。"
   />
 
-  <style>
-    :root {
-      --bg: #0a0e1a;
-      --surface: rgba(26, 32, 54, 0.72);
-      --surface2: rgba(18, 23, 43, 0.55);
-      --text: #e8ecf5;
-      --text-muted: #93a0bd;
-      --accent-blue: #3b82f6;
-      --accent-indigo: #6366f1;
-      --gradient-1: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-      --gradient-2: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
-      --shadow-lg: 0 25px 60px -18px rgba(0, 0, 0, 0.55);
-      --shadow-md: 0 16px 40px -20px rgba(0, 0, 0, 0.45);
-      --radius: 24px;
-      --max: 1200px;
-      --max-reading: 980px;
-    }
+  <!-- ✅ Statusbar Meta (Release Layout for Manifest) -->
+  <meta name="sx-runtime" content="MANIFEST" />
+  <meta name="sx-build-date" content="2026-01-13" />
+  <meta name="sx-version" content="v1.0.4-Stable" />
+  <meta name="sx-commit" content="ba...227" />
+  <meta name="sx-policy" content="DAG Constitution" />
+  <meta name="sx-statusbar-layout" content="release" />
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC",
-        "Hiragino Sans GB", "Microsoft YaHei", Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
-      line-height: 1.75;
-    }
-    a { color: inherit; text-decoration: none; }
-    p { color: var(--text-muted); }
-    strong, b { color: var(--text); }
+  <!-- ✅ Shared CSS -->
+  <link rel="stylesheet" href="assets/css/sx.core.css" />
+  <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
 
-    .bg-gradient {
-      position: fixed;
-      top: -35%;
-      left: -35%;
-      width: 170%;
-      height: 170%;
-      background:
-        radial-gradient(circle at 20% 40%, rgba(59, 130, 246, 0.12) 0%, transparent 55%),
-        radial-gradient(circle at 78% 70%, rgba(99, 102, 241, 0.12) 0%, transparent 55%),
-        radial-gradient(circle at 42% 10%, rgba(37, 99, 235, 0.08) 0%, transparent 55%);
-      pointer-events: none;
-      z-index: 0;
-      transform: translate3d(0,0,0);
-    }
-
-    .container {
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 0 24px;
-      position: relative;
-      z-index: 2;
-    }
-
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      backdrop-filter: blur(18px);
-      background: rgba(10, 14, 26, 0.72);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      transition: background 0.3s ease, box-shadow 0.3s ease;
-    }
-    nav.scrolled {
-      background: rgba(10, 14, 26, 0.92);
-      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.32);
-    }
-    .nav-content {
-      height: 76px;
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-    }
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      font-size: 18px;
-      white-space: nowrap;
-    }
-    .logo-icon {
-      width: 38px; height: 38px;
-      background: var(--gradient-1);
-      border-radius: 12px;
-      display: grid;
-      place-items: center;
-      box-shadow: 0 10px 24px rgba(59, 130, 246, 0.22);
-      color: #071022;
-      font-weight: 900;
-      user-select: none;
-    }
-    .logo span b {
-      background: var(--gradient-1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 14px;
-      list-style: none;
-      align-items: center;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-    .nav-links a {
-      color: var(--text-muted);
-      font-weight: 800;
-      font-size: 12px;
-      padding: 7px 9px;
-      border-radius: 10px;
-      border: 1px solid transparent;
-      transition: 0.25s ease;
-      white-space: nowrap;
-    }
-    .nav-links a:hover {
-      color: var(--text);
-      border-color: rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-    }
-
-    .cta-button {
-      padding: 11px 14px;
-      background: var(--gradient-1);
-      border: none;
-      border-radius: 12px;
-      color: #071022;
-      font-weight: 900;
-      font-size: 12px;
-      cursor: pointer;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 12px 24px rgba(59, 130, 246, 0.18);
-      white-space: nowrap;
-    }
-    .cta-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 16px 32px rgba(59, 130, 246, 0.28);
-    }
-    .btn-secondary {
-      padding: 11px 14px;
-      background: transparent;
-      border: 1px solid rgba(59, 130, 246, 0.55);
-      border-radius: 12px;
-      color: #9fc3ff;
-      font-weight: 900;
-      font-size: 12px;
-      cursor: pointer;
-      transition: 0.25s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      white-space: nowrap;
-    }
-    .btn-secondary:hover {
-      background: rgba(59, 130, 246, 0.12);
-      transform: translateY(-2px);
-    }
-
-    /* Hero */
-    .hero {
-      min-height: 88vh;
-      display: flex;
-      align-items: center;
-      padding-top: 96px;
-      padding-bottom: 64px;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero-content {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 46px;
-      align-items: center;
-      opacity: 0;
-      transform: translateY(18px);
-      animation: fadeInUp 0.9s ease forwards;
-    }
-    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-
-    .kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
-      color: #b8c5e6;
-      font-size: 12px;
-      margin-bottom: 14px;
-    }
-    .kicker .dot {
-      width: 8px; height: 8px;
-      border-radius: 999px;
-      background: var(--accent-blue);
-      box-shadow: 0 0 18px rgba(59,130,246,0.35);
-    }
-
-    .hero-text h1 {
-      font-size: clamp(38px, 4.8vw, 64px);
-      font-weight: 900;
-      line-height: 1.06;
-      margin-bottom: 18px;
-      letter-spacing: -0.03em;
-      background: linear-gradient(135deg, #ffffff 0%, #a9c8ff 40%, #3b82f6 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .hero-text .subtitle {
-      font-size: 15.5px;
-      color: var(--text-muted);
-      margin-bottom: 22px;
-      line-height: 1.95;
-      max-width: 72ch;
-    }
-
-    .hero-buttons {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-top: 6px;
-    }
-
-    .hero-card {
-      background: linear-gradient(135deg, var(--surface), var(--surface2));
-      border: 1px solid rgba(255, 255, 255, 0.10);
-      border-radius: var(--radius);
-      padding: 26px;
-      backdrop-filter: blur(16px);
-      transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
-      box-shadow: var(--shadow-lg);
-    }
-    .hero-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 34px 90px rgba(59, 130, 246, 0.16);
-      border-color: rgba(59, 130, 246, 0.28);
-    }
-    .card-title {
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #9fc3ff;
-      margin-bottom: 14px;
-    }
-    .card-item {
-      margin-bottom: 12px;
-      padding: 14px 14px;
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      transition: 0.25s ease;
-    }
-    .card-item:hover {
-      background: rgba(59, 130, 246, 0.07);
-      border-color: rgba(59, 130, 246, 0.22);
-    }
-    .card-item h4 {
-      font-size: 13px;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-    .card-item p {
-      font-size: 12.5px;
-      color: var(--text-muted);
-      line-height: 1.75;
-    }
-    .trace {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-top: 10px;
-      color: var(--text-muted);
-      font-size: 12px;
-    }
-    .trace code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 12px;
-      color: #d8e2ff;
-      background: rgba(99, 102, 241, 0.10);
-      border: 1px solid rgba(99, 102, 241, 0.18);
-      padding: 6px 8px;
-      border-radius: 10px;
-    }
-
-    section { padding: 92px 0; }
-    .section-header {
-      text-align: center;
-      margin-bottom: 44px;
-    }
-    .section-tag {
-      display: inline-block;
-      padding: 8px 16px;
-      background: rgba(59, 130, 246, 0.10);
-      border: 1px solid rgba(59, 130, 246, 0.26);
-      border-radius: 999px;
-      color: #9fc3ff;
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-    .section-title {
-      font-size: clamp(28px, 3.6vw, 44px);
-      font-weight: 900;
-      margin-bottom: 12px;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #fff 0%, #bcd6ff 45%, var(--accent-blue) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .section-subtitle {
-      font-size: 15px;
-      color: var(--text-muted);
-      max-width: 92ch;
-      margin: 0 auto;
-      line-height: 1.95;
-    }
-
-    /* Reading layout */
-    .reading {
-      max-width: var(--max-reading);
-      margin: 0 auto;
-    }
-
-    .toc-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      margin-top: 20px;
-      align-items: stretch;
-    }
-    .toc-card {
-      background: linear-gradient(135deg, rgba(26, 32, 54, 0.60), rgba(18, 23, 43, 0.45));
-      border: 1px solid rgba(255, 255, 255, 0.10);
-      border-radius: 20px;
-      padding: 22px;
-      box-shadow: var(--shadow-md);
-      transition: 0.25s ease;
-    }
-    .toc-card:hover {
-      transform: translateY(-5px);
-      border-color: rgba(59, 130, 246, 0.22);
-      box-shadow: 0 28px 70px rgba(59, 130, 246, 0.16);
-    }
-    .toc-card h3 {
-      font-size: 16px;
-      margin-bottom: 10px;
-      color: #dbe7ff;
-    }
-    .toc-list {
-      list-style: none;
-      display: grid;
-      gap: 10px;
-    }
-    .toc-list a {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.18);
-      color: #cfe0ff;
-      font-weight: 900;
-      font-size: 13px;
-      transition: 0.2s ease;
-    }
-    .toc-list a:hover {
-      background: rgba(59, 130, 246, 0.10);
-      border-color: rgba(59, 130, 246, 0.22);
-      transform: translateY(-1px);
-    }
-    .toc-meta {
-      color: var(--text-muted);
-      font-weight: 900;
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
-      white-space: nowrap;
-    }
-
-    /* Chapter blocks */
-    .chapter {
-      padding-top: 18px;
-    }
-    .chapter-card {
-      background: linear-gradient(135deg, rgba(26, 32, 54, 0.55), rgba(18, 23, 43, 0.40));
-      border: 1px solid rgba(255, 255, 255, 0.10);
-      border-radius: 20px;
-      padding: 26px;
-      box-shadow: var(--shadow-md);
-      position: relative;
-      overflow: hidden;
-    }
-    .chapter-card::before{
-      content:"";
-      position:absolute;
-      top:0; left:0; right:0;
-      height:2px;
-      background: var(--gradient-1);
-      opacity: 0.85;
-    }
-    .chapter-head {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-    .chapter-k {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      color: #9fc3ff;
-      font-weight: 900;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-size: 12px;
-    }
-    .chapter-title {
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: -0.01em;
-      color: var(--text);
-      margin-top: 2px;
-    }
-    .chapter-sub {
-      color: var(--text-muted);
-      font-size: 13.5px;
-      font-weight: 900;
-    }
-    .chapter-body {
-      display: grid;
-      gap: 14px;
-      margin-top: 14px;
-    }
-    .chapter-body p {
-      font-size: 14.5px;
-      line-height: 2.0;
-    }
-    .chapter-body h4 {
-      color: #dbe7ff;
-      font-size: 14px;
-      margin-top: 10px;
-      margin-bottom: 2px;
-      letter-spacing: -0.01em;
-    }
-    .callout {
-      border-radius: 18px;
-      border: 1px solid rgba(59, 130, 246, 0.22);
-      background: rgba(59, 130, 246, 0.08);
-      padding: 16px 16px;
-      color: #cfe0ff;
-      font-weight: 900;
-      line-height: 1.9;
-    }
-    .callout span {
-      display: inline-block;
-      background: rgba(0,0,0,0.22);
-      border: 1px solid rgba(255,255,255,0.10);
-      padding: 4px 10px;
-      border-radius: 999px;
-      color: #dbe7ff;
-      font-size: 12px;
-      margin-right: 10px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-    }
-    .rule-list {
-      list-style: none;
-      display: grid;
-      gap: 10px;
-      margin-top: 6px;
-    }
-    .rule-list li {
-      color: var(--text-muted);
-      font-size: 14px;
-      line-height: 1.9;
-      padding-left: 14px;
-      position: relative;
-    }
-    .rule-list li:before{
-      content:"•";
-      position:absolute;
-      left:0;
-      color: rgba(159, 179, 255, 0.95);
-    }
-
-    footer {
-      padding: 34px 0 46px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-
-    .reveal { opacity: 0; transform: translateY(20px); transition: 0.7s ease; }
-    .reveal.active { opacity: 1; transform: translateY(0); }
-
-    @media (max-width: 1100px) {
-      .nav-links { display: none; }
-    }
-    @media (max-width: 980px) {
-      .hero-content { grid-template-columns: 1fr; gap: 22px; }
-      .toc-grid { grid-template-columns: 1fr; }
-    }
-    @media (prefers-reduced-motion: reduce){
-      * { animation: none !important; transition: none !important; }
-    }
-  </style>
+  <!-- ✅ Page CSS -->
+  <link rel="stylesheet" href="assets/css/pages/manifest.page.css" />
 </head>
 
 <body>
@@ -546,7 +33,7 @@
     <div class="nav-content">
       <a class="logo" href="#top" aria-label="SynOSX Manifest">
         <div class="logo-icon">SX</div>
-        <span><b>SynOSX</b> <span style="color:var(--text-muted); font-weight:900;">· Manifest</span></span>
+        <span><b>SynOSX</b> <span class="logo-sub">· Manifest</span></span>
       </a>
 
       <ul class="nav-links">
@@ -563,13 +50,14 @@
         <li><a href="#c10">Ch.10</a></li>
       </ul>
 
-      <div style="display:flex; gap:10px; align-items:center;">
+      <div class="nav-actions">
         <a class="btn-secondary" href="index.html">返回首页</a>
         <a class="cta-button" href="#toc">开始阅读</a>
       </div>
     </div>
   </nav>
 
+  <!-- Hero -->
   <section class="hero" id="top">
     <div class="container">
       <div class="hero-content">
@@ -663,7 +151,7 @@
     </div>
   </section>
 
-  <!-- Chapter 1 -->
+ <!-- Chapter 1 -->
   <section id="c1">
     <div class="container">
       <div class="section-header reveal">
@@ -1099,19 +587,12 @@
     </div>
   </footer>
 
-  <script>
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 12) navbar.classList.add('scrolled');
-      else navbar.classList.remove('scrolled');
-    });
+  <!-- ✅ Shared JS -->
+  <script src="assets/js/sx.statusbar.js"></script>
+  <script src="assets/js/sx.core.js"></script>
 
-    const reveals = document.querySelectorAll('.reveal');
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
-    }, { threshold: 0.12 });
-    reveals.forEach(el => io.observe(el));
-  </script>
+  <!-- ✅ Page runtime -->
+  <script src="assets/js/runtime/manifest.runtime.js"></script>
 
   <!--
   Self-Audit (Manifest Edition):

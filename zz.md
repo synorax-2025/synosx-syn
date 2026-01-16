@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>SynOSX Manifest / Whitepaper · 完整法典</title>
+  <meta
+    name="description"
+    content="SynOSX Manifest / Whitepaper（完整法典）：制度先于实现、角色分离、S0–S6 治理运行时与证据链，构建可追溯、可表达、可进化（零降维）的治理系统。"
+  />
+
+  <!-- ✅ Statusbar Meta (Release Layout for Manifest) -->
+  <meta name="sx-runtime" content="MANIFEST" />
+  <meta name="sx-build-date" content="2026-01-13" />
+  <meta name="sx-version" content="v1.0.4-Stable" />
+  <meta name="sx-commit" content="ba...227" />
+  <meta name="sx-policy" content="DAG Constitution" />
+  <meta name="sx-statusbar-layout" content="release" />
+
+  <!-- ✅ Shared CSS -->
+  <link rel="stylesheet" href="assets/css/sx.core.css" />
+  <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
+
+  <!-- ✅ Page CSS -->
+  <link rel="stylesheet" href="assets/css/pages/manifest.page.css" />
+</head>
+
+<body>
+  <div class="bg-gradient" aria-hidden="true"></div>
+
+  <nav id="navbar" aria-label="Manifest Navigation">
+    <div class="nav-content">
+      <a class="logo" href="#top" aria-label="SynOSX Manifest">
+        <div class="logo-icon">SX</div>
+        <span><b>SynOSX</b> <span class="logo-sub">· Manifest</span></span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#toc">目录</a></li>
+        <li><a href="#c1">Ch.1</a></li>
+        <li><a href="#c2">Ch.2</a></li>
+        <li><a href="#c3">Ch.3</a></li>
+        <li><a href="#c4">Ch.4</a></li>
+        <li><a href="#c5">Ch.5</a></li>
+        <li><a href="#c6">Ch.6</a></li>
+        <li><a href="#c7">Ch.7</a></li>
+        <li><a href="#c8">Ch.8</a></li>
+        <li><a href="#c9">Ch.9</a></li>
+        <li><a href="#c10">Ch.10</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a class="btn-secondary" href="index.html">返回首页</a>
+        <a class="cta-button" href="#toc">开始阅读</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero" id="top">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-text">
+          <div class="kicker"><span class="dot"></span> 完整法典 · Constitution-level · Implementation-agnostic</div>
+          <h1>SynOSX<br/>Manifest / Whitepaper</h1>
+          <p class="subtitle">
+            这不是产品说明书，也不是实现文档。它是一部<strong>治理法典</strong>：以制度为主权，要求系统的每一次关键行为
+            都能被<strong>追溯</strong>、被<strong>表达</strong>、并在演进中保持<strong>不腐蚀的成长</strong>（零降维）。
+          </p>
+
+          <div class="hero-buttons">
+            <a href="#toc" class="cta-button">进入目录</a>
+            <a href="#c2" class="btn-secondary">直接阅读三铁律</a>
+          </div>
+        </div>
+
+        <aside class="hero-card" aria-label="Manifest Lens">
+          <div class="card-title">Manifest Lens</div>
+
+          <div class="card-item">
+            <h4>制度不是装饰</h4>
+            <p>治理不是“更聪明”，而是“更自律”：把判断权制度化，让系统能解释自己。</p>
+          </div>
+          <div class="card-item">
+            <h4>角色必须分离</h4>
+            <p>解释者、裁决者、执行者不可混用；没有裁决，就没有执行。</p>
+          </div>
+          <div class="card-item">
+            <h4>证据高于叙事</h4>
+            <p>治理靠事实证据存在：允许与阻断都必须可定位、可回放、可复核。</p>
+          </div>
+
+          <div class="trace">
+            Manifest 版本 <code>v1.0 (publish-ready)</code>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOC -->
+  <section id="toc">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Table of Contents</span>
+        <h2 class="section-title">目录</h2>
+        <p class="section-subtitle">
+          本文按“法典结构”组织：从问题立案、最高法原则、结构法、制度器官法，再到证据与判例，最后以边界与文明选择收束。
+        </p>
+      </div>
+
+      <div class="reading">
+        <div class="toc-grid">
+          <div class="toc-card reveal">
+            <h3>总则与原则</h3>
+            <ul class="toc-list">
+              <li><a href="#c1"><span>Chapter 1 · The Constitutional Problem</span><span class="toc-meta">失效根源</span></a></li>
+              <li><a href="#c2"><span>Chapter 2 · Core Principles</span><span class="toc-meta">三铁律</span></a></li>
+              <li><a href="#c3"><span>Chapter 3 · Governance Architecture</span><span class="toc-meta">角色分离</span></a></li>
+            </ul>
+          </div>
+
+          <div class="toc-card reveal">
+            <h3>结构法与器官法</h3>
+            <ul class="toc-list">
+              <li><a href="#c4"><span>Chapter 4 · Governance Runtime (S0–S6)</span><span class="toc-meta">运行时宪章</span></a></li>
+              <li><a href="#c5"><span>Chapter 5 · Voice & Authority</span><span class="toc-meta">发声权</span></a></li>
+              <li><a href="#c6"><span>Chapter 6 · Contracts-first World</span><span class="toc-meta">制度先于实现</span></a></li>
+            </ul>
+          </div>
+
+          <div class="toc-card reveal">
+            <h3>方法论与证据</h3>
+            <ul class="toc-list">
+              <li><a href="#c7"><span>Chapter 7 · Operational Evidence</span><span class="toc-meta">证据法</span></a></li>
+              <li><a href="#c8"><span>Chapter 8 · Case Study</span><span class="toc-meta">判例</span></a></li>
+            </ul>
+          </div>
+
+          <div class="toc-card reveal">
+            <h3>判例与收束</h3>
+            <ul class="toc-list">
+              <li><a href="#c9"><span>Chapter 9 · Scope & Non-Goals</span><span class="toc-meta">克制声明</span></a></li>
+              <li><a href="#c10"><span>Chapter 10 · Conclusion</span><span class="toc-meta">文明选择</span></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+ <!-- Chapter 1 -->
+  <section id="c1">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Chapter 1</span>
+        <h2 class="section-title">The Constitutional Problem</h2>
+        <p class="section-subtitle">Why Modern Systems Fail at Governance</p>
+      </div>
+
+      <div class="reading chapter reveal">
+        <div class="chapter-card">
+          <div class="chapter-head">
+            <div>
+              <div class="chapter-k">CONSTITUTIONAL PROBLEM</div>
+              <div class="chapter-title">治理失效的根源</div>
+            </div>
+            <div class="chapter-sub">问题建模章</div>
+          </div>
+
+          <div class="chapter-body">
+            <p>现代系统的失败，很少源于“功能不足”。绝大多数失败，源于<strong>系统无法解释自己的行为</strong>。</p>
+
+            <h4>1.1 隐形路径（Invisible Paths）</h4>
+            <p>真正危险的行为往往不发生在官方入口，而发生在绕过流程的临时调用、被默许的捷径、只在特殊情况下启用的后门。它们共同点是：无法被制度感知，却真实影响系统结果。系统可能“看起来正常”，但已失去对自身行为的主权。</p>
+
+            <h4>1.2 越权执行与事后合理化</h4>
+            <p>当执行权缺乏前置裁决时，系统只能事后寻找解释：行为先发生，结果不可逆，再用“效率/紧急”合理化。治理退化为叙事：错误被包装、权力被转移。</p>
+
+            <h4>1.3 不可回放的决策链</h4>
+            <p>无法回放历史的系统，本质上是不负责任的系统。若无法复现“来源—依据—规则—例外—结果”的链路，那么日志与告警只是碎片，而非事实。</p>
+
+            <h4>1.4 “信任”被错误地当作前提</h4>
+            <p>复杂度越高，越不能依赖信任。AI 引入后，不确定性被放大。信任不应是前提，而应是制度运行后的结果。</p>
+
+            <div class="callout">
+              <span>结论</span>
+              如果系统行为无法被制度解释，那么系统就不具备长期存在的资格。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 2 -->
+  <section id="c2">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Chapter 2</span>
+        <h2 class="section-title">Core Principles</h2>
+        <p class="section-subtitle">The Three Irreducible Laws of Governance</p>
+      </div>
+
+      <div class="reading chapter reveal">
+        <div class="chapter-card">
+          <div class="chapter-head">
+            <div>
+              <div class="chapter-k">HIGH LAW</div>
+              <div class="chapter-title">三铁律（不可被打破）</div>
+            </div>
+            <div class="chapter-sub">最高法 · 后文一切推论之源</div>
+          </div>
+
+          <div class="chapter-body">
+            <p>这三条原则不是最佳实践，而是可长期存在系统的不可约条件。凡不满足任一原则的系统，即便短期可运行，也必然在规模、时间或复杂度面前失效。</p>
+
+            <h4>2.1 Traceability（可追溯性）</h4>
+            <p>每一次关键行为必须可回答：从何而来、在何上下文发生、依据哪些规则被允许或拒绝、对系统状态造成何影响。可追溯性是系统对自身行为承担责任的前提。不可追溯的行为视为非法行为。</p>
+
+            <h4>2.2 Expressibility（可表达性）</h4>
+            <p>规则、边界与裁决条件必须能被明确写成制度文本，而非依赖隐式约定或个人经验。凡无法被表达为制度的规则，不具备约束系统行为的合法性。</p>
+
+            <h4>2.3 Growth without Corruption（可进化而不腐蚀）</h4>
+            <p>系统必须在规则增加、模块替换、参与者变化、AI 引入时持续演进，同时不破坏边界与责任结构。演进必须显式、依赖必须合法、变化必须可回溯。绕过规则的扩展属于结构腐蚀。</p>
+
+            <div class="callout">
+              <span>不可拆分</span>
+              没有追溯则表达失效；没有表达则追溯无法裁决；没有可进化性则治理只能停留在过去。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 3 -->
+  <section id="c3">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Chapter 3</span>
+        <h2 class="section-title">Governance Architecture</h2>
+        <p class="section-subtitle">Why Roles Must Be Separated</p>
+      </div>
+
+      <div class="reading chapter reveal">
+        <div class="chapter-card">
+          <div class="chapter-head">
+            <div>
+              <div class="chapter-k">STRUCTURAL LAW</div>
+              <div class="chapter-title">角色分离（解释 / 裁决 / 执行）</div>
+            </div>
+            <div class="chapter-sub">结构法 · 治理存在的前提</div>
+          </div>
+
+          <div class="chapter-body">
+            <p>治理失败常源于同一主体承担过多角色：解释规则的人同时执行规则、发起请求的人同时决定是否允许、实现功能的模块同时定义边界。权力无法被制衡时，治理失去可能性。</p>
+
+            <h4>3.1 三种不可合并的角色</h4>
+            <ul class="rule-list">
+              <li><b>Interpreter（解释者）</b>：理解输入，将请求转化为结构化意图；不具裁决与执行权。</li>
+              <li><b>Arbiter（裁决者）</b>：依据制度判断允许或拒绝；不直接改变业务状态。</li>
+              <li><b>Executor（执行者）</b>：只执行被允许的行为；不解释规则，不判断合法性。</li>
+            </ul>
+
+            <h4>3.2 为什么 AI 必须不执行</h4>
+            <p>AI 具备表达能力，但不具备主权责任。AI 的合法位置是解释者，不是执行者。允许 AI 直接执行将导致裁决权隐式转移、责任无法归因、治理失效。</p>
+
+            <div class="callout">
+              <span>裁决链</span>
+              Input → Intent → Decision → Execution → Record（任何跳过任一环的行为，视为非法路径）
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 4 -->
+  <section id="c4">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Chapter 4</span>
+        <h2 class="section-title">The Governance Runtime</h2>
+        <p class="section-subtitle">How Structure Becomes Operable (S0–S6)</p>
+      </div>
+
+      <div class="reading chapter reveal">
+        <div class="chapter-card">
+          <div class="chapter-head">
+            <div>
+              <div class="chapter-k">RUNTIME CHARTER</div>
+              <div class="chapter-title">治理运行时（S0–S6）</div>
+            </div>
+            <div class="chapter-sub">制度器官法</div>
+          </div>
+
+          <div class="chapter-body">
+            <p>治理只有在持续运行、反复裁决、长期记录时才存在。SynOSX 将治理结构落实为职责清晰、边界不可混用的制度器官：S0–S6。</p>
+
+            <h4>4.1 S0 — System Integrity</h4>
+            <p>系统完整性：环境、结构与健康。没有底座一致性与可诊断性，就没有治理资格。</p>
+
+            <h4>4.2 S1 — Intent</h4>
+            <p>把输入转化为可被制度理解的意图：明确边界、消除歧义、生成可校验的行为声明。</p>
+
+            <h4>4.3 S2 — Firewall</h4>
+            <p>制度裁决中枢：谁被允许、在何条件下被允许。未被明确允许的行为，视为被禁止。</p>
+
+            <h4>4.4 S3 — Audit</h4>
+            <p>事实记录系统：记录制度关心的事实，使历史可回放，而非靠叙事解释。</p>
+
+            <h4>4.5 S4 — Dictionary</h4>
+            <p>语义一致性：统一术语、概念与对象含义，防止同名不同义导致制度腐蚀。</p>
+
+            <h4>4.6 S5–S6 — NLP & Persona</h4>
+            <p>处理表达方式：自然语言到意图、交互风格调节。它们不拥有裁决权，更不拥有执行权。</p>
+
+            <div class="callout">
+              <span>顺序不可跳</span>
+              S0–S6 的顺序不可颠倒、合并或跳过：完整性 → 意图 → 裁决 → 审计 → 语义 → 表达。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 5 -->
+  <section id="c5">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Chapter 5</span>
+        <h2 class="section-title">Voice & Authority</h2>
+        <p class="section-subtitle">Who Is Allowed to Speak to the System</p>
+      </div>
+
+      <div class="reading chapter reveal">
+        <div class="chapter-card">
+          <div class="chapter-head">
+            <div>
+              <div class="chapter-k">AUTHORITY BOUNDARY</div>
+              <div class="chapter-title">发声权（Voice）即权力入口</div>
+            </div>
+            <div class="chapter-sub">宪法级边界</div>
+          </div>
+
+          <div class="chapter-body">
+            <p>最先被忽视的不是执行权，而是发声权。系统一旦接受输入，就承认了其影响系统状态的合法可能性：<b>所有输入，都是一种权力</b>。</p>
+
+            <h4>5.1 权威先于行动</h4>
+            <p>任何行为发生之前，必须回答：这个发声源是否具备对系统发声的合法性？这不是权限校验，而是治理前提。发声源不被承认，就不应生成意图、不应进入裁决、更不应触发执行。</p>
+
+            <h4>5.2 被承认的发声源 vs 匿名输入</h4>
+            <ul class="rule-list">
+              <li><b>Recognized Voice</b>：身份明确、入口制度化、行为可归因可回放。</li>
+              <li><b>Anonymous Input</b>：无法建立责任归属、无法确认裁决上下文、无法纳入审计链。</li>
+            </ul>
+
+            <h4>5.3 VoiceWall（发声权之墙）</h4>
+            <p>发声权必须被制度化：谁能在什么语境下对系统发声、可发声到什么粒度、可触发哪些意图类型。发声权的缺失会直接导致“越权建议”被误当成“合法请求”。</p>
+
+            <div class="callout">
+              <span>宪法句</span>
+              系统不接受匿名、越权或未被认可的发声源；一切意图必须来自可被制度裁决的入口。
+            </div>
+
+            <h4>5.4 AI 与发声授权</h4>
+            <p>AI 的发声权必须被明确授权，且始终以代理身份存在。否则系统将无法区分建议、越权与错误。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 6 -->
+  <section id="c6">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Chapter 6</span>
+        <h2 class="section-title">Contracts-first World</h2>
+        <p class="section-subtitle">Why Institutions Must Precede Implementations</p>
+      </div>
+
+      <div class="reading chapter reveal">
+        <div class="chapter-card">
+          <div class="chapter-head">
+            <div>
+              <div class="chapter-k">METHOD LAW</div>
+              <div class="chapter-title">制度先于实现（Contracts-first）</div>
+            </div>
+            <div class="chapter-sub">可替换实现 · 稳定制度</div>
+          </div>
+
+          <div class="chapter-body">
+            <p>当实现先于制度，治理只能追认既成事实；当制度先于实现，治理才成为结构。SynOSX 的立场不可妥协：<b>制度必须先于实现存在</b>。</p>
+
+            <h4>6.1 契约是什么</h4>
+            <p>契约不是接口说明，而是制度声明：什么行为被允许、在何条件下被允许、成功/失败意味着什么、责任如何归属。契约定义“世界可以发生什么”，而非“代码怎么写”。</p>
+
+            <h4>6.2 唯一真源</h4>
+            <p>规则不能分散在代码假设、文档注释与人的记忆里。治理相关规则必须存在于可识别、可校验、可版本化的契约之中；实现层只负责解释并遵守。</p>
+
+            <h4>6.3 校验不是执行</h4>
+            <p>校验是执行的前置条件：没有被校验通过的行为，不应被允许进入执行阶段。</p>
+
+            <div class="callout">
+              <span>可替换</span>
+              技术会变化，但制度不应动摇：实现可替换、运行时可升级，只要契约成立，治理身份不变。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 7 -->
+  <section id="c7">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Chapter 7</span>
+        <h2 class="section-title">Operational Evidence</h2>
+        <p class="section-subtitle">When Governance Becomes Observable</p>
+      </div>
+
+      <div class="reading chapter reveal">
+        <div class="chapter-card">
+          <div class="chapter-head">
+            <div>
+              <div class="chapter-k">EVIDENCE LAW</div>
+              <div class="chapter-title">证据法：治理必须可被证明正在运行</div>
+            </div>
+            <div class="chapter-sub">证据高于叙事</div>
+          </div>
+
+          <div class="chapter-body">
+            <p>治理如果只能被宣称而无法被证明，就仍停留在理念层。SynOSX 不要求系统永远正确，而要求系统永远能解释自己。治理是否存在，取决于是否存在可验证的运行证据。</p>
+
+            <h4>7.1 什么是治理证据</h4>
+            <p>治理证据必须：可定位、可回放、可复核、可归因。它回答“为什么允许/拒绝”，而不仅是“发生了什么”。</p>
+
+            <h4>7.2 允许与阻断都是证据</h4>
+            <p>只记录成功无法证明治理能力。被阻断意味着制度被触发、边界生效、裁决权未被绕过。一个从不阻断任何请求的系统，不是稳定，而是失守。</p>
+
+            <div class="callout">
+              <span>缺失也是证据</span>
+              证据缺失本身就是证据：它说明制度未在该路径上生效。治理是可判断的存在或缺失，而非“尽量做到”。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 8 -->
+  <section id="c8">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Chapter 8</span>
+        <h2 class="section-title">Case Study</h2>
+        <p class="section-subtitle">A Verifiable System in Practice</p>
+      </div>
+
+      <div class="reading chapter reveal">
+        <div class="chapter-card">
+          <div class="chapter-head">
+            <div>
+              <div class="chapter-k">CASE LAW</div>
+              <div class="chapter-title">判例：可治理系统在真实复杂度下如何成立</div>
+            </div>
+            <div class="chapter-sub">实践证明 · 非产品故事</div>
+          </div>
+
+          <div class="chapter-body">
+            <p>本章展示的不是一个“成功的系统”，而是一个可被治理的系统：当冲突、风险与复杂性出现时，制度是否真的介入并裁决。</p>
+
+            <h4>8.1 真实复杂度背景</h4>
+            <p>系统包含多角色参与（人/自动化/AI）、高频外部请求、可变规则、长链路依赖。治理前的核心风险不是技术故障，而是来源不清、权限绕行、历史不可回放。</p>
+
+            <h4>8.2 一个具体裁决场景</h4>
+            <p>一次高权限动作请求语义合理，但缺乏可确认的发声授权。治理体系中：请求被转化为意图，发声资格被前置检查，裁决在执行前发生，行为被明确拒绝。拒绝不是错误，而是制度成功运行的体现。</p>
+
+            <h4>8.3 证据在场</h4>
+            <p>每一次裁决都有证据，每一次拒绝有明确依据，每一次执行可回放。没有“特殊情况”的解释空间，也没有“内部约定”的灰区。</p>
+
+            <div class="callout">
+              <span>判例意义</span>
+              它证明：错误不会被隐藏，越界不会被默许，历史不会被覆盖。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 9 -->
+  <section id="c9">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Chapter 9</span>
+        <h2 class="section-title">Scope & Non-Goals</h2>
+        <p class="section-subtitle">What This System Deliberately Does Not Do</p>
+      </div>
+
+      <div class="reading chapter reveal">
+        <div class="chapter-card">
+          <div class="chapter-head">
+            <div>
+              <div class="chapter-k">BOUNDARY STATEMENT</div>
+              <div class="chapter-title">边界与非目标：克制是可信度的一部分</div>
+            </div>
+            <div class="chapter-sub">不做什么同样重要</div>
+          </div>
+
+          <div class="chapter-body">
+            <p>任何制度若不声明边界，都会被误解为“什么都想管”。SynOSX 不是试图解决所有问题的系统，而是一套只对治理负责的制度体系。</p>
+
+            <ul class="rule-list">
+              <li><b>治理不是自动化</b>：目标不是让事情自动发生，而是让事情只在被允许时发生。</li>
+              <li><b>治理不是智能最大化</b>：价值不在推理能力，而在自我约束能力。</li>
+              <li><b>治理不是可开关的功能</b>：治理要么存在，要么不存在；可选择忽略即失去治理。</li>
+              <li><b>治理不替代领域逻辑</b>：不评判业务正确性，只关心行为是否在允许边界内发生。</li>
+              <li><b>治理不建立在信任之上</b>：信任是制度运行后的结果，而非输入前提。</li>
+            </ul>
+
+            <div class="callout">
+              <span>代价</span>
+              SynOSX 接受“更慢的捷径、更少的魔法”，以换取长期可治理性与可托付性。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 10 -->
+  <section id="c10">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Chapter 10</span>
+        <h2 class="section-title">Conclusion</h2>
+        <p class="section-subtitle">Governance as a Civilizational Choice</p>
+      </div>
+
+      <div class="reading chapter reveal">
+        <div class="chapter-card">
+          <div class="chapter-head">
+            <div>
+              <div class="chapter-k">FINAL STATEMENT</div>
+              <div class="chapter-title">治理是一种文明选择</div>
+            </div>
+            <div class="chapter-sub">收官章 · 价值落点</div>
+          </div>
+
+          <div class="chapter-body">
+            <p>能力扩展并不必然带来责任成熟。当系统参与决策、影响现实、放大后果时，真正稀缺的不再是算力或算法，而是自我约束能力。</p>
+
+            <h4>10.1 超越功能</h4>
+            <p>功能回答“能不能做”，治理回答“该不该做”。没有治理的系统只是更快地执行错误的机器。SynOSX 选择让系统知道自己不能做什么。</p>
+
+            <h4>10.2 AI 的位置</h4>
+            <p>AI 扩展表达能力，也放大不确定性。在被治理的系统中，AI 可以建议与表达，但不拥有主权；主权属于制度，而不是模型。</p>
+
+            <h4>10.3 信任的生成</h4>
+            <p>信任不是被给予的，而是被证据赢得的：持续裁决、持续记录、持续阻断越界，才会形成长期依赖。</p>
+
+            <div class="callout">
+              <span>最终声明</span>
+              SynOSX 不承诺完美系统；它承诺错误不被隐藏、权力不被模糊、历史不被覆盖。治理不是限制未来，而是让未来仍然可被理解。
+            </div>
+
+            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top: 14px;">
+              <a class="cta-button" href="#top">回到顶部</a>
+              <a class="btn-secondary" href="index.html">回到首页</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      © 2026 SynOSX · Manifest / Whitepaper — Constitution-level · Contracts-first · Zero-Reduction
+    </div>
+  </footer>
+
+  <!-- ✅ Shared JS -->
+  <script src="assets/js/sx.statusbar.js"></script>
+  <script src="assets/js/sx.core.js"></script>
+
+  <!-- ✅ Page runtime -->
+  <script src="assets/js/runtime/manifest.runtime.js"></script>
+
+  <!--
+  Self-Audit (Manifest Edition):
+  1) 全文保持制度语言：不绑定工程名、不暴露实现路径。
+  2) 角色分离清晰：解释/裁决/执行不可混用。
+  3) 证据链为核心：允许与阻断都必须可回放。
+  -->
+</body>
+</html>

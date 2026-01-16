@@ -1,7 +1,6 @@
 <!-- replay.html  (SynOSX Audit Replay Runtime)
      用法示例：
-     replay.html?trace=rc_2026-01-12T0730Z_0001
-     replay.html?trace=rc_2026-01-15T0210Z_0002
+     replay.html?trace=rc_brand_15s_v1
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -26,8 +25,16 @@
       --max: 1100px;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
 
-      /* ✅ 制度变量：fixed nav 高度（遮挡修复的唯一真源） */
+      /* ✅ 制度变量：fixed nav 高度（遮挡修复唯一真源） */
       --replay-nav-h: 74px;
+
+      /* ✅ 移动端证据条可用宽度（防止 policy/trace 挤爆） */
+      --sb-max-pill: 44vw;
+
+      /* ✅ 对比度治理（变量级：不改主题，只保证可读性下限） */
+      --contrast-hi: rgba(255,255,255,0.92);
+      --contrast-md: rgba(232,236,245,0.86);
+      --contrast-lo: rgba(147,160,189,0.92);
     }
 
     *{ margin:0; padding:0; box-sizing:border-box; }
@@ -38,7 +45,7 @@
       color: var(--text);
       line-height: 1.65;
       overflow-x: hidden;
-      padding-bottom: 56px;
+      padding-bottom: 66px; /* 给 statusbar 留空间 */
     }
     a{ color:inherit; text-decoration:none; }
 
@@ -98,6 +105,8 @@
       font-weight: 900;
       letter-spacing: -0.02em;
       font-size: 16px;
+      white-space: nowrap;
+      min-width: 0;
     }
     .logo-icon{
       width: 36px; height: 36px;
@@ -106,6 +115,7 @@
       display:grid; place-items:center;
       color:#071022; font-weight: 900;
       box-shadow: 0 10px 24px rgba(59,130,246,0.22);
+      flex: 0 0 auto;
     }
     .logo b{
       background: var(--gradient-1);
@@ -119,7 +129,7 @@
       user-select:none;
       border: 1px solid rgba(255,255,255,0.10);
       background: rgba(255,255,255,0.04);
-      color: rgba(232,236,245,0.92);
+      color: var(--contrast-md);
       font-family: var(--mono);
       font-size: 11.5px;
       padding: 10px 12px;
@@ -141,11 +151,17 @@
       color: #dbe7ff;
     }
 
-    /* ✅ header 不再负责“顶开 nav”，避免魔法数字漂移 */
-    header{
-      padding-top: 0;
-      padding-bottom: 26px;
+    /* ✅ 顶部按钮容器：移动端允许换行（按钮不是证据） */
+    .nav-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content: flex-end;
+      min-width: 0;
     }
+
+    header{ padding-top: 0; padding-bottom: 26px; }
 
     .kicker{
       display:inline-flex;
@@ -183,7 +199,7 @@
       margin-bottom: 10px;
     }
     .subtitle{
-      color: var(--text-muted);
+      color: var(--contrast-lo);
       font-size: 14.5px;
       line-height: 1.9;
       max-width: 85ch;
@@ -227,7 +243,6 @@
       white-space: nowrap;
     }
 
-    /* ✅ 状态色灯（UNVERIFIED / VERIFIED / BLOCKED） */
     .status-pack{
       display:inline-flex;
       align-items:center;
@@ -243,23 +258,14 @@
       box-shadow: 0 0 14px rgba(239,68,68,0.35);
       border: 1px solid rgba(255,255,255,0.12);
     }
-    .status-led.verified{
-      background: rgba(74,222,128,0.95);
-      box-shadow: 0 0 16px rgba(74,222,128,0.45);
-    }
-    .status-led.blocked{
-      background: rgba(250,204,21,0.95);
-      box-shadow: 0 0 16px rgba(250,204,21,0.40);
-    }
-    .status-led.unverified{
-      background: rgba(239,68,68,0.95);
-      box-shadow: 0 0 16px rgba(239,68,68,0.40);
-    }
+    .status-led.verified{ background: rgba(74,222,128,0.95); box-shadow: 0 0 16px rgba(74,222,128,0.45); }
+    .status-led.blocked{ background: rgba(250,204,21,0.95); box-shadow: 0 0 16px rgba(250,204,21,0.40); }
+    .status-led.unverified{ background: rgba(239,68,68,0.95); box-shadow: 0 0 16px rgba(239,68,68,0.40); }
 
     .meta{
       font-family: var(--mono);
       font-size: 12px;
-      color: rgba(232,236,245,0.88);
+      color: var(--contrast-md);
       line-height: 1.9;
       background: rgba(0,0,0,0.28);
       border: 1px solid rgba(255,255,255,0.08);
@@ -268,7 +274,7 @@
       overflow-x: auto;
     }
     .kv{ color: rgba(159,195,255,0.95); font-weight: 900; }
-    .muted{ color: rgba(147,160,189,0.92); }
+    .muted{ color: var(--contrast-lo); }
 
     .semantic-note{
       margin-top: 12px;
@@ -276,7 +282,7 @@
       border-radius: 14px;
       border: 1px solid rgba(255,255,255,0.08);
       background: rgba(255,255,255,0.03);
-      color: var(--text-muted);
+      color: var(--contrast-lo);
       font-size: 13.5px;
       line-height: 1.8;
     }
@@ -289,25 +295,15 @@
       border: 1px solid rgba(59,130,246,0.22);
       background: rgba(0,0,0,0.45);
     }
-    video{
-      width: 100%;
-      height: auto;
-      display:block;
-      background:#000;
-    }
+    video{ width: 100%; height: auto; display:block; background:#000; }
 
-    .row{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
+    .row{ display:flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
 
     /* Audit Drawer */
     #audit-drawer{
       display:none;
       position: fixed;
-      bottom: 72px;
+      bottom: 78px;
       right: 24px;
       width: 340px;
       background: #000;
@@ -318,6 +314,8 @@
       font-size: 11px;
       z-index: 2000;
       box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      max-height: 52vh;
+      overflow: auto;
     }
     .log-line{
       margin-bottom: 6px;
@@ -331,7 +329,7 @@
     .log-line.warn{ border-color: #facc15; }
     .log-line.bad{ border-color: #ef4444; color: rgba(255,210,210,0.92); }
 
-    /* Statusbar */
+    /* Statusbar (mobile safe) */
     .statusbar{
       position: fixed;
       left:0; right:0; bottom:0;
@@ -340,19 +338,36 @@
       border-top: 1px solid rgba(59,130,246,0.22);
       backdrop-filter: blur(14px);
     }
+
+    /* ✅ 关键：整条可横向滚动（证据不换行） */
     .statusbar-inner{
       max-width: var(--max);
       margin: 0 auto;
-      padding: 10px 18px;
+      padding: 10px 14px;
       display:flex;
       align-items:center;
       justify-content: space-between;
       gap: 12px;
       font-family: var(--mono);
       font-size: 11.5px;
-      color: rgba(232,236,245,0.86);
+      color: var(--contrast-md);
+
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      white-space: nowrap;
+      scrollbar-width: none;
     }
-    .sb-left, .sb-right{ display:flex; gap: 10px; flex-wrap: wrap; align-items:center; }
+    .statusbar-inner::-webkit-scrollbar{ display:none; }
+
+    .sb-left, .sb-right{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: nowrap; /* ✅ 不换行 */
+      white-space: nowrap;
+    }
+
     .sb-pill{
       display:inline-flex;
       align-items:center;
@@ -362,18 +377,36 @@
       border: 1px solid rgba(255,255,255,0.10);
       background: rgba(255,255,255,0.04);
       white-space: nowrap;
+      flex: 0 0 auto;
+      max-width: var(--sb-max-pill);
     }
+
     .sb-key{ color: rgba(159,195,255,0.9); font-weight: 800; }
-    .sb-val{ color: rgba(232,236,245,0.90); }
+    .sb-val{
+      color: var(--contrast-hi);
+      display:inline-block;
+      max-width: calc(var(--sb-max-pill) - 72px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: bottom;
+    }
+
     .sb-copy{ cursor:pointer; user-select:none; border-color: rgba(59,130,246,0.24); background: rgba(59,130,246,0.08); transition: 0.2s ease; }
     .sb-copy:hover{ transform: translateY(-1px); border-color: rgba(59,130,246,0.40); background: rgba(59,130,246,0.12); }
 
     @media (max-width: 980px){
+      :root{ --sb-max-pill: 62vw; }
       .grid{ grid-template-columns: 1fr; }
-      .statusbar-inner{ justify-content:center; text-align:center; }
       #audit-drawer{ right: 12px; left: 12px; width: auto; }
       .nav-content{ padding: 0 12px; }
+      .container{ padding: 0 12px; }
     }
+
+    @media (max-width: 420px){
+      .btn{ padding: 9px 10px; font-size: 11px; }
+      .logo{ font-size: 15px; }
+    }
+
     @media (prefers-reduced-motion: reduce){
       *{ animation:none !important; transition:none !important; }
       .dot{ animation:none !important; opacity: 1; }
@@ -391,8 +424,8 @@
         <span><b>SynOSX</b> <span style="color:var(--text-muted); font-weight:800;">· Audit Replay</span></span>
       </div>
 
-      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-        <a class="btn" href="index.html">← BACK TO INDEX</a>
+      <div class="nav-actions">
+        <a class="btn" id="lnk-back-index" href="index.html">← BACK TO INDEX</a>
         <button class="btn primary" id="btn-run-replay" type="button">▶ RUN REPLAY</button>
         <button class="btn" id="btn-open-audit" type="button">OPEN AUDIT</button>
       </div>
@@ -465,7 +498,7 @@
           <div class="semantic-note" id="media-note">
             <span class="chip">NOTE</span>
             载体尚未加载。请确认 URL 里包含有效 trace，例如：<br/>
-            <span style="font-family:var(--mono); color:#9fc3ff;">replay.html?trace=rc_2026-01-12T0730Z_0001</span>
+            <span style="font-family:var(--mono); color:#9fc3ff;">replay.html?trace=rc_brand_15s_v1</span>
           </div>
         </section>
       </div>
@@ -473,14 +506,14 @@
   </main>
 
   <div class="statusbar" role="contentinfo" aria-label="System Status Bar">
-    <div class="statusbar-inner">
+    <div class="statusbar-inner" id="sb-scroll">
       <div class="sb-left">
         <span class="sb-pill">
           <span class="sb-key">RUNTIME</span>
           <span class="sb-val">REPLAY</span>
         </span>
 
-        <span class="sb-pill">
+        <span class="sb-pill" title="TRACE">
           <span class="sb-key">TRACE</span>
           <span class="sb-val" id="sb-trace2">—</span>
         </span>
@@ -493,7 +526,7 @@
       </div>
 
       <div class="sb-right">
-        <span class="sb-pill">
+        <span class="sb-pill" title="POLICY: AUDIT REPLAY CONSTITUTION">
           <span class="sb-key">POLICY</span>
           <span class="sb-val">AUDIT REPLAY CONSTITUTION</span>
         </span>
@@ -503,18 +536,21 @@
 
   <script>
     /**
-     * ✅ 高阶方案核心：
-     * - replay.html?trace=xxx
-     * - JS 根据 trace 加载不同视频/元数据
-     * - URL 本身即“审计入口证据”
-     *
      * ✅ 改造点：
-     * - registry 不再内置，改为 fetch: registry/replay.registry.json
-     * - replay.html 本身保持稳定（零新增行数爆炸）
+     * - registry fetch: registry/replay.registry.json
+     * - 移动端：statusbar 横向滚动；按钮允许换行
+     * - 返回链接：自动适配在根目录或 pages/ 子目录
      */
 
-    // ✅ registry 位置（你要的 JSON 版本）
+    // ✅ registry 位置（JSON）
     const REGISTRY_URL = "registry/replay.registry.json";
+
+    // ✅ 自动处理“页面在根目录 / pages 子目录”的返回链接
+    (function fixNavLinks(){
+      const isInPages = location.pathname.includes("/pages/");
+      const back = document.getElementById("lnk-back-index");
+      if (back) back.href = isInPages ? "../index.html" : "index.html";
+    })();
 
     async function loadRegistry(){
       const res = await fetch(REGISTRY_URL, { cache: "no-store" });
@@ -530,17 +566,12 @@
       return (sp.get("trace") || "").trim();
     }
 
-    // ✅ 简单入口约束（仍允许 rc_brand_15s_v1 这类）
     function isProbablyTraceId(v){
       return v.startsWith("rc_") && v.length <= 120;
     }
 
-    function openAudit(){
-      document.getElementById("audit-drawer").style.display = "block";
-    }
-    function closeAudit(){
-      document.getElementById("audit-drawer").style.display = "none";
-    }
+    function openAudit(){ document.getElementById("audit-drawer").style.display = "block"; }
+    function closeAudit(){ document.getElementById("audit-drawer").style.display = "none"; }
     function logLine(msg, type="ok"){
       const c = document.getElementById("log-container");
       const line = document.createElement("div");
@@ -549,9 +580,7 @@
       c.appendChild(line);
       c.scrollTop = c.scrollHeight;
     }
-    function resetAudit(){
-      document.getElementById("log-container").innerHTML = "";
-    }
+    function resetAudit(){ document.getElementById("log-container").innerHTML = ""; }
 
     async function copyText(text){
       try{
@@ -600,23 +629,24 @@
       sbVerdict.textContent = vv;
       chipStatus.textContent = vv;
 
-      if (vv === "VERIFIED"){
-        setLedClass("verified");
-      }else if (vv === "BLOCKED"){
-        setLedClass("blocked");
-      }else{
-        setLedClass("unverified");
-      }
+      if (vv === "VERIFIED") setLedClass("verified");
+      else if (vv === "BLOCKED") setLedClass("blocked");
+      else setLedClass("unverified");
 
-      chipStatus.style.borderColor = (vv === "VERIFIED") ? "rgba(74,222,128,0.45)"
-                            : (vv === "BLOCKED") ? "rgba(250,204,21,0.45)"
-                            : "rgba(239,68,68,0.45)";
-      chipStatus.style.background = (vv === "VERIFIED") ? "rgba(74,222,128,0.10)"
-                           : (vv === "BLOCKED") ? "rgba(250,204,21,0.10)"
-                           : "rgba(239,68,68,0.10)";
-      chipStatus.style.color = (vv === "VERIFIED") ? "#bff7d6"
-                     : (vv === "BLOCKED") ? "#ffe9a8"
-                     : "#ffd2d2";
+      chipStatus.style.borderColor =
+        (vv === "VERIFIED") ? "rgba(74,222,128,0.45)"
+        : (vv === "BLOCKED") ? "rgba(250,204,21,0.45)"
+        : "rgba(239,68,68,0.45)";
+
+      chipStatus.style.background =
+        (vv === "VERIFIED") ? "rgba(74,222,128,0.10)"
+        : (vv === "BLOCKED") ? "rgba(250,204,21,0.10)"
+        : "rgba(239,68,68,0.10)";
+
+      chipStatus.style.color =
+        (vv === "VERIFIED") ? "#bff7d6"
+        : (vv === "BLOCKED") ? "#ffe9a8"
+        : "#ffd2d2";
     }
 
     function escapeHtml(s){
@@ -673,7 +703,7 @@
       if (!m || !m.src){
         chipMedia.textContent = "MEDIA: NONE";
         mediaNote.innerHTML = `<span class="chip">NOTE</span>
-          该 trace 已注册，但未配置 media.src。请在 registry 里补全回放载体路径。`;
+          该 trace 已注册，但未配置 <b>media.src</b>。请在 registry 里补全回放载体路径。`;
         return;
       }
 
@@ -733,21 +763,17 @@
 
     (async function boot(){
       const trace = getTraceFromUrl();
-
-      // 初始状态灯：默认 UNVERIFIED
       setVerdict("UNVERIFIED");
 
       if (!trace){
         renderUnverified("", "缺少 ?trace=... 参数。");
         return;
       }
-
       if (!isProbablyTraceId(trace)){
         renderUnverified(trace, "trace 格式不合法（必须以 rc_ 开头）。");
         return;
       }
 
-      // ✅ 从 JSON 拉 registry
       let registry;
       try{
         registry = await loadRegistry();
@@ -756,7 +782,7 @@
         resetAudit();
         logLine(`REGISTRY LOAD FAILED: ${REGISTRY_URL}`, "bad");
         logLine(String(e && e.message ? e.message : e), "warn");
-        renderUnverified(trace, "registry 加载失败（请使用本地静态服务器打开站点，而不是 file://）。");
+        renderUnverified(trace, "registry 加载失败（请使用本地静态服务器或 GitHub Pages 打开，而不是 file://）。");
         return;
       }
 

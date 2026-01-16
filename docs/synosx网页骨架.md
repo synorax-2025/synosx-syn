@@ -1,29 +1,41 @@
-sx-site/
-├─ index.html
-├─ manifest.html
-├─ whitepaper.html
-├─ cases.html
-├─ replay.html                 # ✅ 你刚做的：replay.html?trace=xxx
+synosx-site/
+├─ assets/
+│  ├─ css/
+│  │  ├─ sx.core.css              # ✅ 全站制度级样式（变量/组件/状态条/可读性底线）
+│  │  ├─ sx.statusbar.css         # ✅ 底部指纹条（可选：拆分更清晰）
+│  │  └─ pages/
+│  │     ├─ index.page.css
+│  │     ├─ cases.page.css
+│  │     ├─ replay.page.css
+│  │     ├─ manifest.page.css
+│  │     └─ whitepaper.page.css
+│  └─ js/
+│     ├─ sx.core.js               # ✅ 全站制度行为（reveal/copy/scroll）
+│     ├─ sx.statusbar.js          # ✅ 指纹条读取 meta + copy commit（可选拆分）
+│     └─ runtime/
+│        ├─ index.runtime.js       # index 专属交互（跳 replay）
+│        ├─ cases.runtime.js       # cases 专属交互（跳 case 页）
+│        └─ replay.runtime.js      # replay 专属运行时（fetch registry + 播放）
 │
-├─ pages/                      # 可选：如果你后面页面越来越多
+├─ pages/
 │  ├─ case-video.html
 │  ├─ case-voicewall.html
-│  └─ data.html
+│  └─ ... (更多判例页)
 │
-├─ assets/
-│  ├─ css/                     # 可选：你现在是内联 CSS，以后想抽离再用
-│  ├─ js/                      # 可选：同上
-│  ├─ img/
-│  ├─ icons/
-│  └─ fonts/
+├─ registry/
+│  ├─ replay.registry.schema.json
+│  └─ replay.registry.json
 │
-├─ replay/                     # ✅ 证据载体区：视频/海报/截图（只放“回放资产”）
-│  ├─ rc_2026-01-12T0730Z_0001.mp4
-│  ├─ rc_2026-01-12T0730Z_0001.jpg
-│  ├─ rc_2026-01-15T0210Z_0002.mp4
-│  └─ rc_2026-01-15T0210Z_0002.jpg
+├─ replay/
+│  ├─ rc_brand_15s_v1.mp4
+│  ├─ rc_brand_15s_v1.jpg
+│  ├─ rc_brand_15s_v2.mp4
+│  └─ ...
 │
-└─ registry/                   # ✅ “制度化数据区”：把可变内容从 HTML 里拔出来
-   ├─ replay.registry.json      # trace -> 元数据 + media 路径（replay.html 会读取它）
-   ├─ cases.registry.json       # cases.html 列表数据来源（可选）
-   └─ site.meta.json            # build/version/commit 等（可选）
+├─ index.html
+├─ cases.html
+├─ replay.html
+├─ manifest.html
+├─ whitepaper.html
+└─ docs/
+   └─ ... (可选：写你的网站制度说明)

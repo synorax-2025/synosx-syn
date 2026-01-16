@@ -1,0 +1,141 @@
+/* sx.statusbar.css — SynOSX System Status Bar (shared) */
+
+:root{
+  /* 可被各页面覆盖的“制度变量” */
+  --sb-max: 1200px;
+
+  /* 移动端：statusbar 单个 pill 最大宽度（配合省略号） */
+  --sb-max-pill: 44vw;
+
+  /* 对比度治理（变量级：阅读下限） */
+  --fg-strong: rgba(255,255,255,0.92);
+  --fg: rgba(232,236,245,0.86);
+  --fg-muted: rgba(147,160,189,0.92);
+
+  /* 颜色（允许页面覆盖） */
+  --sb-border: rgba(59,130,246,0.22);
+  --sb-bg: rgba(0,0,0,0.70);
+
+  /* 兼容：如果页面没定义 mono，就给默认 */
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+}
+
+/* 需要 body 给底部留空间：建议各页面统一用这个变量 */
+body{
+  padding-bottom: 66px;
+}
+
+/* Statusbar */
+.statusbar{
+  position: fixed;
+  left:0; right:0; bottom:0;
+  z-index: 2500;
+  background: var(--sb-bg);
+  border-top: 1px solid var(--sb-border);
+  backdrop-filter: blur(14px);
+}
+
+/* ✅ 关键：整条可横向滚动（证据不换行） */
+.statusbar-inner{
+  max-width: var(--sb-max);
+  margin: 0 auto;
+  padding: 10px 14px;
+
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--fg);
+
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+.statusbar-inner::-webkit-scrollbar{ display:none; }
+
+.sb-left, .sb-right{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+  flex-wrap: nowrap; /* ✅ 不换行 */
+  white-space: nowrap;
+}
+
+.sb-pill{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.04);
+  white-space: nowrap;
+
+  flex: 0 0 auto;
+
+  /* ✅ 移动端治理：pill 自己必须能裁剪，ellipsis 才可靠 */
+  max-width: var(--sb-max-pill);
+  overflow: hidden;
+}
+
+.sb-key{
+  color: rgba(159,195,255,0.9);
+  font-weight: 800;
+  flex: 0 0 auto; /* ✅ key 不参与压缩 */
+}
+
+.sb-val{
+  color: var(--fg-strong);
+  flex: 1 1 auto;
+  min-width: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sb-muted{
+  color: var(--fg-muted);
+  opacity: 0.85;
+}
+
+/* 可点击 pill */
+.sb-copy{
+  cursor:pointer;
+  user-select:none;
+  border-color: rgba(59,130,246,0.24);
+  background: rgba(59,130,246,0.08);
+  transition: 0.2s ease;
+}
+.sb-copy:hover{
+  transform: translateY(-1px);
+  border-color: rgba(59,130,246,0.40);
+  background: rgba(59,130,246,0.12);
+}
+
+/* 链接（Policy） */
+.sb-link{
+  color: rgba(159,195,255,0.95);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* 可选：引擎灯 */
+.engine-dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(74,222,128,0.95);
+  box-shadow: 0 0 14px rgba(74,222,128,0.45);
+  border: 1px solid rgba(255,255,255,0.12);
+  flex: 0 0 auto;
+}
+
+/* ✅ 小屏扩大 pill 宽度上限 */
+@media (max-width: 980px){
+  :root{ --sb-max-pill: 62vw; }
+}

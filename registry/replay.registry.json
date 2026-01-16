@@ -24,6 +24,26 @@
       "notes": "SynOSX 品牌短片（15s）。用于官网演示 Replay Runtime 能力。"
     },
 
+    "rc_brand_15s_v2": {
+  "trace_id": "rc_brand_15s_v2",
+  "intent": "BRAND_FILM_PLAYBACK",
+  "actor": "site@sx",
+  "dag": "OK",
+  "firewall": "GRANTED",
+  "audit": "HASHED",
+  "verdict": "VERIFIED",
+  "evidence_hash": "sha256:brand-demo-placeholder-v2",
+  "recorded_at": "2026-01-16T00:00:00Z",
+  "media": {
+    "type": "video/mp4",
+    "src": "replay/rc_brand_15s_v2.mp4",
+    "poster": "replay/rc_brand_15s_v2.jpg",
+    "duration_sec": 15
+  },
+  "notes": "SynOSX 品牌短片（15s）v2。用于官网演示 Replay Runtime 能力。"
+},
+
+
     "rc_2026-01-12T0730Z_0001": {
       "trace_id": "rc_2026-01-12T0730Z_0001",
       "intent": "EXPORT_BILLING_DATA",

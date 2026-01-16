@@ -11,31 +11,35 @@
   <meta name="description" content="SynOSX Audit Replay Runtime：以 trace_id 为入口，回放已被治理链路裁决并审计的行为证据。" />
 
   <style>
-    :root{
-      --bg:#0a0e1a;
-      --surface: rgba(26, 32, 54, 0.72);
-      --surface2: rgba(18, 23, 43, 0.55);
-      --text:#e8ecf5;
-      --text-muted:#93a0bd;
-      --accent-blue:#3b82f6;
-      --accent-indigo:#6366f1;
-      --gradient-1: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-      --shadow-lg: 0 25px 60px -18px rgba(0, 0, 0, 0.55);
-      --radius: 24px;
-      --max: 1100px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+ :root{
+  --bg:#0a0e1a;
+  --surface: rgba(26, 32, 54, 0.72);
+  --surface2: rgba(18, 23, 43, 0.55);
 
-      /* ✅ 制度变量：fixed nav 高度（遮挡修复唯一真源） */
-      --replay-nav-h: 74px;
+  /* 基础文本 */
+  --text:#e8ecf5;
+  --text-muted:#93a0bd;
 
-      /* ✅ 移动端证据条可用宽度（防止 policy/trace 挤爆） */
-      --sb-max-pill: 44vw;
+  --accent-blue:#3b82f6;
+  --accent-indigo:#6366f1;
+  --gradient-1: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  --shadow-lg: 0 25px 60px -18px rgba(0, 0, 0, 0.55);
+  --radius: 24px;
+  --max: 1100px;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
 
-      /* ✅ 对比度治理（变量级：不改主题，只保证可读性下限） */
-      --contrast-hi: rgba(255,255,255,0.92);
-      --contrast-md: rgba(232,236,245,0.86);
-      --contrast-lo: rgba(147,160,189,0.92);
-    }
+  /* ✅ 制度变量：fixed nav 高度（遮挡修复唯一真源） */
+  --replay-nav-h: 74px;
+
+  /* ✅ 移动端：statusbar 单个 pill 的最大可用宽度（配合省略号） */
+  --sb-max-pill: 44vw;
+
+  /* ✅ 对比度治理（变量级：阅读下限） */
+  --fg-strong: rgba(255,255,255,0.92);
+  --fg: rgba(232,236,245,0.86);
+  --fg-muted: rgba(147,160,189,0.92);
+}
+
 
     *{ margin:0; padding:0; box-sizing:border-box; }
     body{
@@ -45,7 +49,8 @@
       color: var(--text);
       line-height: 1.65;
       overflow-x: hidden;
-      padding-bottom: 66px; /* 给 statusbar 留空间 */
+      /* ✅ 给 statusbar + iOS 安全区统一留空间 */
+  padding-bottom: calc(66px + env(safe-area-inset-bottom));
     }
     a{ color:inherit; text-decoration:none; }
 
@@ -330,66 +335,84 @@
     .log-line.bad{ border-color: #ef4444; color: rgba(255,210,210,0.92); }
 
     /* Statusbar (mobile safe) */
-    .statusbar{
-      position: fixed;
-      left:0; right:0; bottom:0;
-      z-index: 2500;
-      background: rgba(0,0,0,0.70);
-      border-top: 1px solid rgba(59,130,246,0.22);
-      backdrop-filter: blur(14px);
-    }
+.statusbar{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 2500;
+  background: rgba(0,0,0,0.70);
+  border-top: 1px solid rgba(59,130,246,0.22);
+  backdrop-filter: blur(14px);
 
-    /* ✅ 关键：整条可横向滚动（证据不换行） */
-    .statusbar-inner{
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 10px 14px;
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 12px;
-      font-family: var(--mono);
-      font-size: 11.5px;
-      color: var(--contrast-md);
+  /* ✅ iOS 安全区：避免贴住 Home Indicator / 手势区域 */
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
-      overflow-x: auto;
-      overflow-y: hidden;
-      -webkit-overflow-scrolling: touch;
-      white-space: nowrap;
-      scrollbar-width: none;
-    }
-    .statusbar-inner::-webkit-scrollbar{ display:none; }
+/* ✅ 关键：整条可横向滚动（证据不换行） */
+.statusbar-inner{
+  max-width: var(--max);
+  margin: 0 auto;
 
-    .sb-left, .sb-right{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      flex-wrap: nowrap; /* ✅ 不换行 */
-      white-space: nowrap;
-    }
+  /* ✅ 内容也抬起：把 safe-area 算进来 */
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
 
-    .sb-pill{
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.04);
-      white-space: nowrap;
-      flex: 0 0 auto;
-      max-width: var(--sb-max-pill);
-    }
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--contrast-md);
 
-    .sb-key{ color: rgba(159,195,255,0.9); font-weight: 800; }
-    .sb-val{
-      color: var(--contrast-hi);
-      display:inline-block;
-      max-width: calc(var(--sb-max-pill) - 72px);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      vertical-align: bottom;
-    }
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+.statusbar-inner::-webkit-scrollbar{ display:none; }
+
+.sb-left, .sb-right{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+
+   .sb-pill{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.04);
+  white-space: nowrap;
+  flex: 0 0 auto;
+
+  /* ✅ 移动端治理：pill 自己必须能裁剪，ellipsis 才可靠 */
+  max-width: var(--sb-max-pill);
+  overflow: hidden;
+}
+
+.sb-key{
+  color: rgba(159,195,255,0.9);
+  font-weight: 800;
+  flex: 0 0 auto; /* ✅ key 不参与压缩 */
+}
+
+.sb-val{
+  color: var(--contrast-hi);
+
+  /* ✅ 关键：让 value 吃掉剩余空间，不要用 -72px 这种魔法 */
+  flex: 1 1 auto;
+  min-width: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 
     .sb-copy{ cursor:pointer; user-select:none; border-color: rgba(59,130,246,0.24); background: rgba(59,130,246,0.08); transition: 0.2s ease; }
     .sb-copy:hover{ transform: translateY(-1px); border-color: rgba(59,130,246,0.40); background: rgba(59,130,246,0.12); }

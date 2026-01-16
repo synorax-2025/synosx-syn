@@ -169,6 +169,46 @@
       text-decoration: underline;
     }
 
+    /* =========================
+       ✅ Replay Demo (auto registry)
+       ========================= */
+    .replay-links{
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .replay-links a{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(59,130,246,.28);
+      background: rgba(59,130,246,.10);
+      color: #9fc3ff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .replay-links a:hover{
+      border-color: rgba(59,130,246,.45);
+      background: rgba(59,130,246,.14);
+      text-decoration: underline;
+    }
+
+    .replay-muted{
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size: 12px;
+      color: #bcd6ff;
+    }
+
     /* ===== Mobile tuning for Cases ===== */
     @media (max-width: 600px){
       header{
@@ -215,6 +255,24 @@
   <section>
     <div class="container">
       <div class="grid">
+
+        <!-- ✅ 新增：Replay Demo（从 registry 自动读取，永不手写 v1/v2） -->
+        <div class="card" id="replay-demo-card">
+          <span class="badge">REPLAY · DEMO</span>
+          <h2>Brand Film · Replay</h2>
+          <p>
+            本卡片从 <code>registry/replay.registry.json</code> 自动读取品牌回放列表。<br/>
+            新增 v3/v4 只需要更新 registry，不需要改本页代码。
+          </p>
+
+          <div class="replay-links" id="replay-links">
+            <span class="replay-muted">Loading registry…</span>
+          </div>
+
+          <a href="replay.html?trace=rc_brand_15s_v1" class="link" style="opacity:.75;">
+            进入 Replay Runtime（示例入口） →
+          </a>
+        </div>
 
         <div class="card">
           <span class="badge">CASE · VIDEO</span>
@@ -271,6 +329,62 @@
       <a href="manifest.html">Read Manifest</a>
     </div>
   </footer>
+
+  <script>
+  (function bootReplayDemoCard(){
+    const linksEl = document.getElementById("replay-links");
+    if (!linksEl) return;
+
+    // cases.html 在根目录；但也兼容未来放 pages/ 的情况
+    const base = location.pathname.includes("/pages/") ? "../" : "";
+    const registryUrl = base + "registry/replay.registry.json";
+    const replayPage = base + "replay.html";
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    fetch(registryUrl, { cache: "no-store" })
+      .then(r => {
+        if (!r.ok) throw new Error("registry fetch failed: " + r.status);
+        return r.json();
+      })
+      .then(reg => {
+        const entries = reg && reg.entries ? reg.entries : {};
+        const list = Object.values(entries);
+
+        // ✅ Brand demo 过滤规则（稳定、不会误伤真实业务 trace）
+        // intent = BRAND_FILM_PLAYBACK && actor = site@sx
+        const demos = list
+          .filter(e => e && e.intent === "BRAND_FILM_PLAYBACK" && e.actor === "site@sx")
+          .sort((a,b) => String(b.recorded_at || "").localeCompare(String(a.recorded_at || "")));
+
+        if (!demos.length){
+          linksEl.innerHTML = `<span class="replay-muted">No brand demo entries found in registry.</span>`;
+          return;
+        }
+
+        linksEl.innerHTML = demos.map(e => {
+          const trace = e.trace_id || "";
+          // notes 有“v2/15s”等信息：优先用于按钮展示；没有就退回 trace_id
+          const label = (e.notes || trace).trim();
+          return `
+            <a href="${replayPage}?trace=${encodeURIComponent(trace)}" title="${escapeHtml(trace)}">
+              ▶ ${escapeHtml(label)}
+            </a>
+          `;
+        }).join("");
+      })
+      .catch(err => {
+        linksEl.innerHTML = `<span class="replay-muted">Registry load failed. (${escapeHtml(err && err.message ? err.message : err)})</span>`;
+      });
+  })();
+  </script>
 
 </body>
 </html>

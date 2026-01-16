@@ -338,6 +338,7 @@
 .statusbar{
   position: fixed;
   left: 0; right: 0; bottom: 0;
+  bottom: 10px; /* ✅ 从 0 改成 10px（你嫌还抢就 12~14） */
   z-index: 2500;
   background: rgba(0,0,0,0.70);
   border-top: 1px solid rgba(59,130,246,0.22);
@@ -368,6 +369,8 @@
   -webkit-overflow-scrolling: touch;
   white-space: nowrap;
   scrollbar-width: none;
+  touch-action: pan-x;          /* ✅ 告诉浏览器这里是横滑 */
+  overscroll-behavior: contain; /* ✅ 不把滑动传给页面/系统 */
 }
 .statusbar-inner::-webkit-scrollbar{ display:none; }
 

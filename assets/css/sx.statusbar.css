@@ -1,8 +1,20 @@
-/* sx.statusbar.css — SynOSX System Status Bar (shared) */
+/* sx.statusbar.css — SynOSX System Status Bar (shared)
+   ✅ Mobile-safe + Safe-area governance + Variable-level contrast
+*/
 
 :root{
+  /* -----------------------------
+     Layout Constitution (shared)
+     ----------------------------- */
+
   /* 可被各页面覆盖的“制度变量” */
   --sb-max: 1200px;
+
+  /* statusbar 自身高度（页面让位的唯一真源） */
+  --sx-statusbar-h: 66px;
+
+  /* iOS / 系统安全区（制度外变量） */
+  --sx-safe-bottom: env(safe-area-inset-bottom, 0px);
 
   /* 移动端：statusbar 单个 pill 最大宽度（配合省略号） */
   --sb-max-pill: 44vw;
@@ -20,15 +32,20 @@
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
 }
 
-/* 需要 body 给底部留空间：建议各页面统一用这个变量 */
+/* ✅ 页面为 statusbar + safe-area 统一让位（不要写死 66px） */
 body{
-  padding-bottom: 66px;
+  padding-bottom: calc(var(--sx-statusbar-h) + var(--sx-safe-bottom));
 }
 
 /* Statusbar */
 .statusbar{
   position: fixed;
-  left:0; right:0; bottom:0;
+  left:0;
+  right:0;
+
+  /* ✅ 不再死贴 0：吃安全区，避免 iOS 手势干扰 + 视觉太靠下 */
+  bottom: var(--sx-safe-bottom);
+
   z-index: 2500;
   background: var(--sb-bg);
   border-top: 1px solid var(--sb-border);

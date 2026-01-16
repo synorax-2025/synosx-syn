@@ -1,5 +1,5 @@
 /* sx.statusbar.css — SynOSX System Status Bar (shared)
-   ✅ Mobile-safe + Safe-area governance + Variable-level contrast
+   ✅ Mobile-safe + Safe-area governance + Gesture governance + Variable-level contrast
 */
 
 :root{
@@ -10,11 +10,14 @@
   /* 可被各页面覆盖的“制度变量” */
   --sb-max: 1200px;
 
-  /* statusbar 自身高度（页面让位的唯一真源） */
+  /* statusbar 视觉高度（页面让位的唯一真源） */
   --sx-statusbar-h: 66px;
 
   /* iOS / 系统安全区（制度外变量） */
   --sx-safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* ✅ 抬高量：避免贴住 Home Indicator / 手势区（你确认 10px 可用） */
+  --sx-statusbar-lift: 10px;
 
   /* 移动端：statusbar 单个 pill 最大宽度（配合省略号） */
   --sb-max-pill: 44vw;
@@ -32,9 +35,9 @@
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
 }
 
-/* ✅ 页面为 statusbar + safe-area 统一让位（不要写死 66px） */
+/* ✅ 页面为 statusbar + safe-area + lift 统一让位（不要写死 66px） */
 body{
-  padding-bottom: calc(var(--sx-statusbar-h) + var(--sx-safe-bottom));
+  padding-bottom: calc(var(--sx-statusbar-h) + var(--sx-safe-bottom) + var(--sx-statusbar-lift));
 }
 
 /* Statusbar */
@@ -43,8 +46,8 @@ body{
   left:0;
   right:0;
 
-  /* ✅ 不再死贴 0：吃安全区，避免 iOS 手势干扰 + 视觉太靠下 */
-  bottom: var(--sx-safe-bottom);
+  /* ✅ 不再贴 0：safe-area + lift */
+  bottom: calc(var(--sx-safe-bottom) + var(--sx-statusbar-lift));
 
   z-index: 2500;
   background: var(--sb-bg);
@@ -52,7 +55,7 @@ body{
   backdrop-filter: blur(14px);
 }
 
-/* ✅ 关键：整条可横向滚动（证据不换行） */
+/* ✅ 关键：整条可横向滚动（证据不换行） + 手势治理 */
 .statusbar-inner{
   max-width: var(--sb-max);
   margin: 0 auto;
@@ -72,6 +75,10 @@ body{
   -webkit-overflow-scrolling: touch;
   white-space: nowrap;
   scrollbar-width: none;
+
+  /* ✅ 手势治理：减少 iOS 抢滑（关键） */
+  touch-action: pan-x;
+  overscroll-behavior: contain;
 }
 .statusbar-inner::-webkit-scrollbar{ display:none; }
 

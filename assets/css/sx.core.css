@@ -1,0 +1,247 @@
+/* sx.core.css — SynOSX Core Styles (shared)
+   ✅ Tokens / Baseline / Layout / Utilities / Shared Components
+   ✅ Page CSS should only contain page-specific layout & sections
+*/
+
+/* -----------------------------
+   Tokens (shared)
+   ----------------------------- */
+:root{
+  /* Theme */
+  --bg: #0a0e1a;
+  --surface: rgba(26, 32, 54, 0.72);
+  --surface2: rgba(18, 23, 43, 0.55);
+
+  --text: #e8ecf5;
+  --text-muted: #a9c8ff;
+
+  --accent-blue: #3b82f6;
+  --accent-indigo: #6366f1;
+
+  --gradient-1: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  --gradient-2: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+
+  --shadow-lg: 0 25px 60px -18px rgba(0, 0, 0, 0.55);
+  --shadow-md: 0 16px 40px -20px rgba(0, 0, 0, 0.45);
+
+  --radius: 24px;
+
+  /* Layout */
+  --max: 1200px;
+
+  /* Fonts */
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+
+  /* Motion */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 180ms;
+  --dur: 260ms;
+  --dur-slow: 700ms;
+
+  /* Focus ring */
+  --focus: rgba(59,130,246,0.45);
+}
+
+/* -----------------------------
+   Baseline
+   ----------------------------- */
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+html{ scroll-behavior:smooth; }
+
+body{
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC",
+               "Hiragino Sans GB", "Microsoft YaHei", Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  line-height: 1.65;
+}
+
+a{ color: inherit; text-decoration: none; }
+img, svg, video{ max-width:100%; height:auto; display:block; }
+button, input, textarea, select{ font: inherit; color: inherit; }
+
+::selection{
+  background: rgba(59,130,246,0.35);
+  color: var(--text);
+}
+
+/* Accessible focus */
+:focus-visible{
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+/* -----------------------------
+   Global background (optional shared)
+   If a page doesn't want it, it can override/hide in page css.
+   ----------------------------- */
+.bg-gradient{
+  position: fixed;
+  top: -35%;
+  left: -35%;
+  width: 170%;
+  height: 170%;
+  background:
+    radial-gradient(circle at 20% 40%, rgba(59, 130, 246, 0.12) 0%, transparent 55%),
+    radial-gradient(circle at 78% 70%, rgba(99, 102, 241, 0.12) 0%, transparent 55%),
+    radial-gradient(circle at 42% 10%, rgba(37, 99, 235, 0.08) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+  transform: translate3d(0,0,0);
+}
+
+/* -----------------------------
+   Layout primitives
+   ----------------------------- */
+.container{
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 2;
+}
+
+section{ padding: 100px 0; }
+
+/* Grid helper */
+.grid{ display:grid; gap: 18px; }
+
+/* -----------------------------
+   Navbar (shared)
+   Page can supply its own nav markup, these are baseline styles
+   ----------------------------- */
+nav{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  backdrop-filter: blur(18px);
+  background: rgba(10, 14, 26, 0.72);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: background var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+nav.scrolled{
+  background: rgba(10, 14, 26, 0.92);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.32);
+}
+
+/* -----------------------------
+   Buttons (shared)
+   ----------------------------- */
+.cta-button{
+  padding: 11px 18px;
+  background: var(--gradient-1);
+  border: none;
+  border-radius: 12px;
+  color: #071022;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 12px 24px rgba(59,130,246,0.18);
+  will-change: transform;
+}
+.cta-button:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px rgba(59,130,246,0.28);
+}
+.cta-button:active{ transform: translateY(-1px); }
+
+.btn-secondary{
+  padding: 11px 18px;
+  background: transparent;
+  border: 1px solid rgba(59, 130, 246, 0.55);
+  border-radius: 12px;
+  color: #9fc3ff;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  transition: transform var(--dur) var(--ease), background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  will-change: transform;
+}
+.btn-secondary:hover{
+  background: rgba(59, 130, 246, 0.12);
+  transform: translateY(-2px);
+  border-color: rgba(59, 130, 246, 0.75);
+}
+.btn-secondary:active{ transform: translateY(-1px); }
+
+/* -----------------------------
+   Badges / Chips (shared)
+   ----------------------------- */
+.badge{
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #dbe7ff;
+  background: rgba(255,255,255,0.04);
+  white-space: nowrap;
+}
+.badge.must{
+  border-color: rgba(59,130,246,0.35);
+  background: rgba(59,130,246,0.10);
+}
+.badge.not{
+  border-color: rgba(255,107,107,0.35);
+  background: rgba(255,107,107,0.10);
+}
+
+/* -----------------------------
+   Reveal animation (shared)
+   ----------------------------- */
+.reveal{
+  opacity: 0;
+  transform: translateY(20px);
+  transition: var(--dur-slow) var(--ease);
+  will-change: opacity, transform;
+}
+.reveal.active{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* -----------------------------
+   Footer baseline (shared)
+   ----------------------------- */
+footer{
+  padding: 34px 0 46px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* -----------------------------
+   Inline links (shared)
+   ----------------------------- */
+.sb-link{
+  color: rgba(159,195,255,0.92);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* -----------------------------
+   Reduced motion (shared)
+   ----------------------------- */
+@media (prefers-reduced-motion: reduce){
+  *{ animation: none !important; transition: none !important; }
+}
+
+/* -----------------------------
+   Small screens baseline (shared)
+   Keep minimal; page css can override.
+   ----------------------------- */
+@media (max-width: 980px){
+  .container{ padding: 0 18px; }
+}

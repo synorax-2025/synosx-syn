@@ -1,0 +1,142 @@
+/* =========================================================
+ * Case Page: Video (expression only)
+ * - Keep Cases Shell as-is (cases.page.css)
+ * - Only tune: hero centering/whitespace + typography + flow
+ * Scope: body[data-case="video"]
+ * ========================================================= */
+
+body[data-case="video"] .case-hero{
+  text-align: center;
+  padding-top: 118px; /* 贴合 cases.hero 但更像你截图那种“顶上留空” */
+  padding-bottom: 68px;
+}
+
+/* kicker 居中 */
+body[data-case="video"] .case-hero .kicker{
+  justify-content: center;
+}
+
+/* 让标题更“高级”：字重/字距/渐变一致性 */
+body[data-case="video"] .case-title{
+  font-size: clamp(38px, 5.2vw, 66px);
+  font-weight: 950;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  margin-bottom: 22px;
+
+  background: linear-gradient(135deg,#fff 0%, #bcd6ff 45%, #3b82f6 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* subtitle：更像“判例文案”，比 cases 稍微收敛一点 */
+body[data-case="video"] .case-subtitle{
+  max-width: 72ch;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 15px;
+  line-height: 1.95;
+  opacity: 0.84;
+}
+
+/* case section：让正文离 hero 不要太挤 */
+body[data-case="video"] .case-video{
+  padding-top: 70px;
+}
+
+/* card：保持你原来的质感，但让长文更舒服 */
+body[data-case="video"] .card{
+  padding: 34px;
+}
+
+/* 列表/段落更适合“判例”阅读 */
+body[data-case="video"] .card p{
+  font-size: 14.5px;
+  line-height: 1.95;
+}
+
+body[data-case="video"] .list{
+  margin-top: 12px;
+  padding-left: 18px;
+}
+
+body[data-case="video"] .list li{
+  margin-bottom: 10px;
+  line-height: 1.9;
+}
+
+/* flow 视觉：更像你截图里的“制度链” */
+body[data-case="video"] .flow{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+body[data-case="video"] .step{
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.22);
+  font-size: 13px;
+  font-weight: 900;
+  color: rgba(219, 231, 255, 0.98);
+  white-space: nowrap;
+}
+
+/* nav 右侧两个返回：做成你要的“胶囊按钮”，不动 logo */
+body[data-case="video"] .nav-links{
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+body[data-case="video"] .nav-links .pill{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.04);
+  color: rgba(159,195,255,0.92);
+  font-size: 13px;
+  font-weight: 900;
+  transition: .25s ease;
+}
+
+body[data-case="video"] .nav-links .pill:hover{
+  border-color: rgba(59,130,246,0.35);
+  background: rgba(59,130,246,0.10);
+}
+
+body[data-case="video"] .nav-links .pill.muted{
+  opacity: 0.78;
+}
+
+/* note paragraph */
+body[data-case="video"] .case-note{
+  opacity: 0.88;
+  margin-top: 10px;
+}
+
+/* Mobile tuning */
+@media (max-width: 600px){
+  body[data-case="video"] .case-hero{
+    padding-top: 86px;
+    padding-bottom: 48px;
+  }
+
+  body[data-case="video"] .case-title{
+    font-size: clamp(32px, 8.6vw, 46px);
+  }
+
+  body[data-case="video"] .card{
+    padding: 22px;
+  }
+
+  body[data-case="video"] .step{
+    white-space: normal;
+  }
+}

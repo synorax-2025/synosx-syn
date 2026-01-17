@@ -1,0 +1,70 @@
+{
+  "meta": {
+    "registry": "governance-narratives",
+    "status": "non-normative",
+    "description": "Illustrative governance narratives derived from SynOSX cases. These narratives are explanatory only and MUST NOT be treated as executable or normative rules.",
+    "governance_note": "Narratives are case projections. They do not define rules, authority, or system behavior.",
+    "last_updated": "2026-01-18"
+  },
+
+  "chapters": [
+    {
+      "id": "case-00",
+      "slug": "separation-of-power-and-ability",
+      "title": "Separation of Power and Ability",
+      "subtitle": "Why governance must not execute",
+      "derived_from": "SYNOSX CORE CONSTITUTION",
+      "risk_category": [
+        "structural-corruption",
+        "power-capability-coupling"
+      ],
+      "status": "published",
+      "order": 0
+    },
+
+    {
+      "id": "case-01",
+      "slug": "unauthorized-execution-path",
+      "title": "Unauthorized Execution Path",
+      "subtitle": "When execution bypasses intent",
+      "derived_from": "EXPORT / PERMISSION GOVERNANCE",
+      "risk_category": [
+        "execution",
+        "intent-bypass",
+        "invisible-path"
+      ],
+      "status": "published",
+      "order": 1
+    },
+
+    {
+      "id": "case-02",
+      "slug": "intent-without-voice",
+      "title": "Intent Without Voice",
+      "subtitle": "An action without an accountable speaker",
+      "derived_from": "VOICEWALL",
+      "risk_category": [
+        "identity",
+        "accountability",
+        "anonymous-intent"
+      ],
+      "status": "published",
+      "order": 2
+    },
+
+    {
+      "id": "case-03",
+      "slug": "audit-as-evidence",
+      "title": "Audit as Evidence",
+      "subtitle": "When records become authority",
+      "derived_from": "AUDIT / TRACE GOVERNANCE",
+      "risk_category": [
+        "audit",
+        "traceability",
+        "post-incident-governance"
+      ],
+      "status": "draft",
+      "order": 3
+    }
+  ]
+}

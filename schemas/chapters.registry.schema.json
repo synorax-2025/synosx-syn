@@ -1,0 +1,17 @@
+{
+  "$id": "https://synosx.dev/schemas/chapters.registry.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Narratives Chapters Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "updated_at", "chapters"],
+  "properties": {
+    "version": { "type": "string", "minLength": 1 },
+    "updated_at": { "type": "string", "minLength": 8 },
+    "chapters": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "narratives.chapter.schema.json" }
+    }
+  }
+}

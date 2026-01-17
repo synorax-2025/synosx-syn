@@ -1,0 +1,53 @@
+{
+  "id": "case-00",
+  "title": "三界初分",
+  "subtitle": "Power ≠ Ability — The Origin of Governance",
+  "summary": "确立能力、治理与执行三界分离的根本原则，解释为什么权力不能存在于能力之中。",
+  "meta": {
+    "category": "foundational",
+    "non_normative": true
+  },
+  "sections": [
+    {
+      "heading": "原则",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "Ability is not authority",
+            "Governance must be centralized",
+            "All execution must be auditable and replayable"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "叙事",
+      "blocks": [
+        { "type": "p", "text": "在系统的早期阶段，能力被直接调用，模块可以绕过边界执行行为。" },
+        { "type": "p", "text": "系统并不缺少智能，但缺少一种能够判断『是否应该执行』的结构。" },
+        { "type": "p", "text": "能力越强，系统越依赖隐含假设与人工记忆，结构腐蚀随之产生。" },
+        { "type": "p", "text": "为解决这一问题，系统被明确划分为三个领域：能力之界、治理之界与执行之界。" }
+      ]
+    },
+    {
+      "heading": "三界定义",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "Ability Realm：提供具体能力的模块集合，可以执行行为，但不拥有决定权。",
+            "Governance Realm：不执行具体能力，但统一裁决是否允许行为发生。",
+            "Execution Realm：承载真实业务与 API，请求从此发起，结果在此落地。"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "结论",
+      "blocks": [
+        { "type": "p", "text": "从此之后，任何能力的执行，都必须先经过治理裁决。" }
+      ]
+    }
+  ]
+}

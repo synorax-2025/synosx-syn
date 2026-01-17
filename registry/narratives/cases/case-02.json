@@ -1,0 +1,81 @@
+{
+  "id": "case-02",
+  "title": "意图失权",
+  "subtitle": "Intent Without Authority",
+  "summary": "AI 模块的输出被误当成系统裁决，能力开始越权发声。",
+  "meta": {
+    "category": "ai-governance",
+    "non_normative": true
+  },
+  "sections": [
+    {
+      "heading": "事件摘要",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "这类问题不是“AI 不聪明”，而是系统把“建议”当成了“裁决”。一旦能力拥有了决定权，责任归属就开始崩塌。"
+        }
+      ]
+    },
+    {
+      "heading": "Incident",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Context：AI 被用于生成业务建议。"
+        },
+        {
+          "type": "p",
+          "text": "Evolution：AI 输出的语气逐步从建议演化为结论，最终被当作系统决定。"
+        },
+        {
+          "type": "list",
+          "items": [
+            "AI 输出建议",
+            "AI 输出结论",
+            "结论被当作系统决定"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Problem：AI 输出未经过治理裁决即产生执行影响。"
+        }
+      ]
+    },
+    {
+      "heading": "分析",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "AI 具备推理能力，但不具备裁决权。",
+            "能力的表达被误认为权力的来源。",
+            "系统开始失去对责任归属的控制。"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "治理响应",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "所有 AI 输出必须绑定明确 Intent。",
+            "AI 结果需经过 Firewall 裁决。",
+            "AI 被明确定位为能力提供者（只能发声，不拥有执行权/裁决权）。"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "结论",
+      "blocks": [
+        {
+          "type": "quote",
+          "text": "能力可以发声，但不能裁决。"
+        }
+      ]
+    }
+  ]
+}

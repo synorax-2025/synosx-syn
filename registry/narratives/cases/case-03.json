@@ -1,0 +1,75 @@
+{
+  "id": "case-03",
+  "title": "审计即证据",
+  "subtitle": "Audit as Evidence",
+  "summary": "一次未造成损失的事件，却因无法回放而被判定为高风险。",
+  "meta": {
+    "category": "audit",
+    "non_normative": true
+  },
+  "sections": [
+    {
+      "heading": "事件摘要",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "这次事件在结果上是“成功的”，但在治理意义上却是失败的。系统阻断了请求，却无法证明自己为什么是对的。"
+        }
+      ]
+    },
+    {
+      "heading": "Incident",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Result：请求被正确阻断。"
+        },
+        {
+          "type": "p",
+          "text": "Issue：系统无法重建完整的执行上下文。"
+        },
+        {
+          "type": "list",
+          "items": [
+            "缺失完整的 audit trace"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "分析",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "系统无法回答执行发生的具体条件。",
+            "没有审计就无法自证裁决合理性。",
+            "系统开始依赖人工解释，而不是证据链。"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "治理响应",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "所有裁决必须生成可回放的审计记录。",
+            "没有 Audit 的成功不算成功。",
+            "无法复现的失败不被接受。"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "结论",
+      "blocks": [
+        {
+          "type": "quote",
+          "text": "审计不是日志，而是系统的记忆。"
+        }
+      ]
+    }
+  ]
+}

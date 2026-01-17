@@ -40,6 +40,12 @@
 
   /* Focus ring */
   --focus: rgba(59,130,246,0.45);
+
+  /* -----------------------------
+     S0 — Safe-area constitution
+     ----------------------------- */
+  --sx-safe-top: env(safe-area-inset-top, 0px);
+  --sx-safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* -----------------------------
@@ -49,6 +55,12 @@
 
 html{ scroll-behavior:smooth; }
 
+/* ✅ Fixed-position stability governance (iOS/WebView) */
+html, body{
+  transform: none;
+  filter: none;
+}
+
 body{
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC",
                "Hiragino Sans GB", "Microsoft YaHei", Helvetica, Arial, sans-serif;
@@ -56,6 +68,10 @@ body{
   color: var(--text);
   overflow-x: hidden;
   line-height: 1.65;
+
+  /* ✅ Mobile governance */
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation; /* components can override (e.g. statusbar pan-x) */
 }
 
 a{ color: inherit; text-decoration: none; }
@@ -77,6 +93,7 @@ button, input, textarea, select{ font: inherit; color: inherit; }
 /* -----------------------------
    Global background (optional shared)
    If a page doesn't want it, it can override/hide in page css.
+   ✅ Avoid transform on full-screen fixed layer (iOS fixed stability)
    ----------------------------- */
 .bg-gradient{
   position: fixed;
@@ -90,7 +107,9 @@ button, input, textarea, select{ font: inherit; color: inherit; }
     radial-gradient(circle at 42% 10%, rgba(37, 99, 235, 0.08) 0%, transparent 55%);
   pointer-events: none;
   z-index: 0;
-  transform: translate3d(0,0,0);
+
+  /* ✅ safer hint (no transform) */
+  will-change: opacity;
 }
 
 /* -----------------------------

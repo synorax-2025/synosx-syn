@@ -16,7 +16,6 @@
   <!-- ✅ Shared (制度层) -->
   <link rel="stylesheet" href="assets/css/sx.core.css" />
   <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
-  <link rel="stylesheet" href="assets/css/sx.drawer.css" />   <!-- ✅ 新增：抽离 drawer 样式 -->
 
   <!-- ✅ Page (页面私有) -->
   <link rel="stylesheet" href="assets/css/pages/index.page.css" />
@@ -26,132 +25,134 @@
   <div class="bg-gradient" aria-hidden="true"></div>
 
   <nav id="navbar" aria-label="Primary Navigation">
-    <div class="nav-content">
-      <div class="logo" aria-label="SynOSX">
-        <div class="logo-icon">SX</div>
-        <span><b>SynOSX</b> <span class="logo-sub">· Governance OS</span></span>
-      </div>
+  <div class="nav-content">
+    <div class="logo" aria-label="SynOSX">
+      <div class="logo-icon">SX</div>
+      <span><b>SynOSX</b> <span class="logo-sub">· Governance OS</span></span>
+    </div>
 
-      <!-- Desktop nav -->
-      <ul class="nav-links nav-desktop" aria-label="Desktop Navigation">
-        <li><a href="#why">Why</a></li>
-        <li><a href="#constitution">Constitution</a></li>
-        <li><a href="#families">S0–S6</a></li>
+    <!-- Desktop nav -->
+    <ul class="nav-links nav-desktop" aria-label="Desktop Navigation">
+      <li><a href="#why">Why</a></li>
+      <li><a href="#constitution">Constitution</a></li>
+      <li><a href="#families">S0–S6</a></li>
 
-        <!-- Use Cases dropdown (desktop only) -->
-        <li class="nav-dropdown">
-          <a href="#usecases"
-             class="nav-drop-trigger"
-             aria-haspopup="true"
-             aria-expanded="false"
-             aria-controls="usecases-menu">
-            Use Cases <span aria-hidden="true" class="nav-caret">▾</span>
+      <!-- Use Cases dropdown (desktop only) -->
+      <li class="nav-dropdown">
+        <a href="#usecases"
+           class="nav-drop-trigger"
+           aria-haspopup="true"
+           aria-expanded="false"
+           aria-controls="usecases-menu">
+          Use Cases <span aria-hidden="true" class="nav-caret">▾</span>
+        </a>
+
+        <div id="usecases-menu" class="nav-drop-menu" role="menu" aria-label="Use Cases Submenu">
+          <a role="menuitem" href="cases.html#enterprise-governance">
+            <span>Enterprise Governance</span><span aria-hidden="true">↗</span>
+          </a>
+          <a role="menuitem" href="cases.html#ai-controlled-workflows">
+            <span>AI-Controlled Workflows</span><span aria-hidden="true">↗</span>
+          </a>
+          <a role="menuitem" href="cases.html#video-content-governance">
+            <span>Video / Content Governance</span><span aria-hidden="true">↗</span>
           </a>
 
-          <div id="usecases-menu" class="nav-drop-menu" role="menu" aria-label="Use Cases Submenu">
-            <a role="menuitem" href="cases.html#enterprise-governance">
-              <span>Enterprise Governance</span><span aria-hidden="true">↗</span>
-            </a>
-            <a role="menuitem" href="cases.html#ai-controlled-workflows">
-              <span>AI-Controlled Workflows</span><span aria-hidden="true">↗</span>
-            </a>
-            <a role="menuitem" href="cases.html#video-content-governance">
-              <span>Video / Content Governance</span><span aria-hidden="true">↗</span>
-            </a>
+          <div class="nav-drop-divider" aria-hidden="true"></div>
 
-            <div class="nav-drop-divider" aria-hidden="true"></div>
+          <a role="menuitem" href="narratives.html" class="nav-drop-narratives">
+            <span>Governance Narratives</span>
+            <span class="nav-drop-sub">Non-normative, illustrative cases</span>
+          </a>
+        </div>
+      </li>
 
-            <a role="menuitem" href="narratives.html" class="nav-drop-narratives">
-              <span>Governance Narratives</span>
-              <span class="nav-drop-sub">Non-normative, illustrative cases</span>
-            </a>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+
+    <!-- Right actions -->
+    <div class="nav-actions">
+      <!-- Mobile menu trigger -->
+      <button
+        class="btn-secondary nav-menu-btn"
+        type="button"
+        aria-label="Open Menu"
+        aria-controls="sx-mobile-menu"
+        aria-expanded="false"
+        id="sxMenuBtn">
+        ☰ Menu
+      </button>
+
+      <a href="#contact" class="cta-button">预约技术对话</a>
+    </div>
+  </div>
+
+  <!-- Mobile Drawer -->
+  <div class="sx-drawer" id="sx-mobile-menu" aria-hidden="true">
+    <div class="sx-drawer-backdrop" data-close="sx-drawer"></div>
+
+    <aside class="sx-drawer-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Mobile Navigation">
+      <div class="sx-drawer-top">
+        <div class="sx-drawer-brand">
+          <div class="logo-icon">SX</div>
+          <div class="sx-drawer-title">
+            <div class="sx-drawer-name">SynOSX</div>
+            <div class="sx-drawer-sub">Governance OS</div>
           </div>
-        </li>
+        </div>
 
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-
-      <!-- Right actions -->
-      <div class="nav-actions">
-        <!-- Mobile menu trigger -->
-        <button
-          class="btn-secondary nav-menu-btn"
-          type="button"
-          aria-label="Open Menu"
-          aria-controls="sx-mobile-menu"
-          aria-expanded="false"
-          id="sxMenuBtn">
-          ☰ Menu
-        </button>
-
-        <a href="#contact" class="cta-button">预约技术对话</a>
+        <button class="sx-drawer-close" type="button" aria-label="Close Menu" data-close="sx-drawer">✕</button>
       </div>
-    </div>
 
-    <!-- Mobile Drawer -->
-    <div class="sx-drawer" id="sx-mobile-menu" aria-hidden="true">
-      <div class="sx-drawer-backdrop" data-close="sx-drawer"></div>
+   <nav class="sx-drawer-nav" aria-label="Mobile Links">
+  <a href="#why" data-close="sx-drawer">Why</a>
+  <a href="#constitution" data-close="sx-drawer">Constitution</a>
+  <a href="#families" data-close="sx-drawer">S0–S6</a>
 
-      <aside class="sx-drawer-panel"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Mobile Navigation">
-        <div class="sx-drawer-top">
-          <div class="sx-drawer-brand">
-            <div class="logo-icon">SX</div>
-            <div class="sx-drawer-title">
-              <div class="sx-drawer-name">SynOSX</div>
-              <div class="sx-drawer-sub">Governance OS</div>
-            </div>
-          </div>
+  <!-- ✅ Use Cases：唯一可展开节点 -->
+  <button
+    class="sx-drawer-usecases"
+    type="button"
+    aria-expanded="false"
+    aria-controls="sx-usecases-panel">
+    Use Cases <span aria-hidden="true" class="sx-usecases-caret">▶</span>
+  </button>
 
-          <button class="sx-drawer-close" type="button" aria-label="Close Menu" data-close="sx-drawer">✕</button>
-        </div>
+  <!-- ✅ 二级：默认隐藏，点击 Use Cases 才展开 -->
+  <div class="sx-drawer-group" id="sx-usecases-panel" hidden>
+    <a href="cases.html#enterprise-governance" data-close="sx-drawer">
+      Enterprise Governance <span aria-hidden="true">↗</span>
+    </a>
+    <a href="cases.html#ai-controlled-workflows" data-close="sx-drawer">
+      AI-Controlled Workflows <span aria-hidden="true">↗</span>
+    </a>
+    <a href="cases.html#video-content-governance" data-close="sx-drawer">
+      Video / Content Governance <span aria-hidden="true">↗</span>
+    </a>
 
-        <nav class="sx-drawer-nav" aria-label="Mobile Links">
-          <a href="#why" data-close="sx-drawer">Why</a>
-          <a href="#constitution" data-close="sx-drawer">Constitution</a>
-          <a href="#families" data-close="sx-drawer">S0–S6</a>
+    <div class="sx-drawer-divider" aria-hidden="true"></div>
 
-          <!-- ✅ Use Cases：唯一可展开节点 -->
-          <button
-            class="sx-drawer-usecases"
-            type="button"
-            aria-expanded="false"
-            aria-controls="sx-usecases-panel">
-            Use Cases <span aria-hidden="true" class="sx-usecases-caret">▶</span>
-          </button>
+    <a href="narratives.html" class="sx-drawer-narratives" data-close="sx-drawer">
+      <span class="sx-drawer-narratives-title">Governance Narratives</span>
+      <span class="sx-drawer-narratives-sub">Non-normative, illustrative cases</span>
+    </a>
+  </div>
 
-          <!-- ✅ 二级：默认隐藏，点击 Use Cases 才展开 -->
-          <div class="sx-drawer-group" id="sx-usecases-panel" hidden>
-            <a href="cases.html#enterprise-governance" data-close="sx-drawer">
-              Enterprise Governance <span aria-hidden="true">↗</span>
-            </a>
-            <a href="cases.html#ai-controlled-workflows" data-close="sx-drawer">
-              AI-Controlled Workflows <span aria-hidden="true">↗</span>
-            </a>
-            <a href="cases.html#video-content-governance" data-close="sx-drawer">
-              Video / Content Governance <span aria-hidden="true">↗</span>
-            </a>
+  <a href="#contact" data-close="sx-drawer">Contact</a>
+</nav>
 
-            <div class="sx-drawer-divider" aria-hidden="true"></div>
 
-            <a href="narratives.html" class="sx-drawer-narratives" data-close="sx-drawer">
-              <span class="sx-drawer-narratives-title">Governance Narratives</span>
-              <span class="sx-drawer-narratives-sub">Non-normative, illustrative cases</span>
-            </a>
-          </div>
+      <div class="sx-drawer-actions">
+        <a href="cases.html" class="btn-secondary" data-close="sx-drawer">进入 Cases</a>
+        <a href="#contact" class="cta-button" data-close="sx-drawer">预约技术对话</a>
+      </div>
+    </aside>
+  </div>
+</nav>
 
-          <a href="#contact" data-close="sx-drawer">Contact</a>
-        </nav>
-
-        <div class="sx-drawer-actions">
-          <a href="cases.html" class="btn-secondary" data-close="sx-drawer">进入 Cases</a>
-          <a href="#contact" class="cta-button" data-close="sx-drawer">预约技术对话</a>
-        </div>
-      </aside>
-    </div>
-  </nav>
 
   <section class="hero">
     <div class="container">
@@ -524,7 +525,7 @@
       <a class="sb-link" href="manifest.html">Manifest / Governance Constitution</a>
     </div>
   </footer>
- 
+
   <!-- ✅ System Status Bar (shell) -->
   <div class="statusbar" role="contentinfo" aria-label="System Status Bar">
     <div class="statusbar-inner" id="sb-scroll">
@@ -568,12 +569,90 @@
   <!-- ✅ Shared JS -->
   <script src="assets/js/sx.statusbar.js"></script>
   <script src="assets/js/sx.core.js"></script>
-  <script src="assets/js/sx.drawer.js"></script> <!-- ✅ 新增：抽离 drawer 逻辑 -->
 
   <!-- ✅ Page runtime -->
   <script src="assets/js/runtime/index.runtime.js"></script>
 
-  <!-- ✅ Minimal dropdown behavior (desktop Use Cases) -->
+  <script>
+(function sxMobileDrawer(){
+  const btn = document.getElementById("sxMenuBtn");
+  const drawer = document.getElementById("sx-mobile-menu");
+  if (!btn || !drawer) return;
+
+  const panel = drawer.querySelector(".sx-drawer-panel");
+  const closeEls = drawer.querySelectorAll('[data-close="sx-drawer"]');
+
+  function open(){
+    drawer.classList.add("is-open");
+    drawer.setAttribute("aria-hidden", "false");
+    btn.setAttribute("aria-expanded", "true");
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    // focus
+    setTimeout(() => panel && panel.focus && panel.focus(), 0);
+  }
+
+  function close(){
+    drawer.classList.remove("is-open");
+    drawer.setAttribute("aria-hidden", "true");
+    btn.setAttribute("aria-expanded", "false");
+    document.documentElement.style.overflow = "";
+    document.body.style.overflow = "";
+    btn.focus();
+  }
+
+  btn.addEventListener("click", () => {
+    const isOpen = drawer.classList.contains("is-open");
+    isOpen ? close() : open();
+  });
+
+  closeEls.forEach(el => el.addEventListener("click", close));
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && drawer.classList.contains("is-open")) close();
+  });
+})();
+
+  // -----------------------------
+  // Use Cases — the only expandable node (mobile)
+  // -----------------------------
+  const ucBtn = drawer.querySelector(".sx-drawer-usecases");
+  const ucPanel = drawer.querySelector("#sx-usecases-panel");
+
+  function closeUseCases(){
+    if (!ucBtn || !ucPanel) return;
+    ucBtn.setAttribute("aria-expanded", "false");
+    ucPanel.hidden = true;
+  }
+
+  function toggleUseCases(){
+    if (!ucBtn || !ucPanel) return;
+    const openNow = ucBtn.getAttribute("aria-expanded") === "true";
+    ucBtn.setAttribute("aria-expanded", openNow ? "false" : "true");
+    ucPanel.hidden = openNow;
+  }
+
+  if (ucBtn && ucPanel){
+    closeUseCases(); // default hidden
+    ucBtn.addEventListener("click", toggleUseCases);
+  }
+
+  // when drawer closes, also collapse Use Cases
+  const _close = close;
+  function close(){
+    closeUseCases();
+    drawer.classList.remove("is-open");
+    drawer.setAttribute("aria-hidden", "true");
+    btn.setAttribute("aria-expanded", "false");
+    document.documentElement.style.overflow = "";
+    document.body.style.overflow = "";
+    btn.focus();
+  }
+
+</script>
+
+
+  <!-- ✅ Minimal dropdown behavior (no dependency, no global rewrite) -->
   <script>
     (function(){
       const trigger = document.querySelector('.nav-drop-trigger');
@@ -589,20 +668,25 @@
         trigger.setAttribute('aria-expanded','false');
       }
 
+      // hover intent (desktop)
       const host = trigger.closest('.nav-dropdown');
       host.addEventListener('mouseenter', open);
       host.addEventListener('mouseleave', close);
 
+      // click toggle (touch)
       trigger.addEventListener('click', (e) => {
+        // 如果你想点 Use Cases 直接跳 #usecases，就删掉下面这行 preventDefault
         e.preventDefault();
         const expanded = trigger.getAttribute('aria-expanded') === 'true';
         expanded ? close() : open();
       });
 
+      // outside click closes
       document.addEventListener('click', (e) => {
         if (!host.contains(e.target)) close();
       });
 
+      // esc closes
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') close();
       });

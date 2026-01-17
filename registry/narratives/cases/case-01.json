@@ -1,0 +1,81 @@
+{
+  "id": "case-01",
+  "title": "绕过之门",
+  "subtitle": "Unauthorized Execution Path",
+  "summary": "一次未经过 Intent 与 Firewall 的执行路径，暴露了系统中被绕过的治理入口。",
+  "meta": {
+    "category": "incident",
+    "non_normative": true
+  },
+  "sections": [
+    {
+      "heading": "事件摘要",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "这不是“权限没写”，而是“入口被绕过”。功能执行成功，但制度裁决链缺席。"
+        }
+      ]
+    },
+    {
+      "heading": "Incident",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Symptom：系统发生未授权导出，但未触发任何错误或报警。"
+        },
+        {
+          "type": "p",
+          "text": "Cause：历史函数被直接调用，绕过治理入口。"
+        },
+        {
+          "type": "p",
+          "text": "Missing：本次路径缺失 intent / firewall / audit。"
+        },
+        {
+          "type": "list",
+          "items": [
+            "intent",
+            "firewall",
+            "audit"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "分析",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "该路径在功能上是正确的，但在制度上是非法的。",
+            "系统无法证明是谁在什么意图下执行了该行为。",
+            "问题不在权限配置，而在入口被绕过。"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "治理响应",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "禁止任何无 Intent 的执行路径。",
+            "所有入口必须强制经过治理中枢。",
+            "历史接口被标记为违宪边。"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "结论",
+      "blocks": [
+        {
+          "type": "quote",
+          "text": "功能正确不等于路径合法。"
+        }
+      ]
+    }
+  ]
+}

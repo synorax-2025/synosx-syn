@@ -6,522 +6,33 @@
   <title>SynOSX Whitepaper · 可验证治理系统白皮书</title>
   <meta name="description" content="SynOSX Whitepaper：解释为什么复杂系统需要可验证治理，以及 SynOSX 如何用 Contracts-first 与裁决链路（Intent/Firewall/Audit）实现可追溯、可表达、可进化（零降维）。" />
 
-  <style>
-    :root {
-      --bg: #0a0e1a;
-      --surface: rgba(26, 32, 54, 0.72);
-      --surface2: rgba(18, 23, 43, 0.55);
-      --text: #e8ecf5;
-      --text-muted: #93a0bd;
-      --accent-blue: #3b82f6;
-      --accent-indigo: #6366f1;
-      --gradient-1: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-      --gradient-2: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
-      --shadow-lg: 0 25px 60px -18px rgba(0, 0, 0, 0.55);
-      --shadow-md: 0 16px 40px -20px rgba(0, 0, 0, 0.45);
-      --radius: 24px;
-      --max: 1200px;
+  <!-- ✅ Statusbar Meta (6个) -->
+  <meta name="sx-runtime" content="MANIFEST" />
+  <meta name="sx-build-date" content="2026-01-13" />
+  <meta name="sx-version" content="v1.0.4-Stable" />
+  <meta name="sx-commit" content="ba...227" />
+  <meta name="sx-policy" content="DAG Constitution" />
+  <meta name="sx-statusbar-layout" content="release" />
 
-      --toc-w: 300px;
-      --border: rgba(255,255,255,0.08);
-      --panel: rgba(255,255,255,0.03);
-      --panel2: rgba(0,0,0,0.35);
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC",
-                   "Hiragino Sans GB", "Microsoft YaHei", Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
-      line-height: 1.75;
-    }
-    a { color: inherit; text-decoration: none; }
-    b,strong { font-weight: 800; }
+  <!-- ✅ Shared CSS -->
+  <link rel="stylesheet" href="assets/css/sx.core.css" />
+  <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
 
-    .bg-gradient{
-      position: fixed;
-      top: -35%;
-      left: -35%;
-      width: 170%;
-      height: 170%;
-      background:
-        radial-gradient(circle at 20% 40%, rgba(59, 130, 246, 0.12) 0%, transparent 55%),
-        radial-gradient(circle at 78% 70%, rgba(99, 102, 241, 0.12) 0%, transparent 55%),
-        radial-gradient(circle at 42% 10%, rgba(37, 99, 235, 0.08) 0%, transparent 55%);
-      pointer-events: none;
-      z-index: 0;
-      transform: translate3d(0,0,0);
-    }
-
-    .container{
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 0 24px;
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Nav */
-    nav{
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      backdrop-filter: blur(18px);
-      background: rgba(10, 14, 26, 0.72);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      transition: background .3s ease, box-shadow .3s ease;
-    }
-    nav.scrolled{
-      background: rgba(10, 14, 26, 0.92);
-      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.32);
-    }
-    .nav-content{
-      height: 76px;
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 0 24px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 14px;
-    }
-    .logo{
-      display:flex; align-items:center; gap: 12px;
-      font-weight: 900;
-      letter-spacing: -0.02em;
-      font-size: 18px;
-      white-space: nowrap;
-    }
-    .logo-icon{
-      width: 38px; height: 38px;
-      background: var(--gradient-1);
-      border-radius: 12px;
-      display:grid; place-items:center;
-      box-shadow: 0 10px 24px rgba(59, 130, 246, 0.22);
-      color: #071022;
-      font-weight: 900;
-    }
-    .logo span b{
-      background: var(--gradient-1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .nav-links{
-      display:flex;
-      gap: 18px;
-      list-style:none;
-      align-items:center;
-    }
-    .nav-links a{
-      color: var(--text-muted);
-      font-weight: 700;
-      font-size: 13px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 1px solid transparent;
-      transition: .25s ease;
-    }
-    .nav-links a:hover{
-      color: var(--text);
-      border-color: rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-    }
-
-    .cta-button{
-      padding: 11px 18px;
-      background: var(--gradient-1);
-      border: none;
-      border-radius: 12px;
-      color: #071022;
-      font-weight: 900;
-      font-size: 13px;
-      cursor: pointer;
-      transition: transform .25s ease, box-shadow .25s ease;
-      display:inline-flex;
-      align-items:center;
-      gap: 10px;
-      box-shadow: 0 12px 24px rgba(59, 130, 246, 0.18);
-      white-space: nowrap;
-    }
-    .cta-button:hover{
-      transform: translateY(-2px);
-      box-shadow: 0 16px 32px rgba(59, 130, 246, 0.28);
-    }
-    .btn-secondary{
-      padding: 11px 18px;
-      background: transparent;
-      border: 1px solid rgba(59, 130, 246, 0.55);
-      border-radius: 12px;
-      color: #9fc3ff;
-      font-weight: 900;
-      font-size: 13px;
-      cursor: pointer;
-      transition: .25s ease;
-      display:inline-flex;
-      align-items:center;
-      gap: 10px;
-      white-space: nowrap;
-    }
-    .btn-secondary:hover{
-      background: rgba(59, 130, 246, 0.12);
-      transform: translateY(-2px);
-    }
-
-    /* Hero */
-    .hero{
-      padding-top: 110px;
-      padding-bottom: 46px;
-    }
-    .kicker{
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
-      color: #b8c5e6;
-      font-size: 12px;
-      margin-bottom: 16px;
-    }
-    .kicker .dot{
-      width: 8px; height: 8px;
-      border-radius: 999px;
-      background: var(--accent-blue);
-      box-shadow: 0 0 18px rgba(59,130,246,0.35);
-    }
-    .hero h1{
-      font-size: clamp(34px, 4.6vw, 60px);
-      font-weight: 950;
-      line-height: 1.06;
-      letter-spacing: -0.03em;
-      margin-bottom: 14px;
-      background: linear-gradient(135deg, #ffffff 0%, #a9c8ff 40%, #3b82f6 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .hero .subtitle{
-      font-size: 15px;
-      color: var(--text-muted);
-      max-width: 80ch;
-      line-height: 1.95;
-      margin-bottom: 18px;
-    }
-    .hero-actions{
-      display:flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    /* Layout */
-    .layout{
-      display:grid;
-      grid-template-columns: var(--toc-w) 1fr;
-      gap: 18px;
-      align-items: start;
-      padding-bottom: 90px;
-    }
-    .toc{
-      position: sticky;
-      top: 96px;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      background: linear-gradient(135deg, rgba(26, 32, 54, 0.55), rgba(18, 23, 43, 0.40));
-      box-shadow: var(--shadow-md);
-      overflow: hidden;
-    }
-    .toc-header{
-      padding: 16px 16px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-    }
-    .toc-title{
-      font-weight: 900;
-      font-size: 12px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #9fc3ff;
-    }
-    .toc-badge{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.12);
-      color: #dbe7ff;
-      background: rgba(255,255,255,0.04);
-      white-space: nowrap;
-    }
-    .toc-body{
-      padding: 10px 10px 12px;
-      display:grid;
-      gap: 6px;
-      max-height: calc(100vh - 130px);
-      overflow:auto;
-    }
-    .toc a{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      padding: 9px 10px;
-      border-radius: 12px;
-      border: 1px solid transparent;
-      color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 750;
-      transition: .22s ease;
-    }
-    .toc a:hover{
-      color: var(--text);
-      background: rgba(255,255,255,0.03);
-      border-color: rgba(255,255,255,0.06);
-    }
-    .toc a.active{
-      color: var(--text);
-      background: rgba(59,130,246,0.10);
-      border-color: rgba(59,130,246,0.24);
-    }
-    .toc .num{
-      width: 26px;
-      height: 26px;
-      border-radius: 10px;
-      display:grid;
-      place-items:center;
-      background: rgba(0,0,0,0.25);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: #d8e2ff;
-      font-weight: 900;
-      font-size: 12px;
-      flex-shrink: 0;
-    }
-
-    /* Article */
-    .paper{
-      border-radius: var(--radius);
-      border: 1px solid rgba(255,255,255,0.10);
-      background: linear-gradient(135deg, var(--surface), var(--surface2));
-      backdrop-filter: blur(16px);
-      box-shadow: var(--shadow-lg);
-      overflow: hidden;
-    }
-    .paper-head{
-      padding: 22px 22px 18px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      display:flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .paper-meta{
-      display:flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: center;
-      color: var(--text-muted);
-      font-size: 12px;
-    }
-    .pill{
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
-      color: #b8c5e6;
-      font-weight: 800;
-    }
-    .paper-body{
-      padding: 22px;
-    }
-    .section{
-      padding: 22px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-    .section:last-child{ border-bottom: none; }
-    .section h2{
-      font-size: 22px;
-      font-weight: 950;
-      letter-spacing: -0.02em;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, #fff 0%, #bcd6ff 45%, var(--accent-blue) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .section h3{
-      font-size: 15px;
-      font-weight: 900;
-      margin-top: 14px;
-      margin-bottom: 8px;
-      color: #dbe7ff;
-    }
-    .section p{
-      color: var(--text-muted);
-      font-size: 13.5px;
-      line-height: 1.95;
-      margin-top: 10px;
-    }
-    .lead{
-      color: var(--text);
-      font-size: 14px;
-      line-height: 1.95;
-      margin-top: 8px;
-    }
-
-    .callout{
-      margin-top: 14px;
-      border: 1px solid rgba(59,130,246,0.24);
-      background: rgba(59,130,246,0.08);
-      border-radius: 18px;
-      padding: 14px 14px;
-      color: #d8e2ff;
-    }
-    .callout b{ color:#ffffff; }
-    .callout p{ margin-top: 8px; color:#c6d7ff; }
-
-    .grid{
-      display:grid;
-      gap: 14px;
-      margin-top: 14px;
-    }
-    .grid.two{ grid-template-columns: 1fr 1fr; }
-    .card{
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.22);
-      border-radius: 18px;
-      padding: 16px;
-    }
-    .card .tag{
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #9fc3ff;
-      margin-bottom: 6px;
-    }
-    .card h4{
-      font-size: 14px;
-      font-weight: 900;
-      color: #eaf1ff;
-      margin-bottom: 8px;
-    }
-    .card p{
-      margin-top: 0;
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.85;
-    }
-
-    .code-block{
-      margin-top: 14px;
-      background: rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.10);
-      border-radius: 16px;
-      padding: 16px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 12.8px;
-      color: #a9c8ff;
-      line-height: 1.85;
-      overflow-x: auto;
-      white-space: pre;
-    }
-
-    .steps{
-      display:flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .step{
-      display:inline-flex;
-      align-items:center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.22);
-      color:#dbe7ff;
-      font-size: 13px;
-      font-weight: 800;
-    }
-    .arrow{
-      color: rgba(159,179,255,0.9);
-      font-weight: 900;
-      margin: 0 2px;
-      display:inline-flex;
-      align-items:center;
-    }
-
-    .mini-links{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
-    .mini-links a{
-      display:inline-flex;
-      align-items:center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
-      color: #dbe7ff;
-      font-size: 13px;
-      font-weight: 900;
-      transition: .22s ease;
-    }
-    .mini-links a:hover{
-      background: rgba(59,130,246,0.10);
-      border-color: rgba(59,130,246,0.24);
-      transform: translateY(-2px);
-    }
-
-    footer{
-      padding: 34px 0 46px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-
-    /* Reveal */
-    .reveal { opacity: 0; transform: translateY(18px); transition: 0.7s ease; }
-    .reveal.active { opacity: 1; transform: translateY(0); }
-
-    /* Responsive */
-    @media (max-width: 980px){
-      .nav-links{ display:none; }
-      .layout{ grid-template-columns: 1fr; }
-      .toc{ position: relative; top: auto; }
-      .grid.two{ grid-template-columns: 1fr; }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      * { animation: none !important; transition: none !important; }
-      html { scroll-behavior: auto; }
-    }
-  </style>
+  <!-- ✅ Page CSS (page-only) -->
+  <link rel="stylesheet" href="assets/css/pages/whitepaper.page.css" />
 </head>
 
-<body>
+<body class="has-statusbar">
   <div class="bg-gradient" aria-hidden="true"></div>
 
-  <nav id="navbar">
+  <nav id="navbar" aria-label="Whitepaper Navigation">
     <div class="nav-content">
-      <div class="logo" aria-label="SynOSX">
+      <a class="logo" href="index.html" aria-label="SynOSX">
         <div class="logo-icon">SX</div>
-        <span><b>SynOSX</b> <span style="color:var(--text-muted); font-weight:900;">· Whitepaper</span></span>
-      </div>
+        <span><b>SynOSX</b> <span class="logo-sub">· Whitepaper</span></span>
+      </a>
 
-      <ul class="nav-links">
+      <ul class="nav-links" aria-label="Whitepaper Chapters">
         <li><a href="#c1">Ch1</a></li>
         <li><a href="#c2">Ch2</a></li>
         <li><a href="#c3">Ch3</a></li>
@@ -532,17 +43,21 @@
         <li><a href="#c8">Ch8</a></li>
       </ul>
 
-      <div style="display:flex; gap:10px; align-items:center;">
+      <div class="nav-actions">
         <a class="btn-secondary" href="index.html">返回首页</a>
         <a class="cta-button" href="manifest.html">阅读 Manifest</a>
       </div>
     </div>
   </nav>
 
-  <header class="hero">
+  <header class="hero" id="top">
     <div class="container">
       <div class="kicker reveal"><span class="dot"></span> Contracts-first · 可验证治理 · Zero-Reduction</div>
-      <h1 class="reveal">SynOSX Whitepaper<br/>可验证治理系统白皮书</h1>
+
+      <h1 class="reveal">
+        SynOSX Whitepaper<br/>可验证治理系统白皮书
+      </h1>
+
       <p class="subtitle reveal">
         这份白皮书回答一个核心问题：<strong>复杂系统与 AI 时代，为什么“做更多功能”不等于“可治理”</strong>。
         SynOSX 的目标不是堆叠能力，而是让系统的每一次关键行为都具备<strong>可追溯、可表达、可进化</strong>的证据链，
@@ -565,6 +80,7 @@
           <div class="toc-title">Contents</div>
           <div class="toc-badge">Whitepaper</div>
         </div>
+
         <div class="toc-body" id="toc">
           <a href="#c1"><span class="num">1</span> 为什么复杂系统会失控</a>
           <a href="#c2"><span class="num">2</span> AI 为什么放大风险</a>
@@ -588,7 +104,7 @@
           </div>
           <div class="paper-meta">
             <span>定位：解释性文本（非工程说明）</span>
-            <span>·</span>
+            <span class="sep">·</span>
             <span>权威规则请以 Manifest 为准</span>
           </div>
         </div>
@@ -693,9 +209,7 @@
 
             <div class="callout">
               <b>一句话：</b>
-              <p>
-                治理的目标不是“阻止行动”，而是让行动<strong>可审计、可回放、可追责、可进化</strong>。
-              </p>
+              <p>治理的目标不是“阻止行动”，而是让行动<strong>可审计、可回放、可追责、可进化</strong>。</p>
             </div>
           </section>
 
@@ -735,7 +249,7 @@
               <b>白皮书提醒：</b>
               <p>
                 白皮书解释“为什么需要这些机制”；真正的<strong>规则条文</strong>与<strong>裁决边界</strong>以
-                <a href="manifest.html" style="text-decoration: underline; color:#cfe0ff; font-weight:900;">Manifest</a> 为准。
+                <a href="manifest.html" class="inline-link">Manifest</a> 为准。
               </p>
             </div>
           </section>
@@ -893,9 +407,7 @@
 
             <div class="callout">
               <b>提示：</b>
-              <p>
-                上述场景的“规则条文”与“边界定义”应以 Manifest 为准；白皮书只解释其必要性与落地意义。
-              </p>
+              <p>上述场景的“规则条文”与“边界定义”应以 Manifest 为准；白皮书只解释其必要性与落地意义。</p>
             </div>
           </section>
 
@@ -942,9 +454,7 @@
 
             <div class="callout">
               <b>Whitepaper 的最后一句话：</b>
-              <p>
-                治理不是把系统变慢，而是把系统变得<strong>可证明</strong>。当你能回放每一次判断与执行，你才能真正放心让系统变快。
-              </p>
+              <p>治理不是把系统变慢，而是把系统变得<strong>可证明</strong>。当你能回放每一次判断与执行，你才能真正放心让系统变快。</p>
             </div>
           </section>
 
@@ -972,44 +482,47 @@
   <footer>
     <div class="container">
       © 2026 SynOSX · Whitepaper — Verifiable Governance ·
-      <a href="manifest.html" style="text-decoration: underline; color:#9fc3ff; font-weight:900;">Manifest / Governance Constitution</a>
+      <a class="sb-link" href="manifest.html">Manifest / Governance Constitution</a>
     </div>
   </footer>
 
-  <script>
-    // Navbar shadow
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 12) navbar.classList.add('scrolled');
-      else navbar.classList.remove('scrolled');
-    });
+  <!-- ✅ Statusbar shell (统一模板) -->
+  <div class="statusbar" role="contentinfo" aria-label="System Status Bar">
+    <div class="statusbar-inner">
+      <div class="sb-left">
+        <span class="sb-pill">
+          <span class="sb-key">RUNTIME</span>
+          <span class="sb-val" id="sb-runtime">—</span>
+        </span>
+        <span class="sb-pill" title="BUILD">
+          <span class="sb-key">BUILD</span>
+          <span class="sb-val" id="sb-build">—</span>
+        </span>
+        <span class="sb-pill" title="VERSION">
+          <span class="sb-key">VER</span>
+          <span class="sb-val" id="sb-version">—</span>
+        </span>
+        <span class="sb-pill sb-copy" title="COMMIT (click to copy)">
+          <span class="sb-key">COMMIT</span>
+          <span class="sb-val" id="sb-commit">—</span>
+        </span>
+      </div>
 
-    // Reveal animations
-    const reveals = document.querySelectorAll('.reveal');
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
-    }, { threshold: 0.12 });
-    reveals.forEach(el => io.observe(el));
+      <div class="sb-right">
+        <span class="sb-pill" title="POLICY">
+          <span class="sb-key">POLICY</span>
+          <span class="sb-val" id="sb-policy">—</span>
+        </span>
+      </div>
+    </div>
+  </div>
 
-    // TOC scrollspy
-    const toc = document.getElementById('toc');
-    const tocLinks = toc.querySelectorAll('a[href^="#"]');
-    const sections = Array.from(tocLinks)
-      .map(a => document.querySelector(a.getAttribute('href')))
-      .filter(Boolean);
+  <!-- ✅ Shared JS -->
+  <script src="assets/js/sx.statusbar.js"></script>
+  <script src="assets/js/sx.core.js"></script>
 
-    const spy = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        const id = entry.target.getAttribute('id');
-        tocLinks.forEach(a => {
-          a.classList.toggle('active', a.getAttribute('href') === '#' + id);
-        });
-      });
-    }, { rootMargin: '-40% 0px -55% 0px', threshold: 0.01 });
-
-    sections.forEach(s => spy.observe(s));
-  </script>
+  <!-- ✅ Page runtime -->
+  <script src="assets/js/runtime/whitepaper.runtime.js"></script>
 
   <!--
     Self-Audit:

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Narrative Case · SynOSX</title>
+  <meta name="description" content="Narrative Case 是非规范叙事例证：展示制度在现实复杂度中的投影。" />
+
+  <!-- ✅ System Status Meta (6个) -->
+  <meta name="sx-runtime" content="NARRATIVE-CASE" />
+  <meta name="sx-build-date" content="2026-01-17" />
+  <meta name="sx-version" content="v1.0.4-Stable" />
+  <meta name="sx-commit" content="ba...227" />
+  <meta name="sx-policy" content="DAG Constitution" />
+  <meta name="sx-statusbar-layout" content="release" />
+
+  <!-- ✅ Shared CSS -->
+  <link rel="stylesheet" href="../assets/css/sx.core.css" />
+  <link rel="stylesheet" href="../assets/css/sx.statusbar.css" />
+
+  <!-- ✅ Page CSS -->
+  <link rel="stylesheet" href="../assets/css/pages/narrative-case.page.css" />
+</head>
+
+<body class="has-statusbar" data-page="narrative-case">
+  <div class="bg-gradient" aria-hidden="true"></div>
+
+  <nav id="navbar" aria-label="Narrative Case Navigation">
+    <div class="nav-content">
+      <a class="logo" href="../narratives.html" aria-label="Back to Narratives">
+        <div class="logo-icon">SX</div>
+        <span><b>SynOSX</b> <span class="logo-sub">· Narrative Case</span></span>
+      </a>
+
+      <div class="nav-links">
+        <a class="pill" href="../narratives.html">← 返回 Narratives</a>
+        <a class="pill muted" href="../cases.html">返回 Use Cases</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="case-hero">
+    <div class="container">
+      <div class="kicker"><span class="dot"></span> NON-NORMATIVE · ILLUSTRATIVE</div>
+      <h1 class="case-title" id="case-title">Loading…</h1>
+      <p class="case-subtitle" id="case-subtitle">正在读取章节内容。</p>
+
+      <div class="notice" role="note" aria-label="Non-normative Notice">
+        <div class="notice-badge">NON-NORMATIVE</div>
+        <div class="notice-body">
+          <div class="notice-title">此页面不是规范文本。</div>
+          <div class="notice-desc">
+            如与 Manifest/Constitution 冲突，以制度文本为准。
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="case-body" aria-label="Narrative Content">
+    <div class="container">
+      <div class="card" id="case-content">
+        <p>Loading case json…</p>
+      </div>
+
+      <div class="bottom-actions">
+        <a class="btn-secondary" href="../narratives.html">← 返回目录</a>
+        <a class="cta-button" href="../cases.html">回到 Use Cases</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      © 2026 SynOSX · Narrative Case ·
+      <a class="sb-link" href="../manifest.html">Read Manifest</a>
+    </div>
+  </footer>
+
+  <!-- ✅ Statusbar (统一模板) -->
+  <div class="statusbar" role="contentinfo" aria-label="System Status Bar">
+    <div class="statusbar-inner">
+      <div class="sb-left">
+        <span class="sb-pill">
+          <span class="sb-key">RUNTIME</span>
+          <span class="sb-val" id="sb-runtime">NARRATIVE-CASE</span>
+        </span>
+      </div>
+
+      <div class="sb-right">
+        <span class="sb-pill" title="POLICY">
+          <span class="sb-key">POLICY</span>
+          <span class="sb-val" id="sb-policy">—</span>
+        </span>
+        <span class="sb-pill" title="BUILD">
+          <span class="sb-key">BUILD</span>
+          <span class="sb-val" id="sb-build">—</span>
+        </span>
+        <span class="sb-pill" title="VER">
+          <span class="sb-key">VER</span>
+          <span class="sb-val" id="sb-version">—</span>
+        </span>
+        <span class="sb-pill sb-copy" title="COMMIT (click to copy)">
+          <span class="sb-key">COMMIT</span>
+          <span class="sb-val" id="sb-commit">—</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Shared JS -->
+  <script src="../assets/js/sx.statusbar.js"></script>
+  <script src="../assets/js/sx.core.js"></script>
+
+  <!-- ✅ Page runtime -->
+  <script src="../assets/js/runtime/narrative-case.runtime.js"></script>
+</body>
+</html>

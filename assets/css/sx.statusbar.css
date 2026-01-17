@@ -1,6 +1,6 @@
 /* sx.statusbar.css — SynOSX System Status Bar (shared)
-   ✅ Mobile-safe + Safe-area governance + Gesture governance + Variable-level contrast
-   ✅ Verdict dot states (VERIFIED / BLOCKED / UNVERIFIED)
+   ✅ Constitution-grade stable on iOS Safari / WeChat WebView
+   ✅ Safe-area via padding, lift via transform, bottom always 0
 */
 
 :root{
@@ -33,33 +33,50 @@
   --sb-bg: rgba(0,0,0,0.70);
 
   /* 兼容：如果页面没定义 mono，就给默认 */
-  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+          "Courier New", monospace;
 }
 
-/* ✅ 页面为 statusbar + safe-area + lift 统一让位（不要写死 66px） */
+/* ✅ 页面为 statusbar 统一让位（唯一真源） */
 body{
-  padding-bottom: calc(var(--sx-statusbar-h) + var(--sx-safe-bottom) + var(--sx-statusbar-lift));
+  padding-bottom: calc(
+    var(--sx-statusbar-h) + var(--sx-safe-bottom) + var(--sx-statusbar-lift)
+  );
 }
 
-/* Statusbar */
+/* -------------------------------------------------
+   Statusbar (constitution-grade stable positioning)
+   - bottom: 0 (never calc/env)
+   - safe-area: padding-bottom
+   - lift: transform
+   ------------------------------------------------- */
 .statusbar{
   position: fixed;
-  left:0;
-  right:0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 
-  /* ✅ 不再贴 0：safe-area + lift */
-  bottom: calc(var(--sx-safe-bottom) + var(--sx-statusbar-lift));
+  /* ✅ safe-area 不参与 bottom 计算 */
+  padding-bottom: var(--sx-safe-bottom);
 
-  z-index: 2500;
+  /* ✅ lift 不参与布局计算（iOS/WeChat 更稳定） */
+  transform: translateY(calc(-1 * var(--sx-statusbar-lift)));
+
+  z-index: 9999;
   background: var(--sb-bg);
   border-top: 1px solid var(--sb-border);
   backdrop-filter: blur(14px);
+
+  /* ✅ 防止被某些布局影响裁剪 */
+  pointer-events: auto;
 }
 
 /* ✅ 关键：整条可横向滚动（证据不换行） + 手势治理 */
 .statusbar-inner{
   max-width: var(--sb-max);
   margin: 0 auto;
+
+  /* ✅ 这里不要再加 safe-area；safe-area 已由 .statusbar padding 承担 */
   padding: 10px 14px;
 
   display:flex;
@@ -77,7 +94,7 @@ body{
   white-space: nowrap;
   scrollbar-width: none;
 
-  /* ✅ 手势治理：减少 iOS 抢滑（关键） */
+  /* ✅ 手势治理：减少 iOS 抢滑 */
   touch-action: pan-x;
   overscroll-behavior: contain;
 }
@@ -87,7 +104,7 @@ body{
   display:flex;
   gap: 10px;
   align-items:center;
-  flex-wrap: nowrap; /* ✅ 不换行 */
+  flex-wrap: nowrap;
   white-space: nowrap;
 }
 
@@ -103,7 +120,6 @@ body{
 
   flex: 0 0 auto;
 
-  /* ✅ 移动端治理：pill 自己必须能裁剪，ellipsis 才可靠 */
   max-width: var(--sb-max-pill);
   overflow: hidden;
 }
@@ -111,14 +127,13 @@ body{
 .sb-key{
   color: rgba(159,195,255,0.9);
   font-weight: 800;
-  flex: 0 0 auto; /* ✅ key 不参与压缩 */
+  flex: 0 0 auto;
 }
 
 .sb-val{
   color: var(--fg-strong);
   flex: 1 1 auto;
   min-width: 0;
-
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -149,7 +164,7 @@ body{
   text-underline-offset: 2px;
 }
 
-/* ✅ 引擎灯（默认：UNVERIFIED，避免“没裁决却亮绿灯”） */
+/* 引擎灯（默认：UNVERIFIED） */
 .engine-dot{
   width: 10px;
   height: 10px;
@@ -159,8 +174,6 @@ body{
   border: 1px solid rgba(255,255,255,0.12);
   flex: 0 0 auto;
 }
-
-/* Verdict dot states (used by sx.statusbar.js) */
 .engine-dot.verified{
   background: rgba(74,222,128,0.95);
   box-shadow: 0 0 14px rgba(74,222,128,0.45);
@@ -178,3 +191,16 @@ body{
 @media (max-width: 980px){
   :root{ --sb-max-pill: 62vw; }
 }
+
+/* -------------------------------------------------
+   Optional hardening:
+   If some page applies transform/filter to <body>/<main>,
+   iOS may treat fixed as "relative fixed" and clip it.
+   Turn this on ONLY if you still see missing bar.
+   ------------------------------------------------- */
+/*
+html, body{
+  transform: none !important;
+  filter: none !important;
+}
+*/

@@ -23,6 +23,8 @@ synosx-site/
 │  └─ ... (更多判例页)
 │
 ├─ registry/
+   ├─ cases.registry.json          # 规范判例（可回放 / 可审计）
+   ├─ narratives.registry.json     # 👈 新增（非规范叙事）
 │  ├─ replay.registry.schema.json
 │  └─ replay.registry.json
 │
@@ -39,3 +41,10 @@ synosx-site/
 ├─ whitepaper.html
 └─ docs/
    └─ ... (可选：写你的网站制度说明)
+
+   registry/
+├─ narratives/
+│  ├─ chapters.registry.json    # 👈 推荐
+│  ├─ case-01.json
+│  ├─ case-02.json
+

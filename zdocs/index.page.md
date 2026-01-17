@@ -1,6 +1,6 @@
 /* index.page.css — Index page specific styles
    ✅ Only page layout/sections/components that are unique to index.html
-   ✅ Requires sx.core.css + sx.statusbar.css + sx.drawer.css
+   ✅ Requires sx.core.css + sx.statusbar.css
 */
 
 /* -----------------------------
@@ -38,12 +38,6 @@
   font-weight: 900;
 }
 
-/* Sub brand in logo line */
-.logo-sub{
-  color: var(--text-muted);
-  font-weight: 800;
-}
-
 .logo span b{
   background: var(--gradient-1);
   -webkit-background-clip: text;
@@ -73,70 +67,28 @@
   background: rgba(255,255,255,0.03);
 }
 
-/* ✅ Desktop only: Use Cases dropdown */
-.nav-dropdown{ position: relative; }
-.nav-caret{ margin-left: 6px; opacity: .7; }
+/* ✅ 方案 B：Use Cases 旁边挂 Narratives 胶囊 */
+.nav-links .nav-usecases{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-.nav-drop-menu{
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 0;
-  min-width: 260px;
-  padding: 10px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(10,14,26,0.92);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 18px 50px rgba(0,0,0,0.45);
-  display: none;
-  z-index: 120;
-}
-.nav-drop-menu a{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding: 10px 12px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 850;
-  color: rgba(232,236,245,0.92);
-  border: 1px solid transparent;
-}
-.nav-drop-menu a:hover{
-  background: rgba(255,255,255,0.03);
-  border-color: rgba(255,255,255,0.08);
-}
-.nav-drop-divider{
-  height: 1px;
-  margin: 8px 6px;
-  background: rgba(255,255,255,0.08);
-}
-.nav-drop-narratives{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(59,130,246,0.18) !important;
-  background: rgba(59,130,246,0.06);
-  color: rgba(159,195,255,0.95) !important;
-}
-.nav-drop-sub{
+.nav-links .nav-subpill{
   font-size: 12px;
   font-weight: 800;
-  opacity: .78;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.04);
+  color: rgba(159,195,255,0.92);
+  line-height: 1;
+  transition: 0.25s ease;
 }
-
-/* show dropdown on hover (desktop) */
-@media (min-width: 981px){
-  .nav-dropdown:hover .nav-drop-menu{ display: block; }
-}
-
-/* nav actions */
-.nav-actions{
-  display:flex;
-  gap: 10px;
-  align-items:center;
+.nav-links .nav-subpill:hover{
+  border-color: rgba(59,130,246,0.35);
+  background: rgba(59,130,246,0.10);
+  color: var(--text);
 }
 
 /* -----------------------------
@@ -885,7 +837,7 @@
    ----------------------------- */
 @media (max-width: 980px){
   .hero-content{ grid-template-columns: 1fr; gap: 22px; }
-  .nav-links{ display: none; } /* desktop links hidden */
+  .nav-links{ display: none; } /* 你原本就是隐藏 */
   .constitution-grid{ grid-template-columns: 1fr; }
   .contact-grid{ grid-template-columns: 1fr; }
   .rule-card{ grid-column: span 12; }
@@ -898,3 +850,222 @@
   .dag-switchbar{ flex-direction: column; align-items: flex-start; gap: 10px; }
   .dag-switch-buttons{ width: 100%; justify-content: center; }
 }
+
+/* =========================================================
+   Mobile Drawer Nav (Index only)
+   ========================================================= */
+
+.logo-sub{
+  color: var(--text-muted);
+  font-weight: 800;
+}
+
+/* desktop dropdown base (thin, no inline styles) */
+.nav-dropdown{ position: relative; }
+.nav-caret{ margin-left: 6px; opacity: .7; }
+
+.nav-drop-menu{
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  min-width: 260px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(10,14,26,0.92);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.45);
+  display: none;
+  z-index: 120;
+}
+.nav-drop-menu a{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 850;
+  color: rgba(232,236,245,0.92);
+  border: 1px solid transparent;
+}
+.nav-drop-menu a:hover{
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.08);
+}
+.nav-drop-divider{
+  height: 1px;
+  margin: 8px 6px;
+  background: rgba(255,255,255,0.08);
+}
+.nav-drop-narratives{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(59,130,246,0.18) !important;
+  background: rgba(59,130,246,0.06);
+  color: rgba(159,195,255,0.95) !important;
+}
+.nav-drop-sub{
+  font-size: 12px;
+  font-weight: 800;
+  opacity: .78;
+}
+
+/* show dropdown on hover (desktop) */
+@media (min-width: 981px){
+  .nav-dropdown:hover .nav-drop-menu{ display: block; }
+}
+
+/* nav actions */
+.nav-actions{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+}
+
+/* ✅ Mobile: hide desktop links, show menu button */
+.nav-menu-btn{ display: none; }
+
+@media (max-width: 980px){
+  .nav-desktop{ display: none; }
+  .nav-menu-btn{ display: inline-flex; }
+}
+
+/* Drawer shell */
+.sx-drawer{
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: none;
+}
+.sx-drawer.is-open{ display:block; }
+
+.sx-drawer-backdrop{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+}
+
+.sx-drawer-panel{
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(380px, 92vw);
+  background: rgba(10,14,26,0.96);
+  border-left: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(18px);
+  box-shadow: -30px 0 90px rgba(0,0,0,0.45);
+  padding: 16px 16px 18px;
+  display:flex;
+  flex-direction:column;
+  gap: 12px;
+}
+
+.sx-drawer-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.sx-drawer-brand{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+}
+.sx-drawer-title{ display:flex; flex-direction:column; line-height: 1.1; }
+.sx-drawer-name{ font-weight: 950; letter-spacing: -0.02em; }
+.sx-drawer-sub{ font-size: 12px; color: var(--text-muted); font-weight: 800; opacity: .9; }
+
+.sx-drawer-close{
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.04);
+  color: rgba(232,236,245,0.9);
+  border-radius: 12px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.sx-drawer-nav{
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
+  padding-top: 6px;
+}
+.sx-drawer-nav > a{
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  font-weight: 850;
+  color: rgba(232,236,245,0.92);
+}
+.sx-drawer-nav > a:hover{
+  border-color: rgba(59,130,246,0.30);
+  background: rgba(59,130,246,0.08);
+}
+
+.sx-drawer-group{
+  margin-top: 6px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.22);
+}
+.sx-drawer-group-title{
+  font-family: var(--mono);
+  font-size: 11px;
+  color: rgba(159,195,255,0.92);
+  letter-spacing: .06em;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+.sx-drawer-group a{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 10px 10px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  color: rgba(232,236,245,0.92);
+  font-weight: 850;
+  font-size: 13px;
+}
+.sx-drawer-group a:hover{
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.08);
+}
+
+.sx-drawer-divider{
+  height: 1px;
+  margin: 10px 4px;
+  background: rgba(255,255,255,0.08);
+}
+
+.sx-drawer-narratives{
+  display:flex !important;
+  flex-direction:column;
+  align-items:flex-start !important;
+  gap:4px;
+  border: 1px solid rgba(59,130,246,0.18) !important;
+  background: rgba(59,130,246,0.06) !important;
+  color: rgba(159,195,255,0.95) !important;
+}
+.sx-drawer-narratives-title{ font-weight: 950; }
+.sx-drawer-narratives-sub{ font-size: 12px; font-weight: 850; opacity: .78; }
+
+.sx-drawer-actions{
+  margin-top: auto;
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+

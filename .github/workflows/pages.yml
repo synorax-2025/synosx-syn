@@ -2,7 +2,7 @@ name: Deploy GitHub Pages (dist)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -17,22 +17,29 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node (with pnpm cache)
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "pnpm"
 
-      # ✅ 只在这里指定 pnpm 版本（唯一真源）
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Enable Corepack (pnpm from packageManager)
+        run: corepack enable
+
+      - name: Get pnpm store dir
+        id: pnpm-store
+        run: echo "dir=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
         with:
-          version: 10.15.1
+          path: ${{ steps.pnpm-store.outputs.dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install deps
         run: pnpm install --frozen-lockfile
@@ -54,7 +61,6 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

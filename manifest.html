@@ -1,3 +1,10 @@
+<!--
+manifest.html — SynOSX Manifest / Whitepaper (Refactored)
+Nav unified: uses nav.partial.html
+Manifest-specific chapter anchors are NOT hardcoded here
+-->
+<!--@include nav-->
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -21,42 +28,17 @@
   <!-- ✅ Shared CSS -->
   <link rel="stylesheet" href="assets/css/sx.core.css" />
   <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
-  <link rel="stylesheet" href="assets/css/sx.drawer.css" />   <!-- ✅ 新增：抽离 drawer 样式 -->
+  <link rel="stylesheet" href="assets/css/sx.drawer.css" />
 
   <!-- ✅ Page CSS -->
   <link rel="stylesheet" href="assets/css/pages/manifest.page.css" />
 </head>
 
-<body>
+<body class="has-statusbar">
   <div class="bg-gradient" aria-hidden="true"></div>
 
-  <nav id="navbar" aria-label="Manifest Navigation">
-    <div class="nav-content">
-      <a class="logo" href="#top" aria-label="SynOSX Manifest">
-        <div class="logo-icon">SX</div>
-        <span><b>SynOSX</b> <span class="logo-sub">· Manifest</span></span>
-      </a>
-
-      <ul class="nav-links">
-        <li><a href="#toc">目录</a></li>
-        <li><a href="#c1">Ch.1</a></li>
-        <li><a href="#c2">Ch.2</a></li>
-        <li><a href="#c3">Ch.3</a></li>
-        <li><a href="#c4">Ch.4</a></li>
-        <li><a href="#c5">Ch.5</a></li>
-        <li><a href="#c6">Ch.6</a></li>
-        <li><a href="#c7">Ch.7</a></li>
-        <li><a href="#c8">Ch.8</a></li>
-        <li><a href="#c9">Ch.9</a></li>
-        <li><a href="#c10">Ch.10</a></li>
-      </ul>
-
-      <div class="nav-actions">
-        <a class="btn-secondary" href="index.html">返回首页</a>
-        <a class="cta-button" href="#toc">开始阅读</a>
-      </div>
-    </div>
-  </nav>
+  <!-- ✅ Unified Nav + Mobile Drawer (from partials/nav.partial.html) -->
+  <!--@include nav-->
 
   <!-- Hero -->
   <section class="hero" id="top">
@@ -152,7 +134,9 @@
     </div>
   </section>
 
- <!-- Chapter 1 -->
+  <!-- 下面 Chapters 内容：保持你原文不动 -->
+
+  <!-- Chapter 1 -->
   <section id="c1">
     <div class="container">
       <div class="section-header reveal">
@@ -589,44 +573,43 @@
   </footer>
 
   <!-- ✅ Statusbar (shared shell) -->
-<div class="statusbar" role="contentinfo" aria-label="System Status Bar">
-  <div class="statusbar-inner">
-    <div class="sb-left">
-      <span class="sb-pill">
-        <span class="sb-key">RUNTIME</span>
-        <span class="sb-val" id="sb-runtime">—</span>
-      </span>
+  <div class="statusbar" role="contentinfo" aria-label="System Status Bar">
+    <div class="statusbar-inner">
+      <div class="sb-left">
+        <span class="sb-pill">
+          <span class="sb-key">RUNTIME</span>
+          <span class="sb-val" id="sb-runtime">—</span>
+        </span>
 
-      <span class="sb-pill" title="BUILD">
-        <span class="sb-key">BUILD</span>
-        <span class="sb-val" id="sb-build">—</span>
-      </span>
+        <span class="sb-pill" title="BUILD">
+          <span class="sb-key">BUILD</span>
+          <span class="sb-val" id="sb-build">—</span>
+        </span>
 
-      <span class="sb-pill" title="VERSION">
-        <span class="sb-key">VER</span>
-        <span class="sb-val" id="sb-version">—</span>
-      </span>
+        <span class="sb-pill" title="VERSION">
+          <span class="sb-key">VER</span>
+          <span class="sb-val" id="sb-version">—</span>
+        </span>
 
-      <span class="sb-pill sb-copy" title="COMMIT (click to copy)">
-        <span class="sb-key">COMMIT</span>
-        <span class="sb-val" id="sb-commit">—</span>
-      </span>
-    </div>
+        <span class="sb-pill sb-copy" title="COMMIT (click to copy)">
+          <span class="sb-key">COMMIT</span>
+          <span class="sb-val" id="sb-commit">—</span>
+        </span>
+      </div>
 
-    <div class="sb-right">
-      <span class="sb-pill" title="POLICY">
-        <span class="sb-key">POLICY</span>
-        <span class="sb-val" id="sb-policy">—</span>
-      </span>
+      <div class="sb-right">
+        <span class="sb-pill" title="POLICY">
+          <span class="sb-key">POLICY</span>
+          <span class="sb-val" id="sb-policy">—</span>
+        </span>
+      </div>
     </div>
   </div>
-</div>
-
 
   <!-- ✅ Shared JS -->
   <script src="assets/js/sx.statusbar.js"></script>
   <script src="assets/js/sx.core.js"></script>
-  <script src="assets/js/sx.drawer.js"></script> <!-- ✅ 新增：抽离 drawer 逻辑 -->
+  <script src="assets/js/sx.drawer.js"></script>
 
   <!-- ✅ Page runtime -->
   <script src="assets/js/runtime/manifest.runtime.js"></script>

@@ -187,9 +187,9 @@ synosx-site/
 │        └─ replay.runtime.js      # replay 专属运行时（fetch registry + 播放）
 │
 ├─ pages/
-│  ├─ case-video.html
+│  ├─ case-video.html 
 │  ├─ case-voicewall.html
-│  └─ ... (更多判例页)
+│  └─ narrative-case.html
 │
 ├─ registry/
    ├─ cases.registry.json          # 规范判例（可回放 / 可审计）

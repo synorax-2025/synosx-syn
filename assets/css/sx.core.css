@@ -148,6 +148,97 @@ nav.scrolled{
 }
 
 /* -----------------------------
+   Nav skeleton (Frozen baseline)
+   目标：
+   - 顶栏骨架固定（nav-content / logo / actions）
+   - 品牌规则写死：SynOSX 可换行；logo-sub 永不换行
+   - 与 sx.drawer.css 共存：drawer 只控制 menu 的显示隐藏
+   ----------------------------- */
+.nav-content{
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 16px 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  position: relative;
+  z-index: 2;
+}
+
+/* Brand block */
+.logo{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  min-width: 0; /* ✅ 允许品牌区在小屏被挤压时由“主品牌”承担换行 */
+}
+
+/* optional: SX icon (if used by page nav) */
+.logo-icon{
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-size: 14px;
+
+  color: #071022;
+  background: var(--gradient-1);
+  box-shadow: 0 14px 30px rgba(59,130,246,0.18);
+  flex-shrink: 0;
+}
+
+/* Text stack: allow main title wrap, forbid sub wrap */
+.logo span{
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0; /* ✅ 关键：让主品牌在 flex 内正确换行 */
+}
+
+.logo b{
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  white-space: normal; /* ✅ 主品牌允许换行 */
+}
+
+/* ✅ 冻结规则：副标题永不换行、永不被压缩 */
+.logo-sub{
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  font-size: 12.5px;
+  font-weight: 800;
+  color: rgba(232,236,245,0.82);
+  opacity: .95;
+}
+
+/* Actions block */
+.nav-actions{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  flex-shrink: 0; /* ✅ 右侧按钮不被挤坏 */
+}
+
+/* Desktop nav links (optional) */
+.nav-links{
+  list-style: none;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+/* -----------------------------
    Buttons (shared)
    ----------------------------- */
 .cta-button{
@@ -263,4 +354,17 @@ footer{
    ----------------------------- */
 @media (max-width: 980px){
   .container{ padding: 0 18px; }
+
+  /* nav padding shrink */
+  .nav-content{ padding: 14px 18px; }
+
+  /* icon slightly smaller on small screens */
+  .logo-icon{
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+  }
+
+  /* keep actions tight */
+  .nav-actions{ gap: 8px; }
 }

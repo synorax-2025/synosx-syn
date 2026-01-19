@@ -1,7 +1,10 @@
-<!-- SynOSX NAV + Mobile Drawer — Final Version -->
+<!-- nav.partial.html — SynOSX NAV + Mobile Drawer (Shared / Frozen v1)
+     ✅ Shared across ALL pages (index / manifest / cases / replay / narratives)
+     ✅ Cross-page anchors always target index.html#...
+-->
 
 <nav id="navbar" aria-label="Primary Navigation">
-  <div class="nav-content container">
+  <div class="nav-content">
     <!-- Brand -->
     <a class="logo" href="index.html" aria-label="SynOSX Home">
       <div class="logo-icon">SX</div>
@@ -13,13 +16,13 @@
 
     <!-- Desktop nav -->
     <ul class="nav-links nav-desktop" aria-label="Desktop Navigation">
-      <li><a href="#why">Why</a></li>
-      <li><a href="#constitution">Constitution</a></li>
-      <li><a href="#families">S0–S6</a></li>
+      <li><a href="index.html#why">Why</a></li>
+      <li><a href="index.html#constitution">Constitution</a></li>
+      <li><a href="index.html#families">S0–S6</a></li>
 
       <!-- Desktop Use Cases dropdown -->
       <li class="nav-dropdown">
-        <a href="#usecases"
+        <a href="cases.html"
            class="nav-drop-trigger"
            aria-haspopup="true"
            aria-expanded="false"
@@ -47,7 +50,7 @@
         </div>
       </li>
 
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
     </ul>
 
     <!-- Right actions -->
@@ -62,20 +65,16 @@
         ☰ Menu
       </button>
 
-      <a class="cta-button" data-sx="nav-cta" href="#contact">预约技术对话</a>
+      <a class="cta-button" data-sx="nav-cta" href="index.html#contact">预约技术对话</a>
     </div>
   </div>
 </nav>
 
 <!-- Mobile Drawer — GitHub Style -->
 <div id="sx-mobile-menu" class="sx-drawer" aria-hidden="true">
-  <!-- 遮罩层 -->
   <div class="sx-drawer-backdrop" data-close="sx-drawer" aria-hidden="true"></div>
 
-  <!-- 主面板（这里会滚动） -->
   <aside class="sx-drawer-panel" role="dialog" aria-modal="true" aria-label="Mobile Navigation" tabindex="-1">
-    
-    <!-- 顶部 Header -->
     <div class="sx-drawer-top">
       <div class="sx-drawer-brand">
         <div class="logo-icon">SX</div>
@@ -85,28 +84,23 @@
         </div>
       </div>
 
-      <button class="sx-drawer-close" type="button" data-close="sx-drawer" aria-label="Close Menu">
-        ✕
-      </button>
+      <button class="sx-drawer-close" type="button" data-close="sx-drawer" aria-label="Close Menu">✕</button>
     </div>
 
-    <!-- 导航链接 -->
     <nav class="sx-drawer-nav" aria-label="Mobile Links">
-      <a href="#why" data-close="sx-drawer">Why</a>
-      <a href="#constitution" data-close="sx-drawer">Constitution</a>
-      <a href="#families" data-close="sx-drawer">S0–S6</a>
+      <a href="index.html#why" data-close="sx-drawer">Why</a>
+      <a href="index.html#constitution" data-close="sx-drawer">Constitution</a>
+      <a href="index.html#families" data-close="sx-drawer">S0–S6</a>
 
-      <!-- Use Cases 折叠按钮 -->
       <button
         class="sx-drawer-usecases"
         type="button"
         aria-expanded="false"
         aria-controls="sx-usecases-panel">
-        Use Cases 
+        Use Cases
         <span class="sx-usecases-caret" aria-hidden="true">▸</span>
       </button>
 
-      <!-- Use Cases 子菜单 -->
       <div id="sx-usecases-panel" hidden>
         <a href="cases.html#enterprise-governance" data-close="sx-drawer">
           Enterprise Governance<span aria-hidden="true"> ↗</span>
@@ -126,14 +120,12 @@
         </a>
       </div>
 
-      <a href="#contact" data-close="sx-drawer">Contact</a>
+      <a href="index.html#contact" data-close="sx-drawer">Contact</a>
     </nav>
 
-    <!-- 底部按钮 -->
     <div class="sx-drawer-actions">
       <a class="btn-secondary" href="index.html" data-close="sx-drawer">返回首页</a>
-      <a class="cta-button" data-sx="drawer-cta" href="#contact" data-close="sx-drawer">预约技术对话</a>
+      <a class="cta-button" data-sx="drawer-cta" href="index.html#contact" data-close="sx-drawer">预约技术对话</a>
     </div>
-
   </aside>
 </div>

@@ -39,11 +39,13 @@ synosx-site/
 ├─ assets/
 │  ├─ css/
 │  │  ├─ sx.core.css                # 全局宪法：tokens / layout / buttons / nav baseline
-│  │  └─ sx.drawer.css              # Drawer 冻结样式 v1.0（内部滚）
+│  │  ├─ sx.drawer.css              # Drawer 冻结样式 v1.0（内部滚）            
+│  │  └─ sx.statusbar.css            
 │  │
 │  ├─ js/
 │  │  ├─ sx.drawer.js               # Drawer 行为（开关 / 锁滚 / UseCases 折叠）
-│  │  └─ sx.nav-config.js           # 读取 meta，注入 A / B / C
+│  │  ├─ sx.nav-config.js           # 读取 meta，注入 A / B / C
+│  │  └─ sx.statusbar.js          
 │  │
 │  └─ ...                           # 图片 / 字体等静态资源
 │

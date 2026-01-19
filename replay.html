@@ -1,7 +1,14 @@
-<!-- replay.html  (SynOSX Audit Replay Runtime)
-     用法示例：
-     replay.html?trace=rc_brand_15s_v1
+<!--
+  replay.html — SynOSX Audit Replay Runtime
+
+  用法示例：
+  replay.html?trace=rc_brand_15s_v1
+
+  说明：
+  - 顶栏（Nav）由 build-includes.mjs 注入
+  - 实际导航结构由 registry/site.nav.json 决定
 -->
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -21,6 +28,7 @@
   <!-- ✅ Shared CSS -->
   <link rel="stylesheet" href="assets/css/sx.core.css" />
   <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
+  <link rel="stylesheet" href="assets/css/sx.drawer.css" />
 
   <!-- ✅ Page CSS -->
   <link rel="stylesheet" href="assets/css/pages/replay.page.css" />
@@ -29,21 +37,11 @@
 <body class="has-statusbar">
   <div class="bg-gradient" aria-hidden="true"></div>
 
-  <nav>
-    <div class="nav-content">
-      <div class="logo" aria-label="SynOSX">
-        <div class="logo-icon">SX</div>
-        <span><b>SynOSX</b> <span class="logo-sub">· Audit Replay</span></span>
-      </div>
+  <!--@include nav-->
 
-      <div class="nav-actions">
-        <a class="btn" id="lnk-back-index" href="index.html">← BACK TO INDEX</a>
-        <button class="btn primary" id="btn-run-replay" type="button">▶ RUN REPLAY</button>
-        <button class="btn" id="btn-open-audit" type="button">OPEN AUDIT</button>
-      </div>
-    </div>
-  </nav>
-
+  <!-- ======================================================
+       原来的 Audit Drawer（运行时审计终端）保留
+       ====================================================== -->
   <div id="audit-drawer" aria-label="audit drawer">
     <div class="audit-title">> AUDIT REPLAY RUNTIME</div>
     <div id="log-container"></div>
@@ -115,7 +113,7 @@
     </section>
   </main>
 
-  <!-- ✅ Statusbar (统一模板：支持 sx.statusbar.js 自动绑定 + layout) -->
+  <!-- ✅ Statusbar -->
   <div class="statusbar" role="contentinfo" aria-label="System Status Bar">
     <div class="statusbar-inner">
       <div class="sb-left">
@@ -141,13 +139,6 @@
           <span class="sb-key">POLICY</span>
           <span class="sb-val" id="sb-policy">AUDIT REPLAY CONSTITUTION</span>
         </span>
-
-        <!-- 可选：如果你想 REPLAY 也显示 build/version/commit，就把这3个 pill 打开 -->
-        <!--
-        <span class="sb-pill" title="BUILD"><span class="sb-key">BUILD</span><span class="sb-val" id="sb-build">—</span></span>
-        <span class="sb-pill" title="VERSION"><span class="sb-key">VER</span><span class="sb-val" id="sb-version">—</span></span>
-        <span class="sb-pill sb-copy" title="COMMIT (click to copy)"><span class="sb-key">COMMIT</span><span class="sb-val" id="sb-commit">—</span></span>
-        -->
       </div>
     </div>
   </div>
@@ -155,6 +146,7 @@
   <!-- ✅ Shared JS -->
   <script src="assets/js/sx.statusbar.js"></script>
   <script src="assets/js/sx.core.js"></script>
+  <script src="assets/js/sx.drawer.js"></script>
 
   <!-- ✅ Page runtime -->
   <script src="assets/js/runtime/replay.runtime.js"></script>

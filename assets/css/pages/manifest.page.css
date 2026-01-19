@@ -1,13 +1,12 @@
 /* pages/manifest.page.css — Manifest page-only styles
-   ✅ Keep this file "thin": only manifest-specific layout & reading typography.
-   ✅ Shared baseline (tokens / bg-gradient / container / nav base / buttons / reveal / footer)
-      lives in assets/css/sx.core.css
+   ✅ Thin: only manifest-specific layout & reading typography.
+   ✅ DOES NOT include sx.drawer (Manifest is a reading page, not a nav hub)
 */
 
 :root{
   --max-reading: 980px;
 
-  /* ✅ Reading-mode override: dim body text (restore hierarchy) */
+  /* Reading-mode override: dim body text (restore hierarchy) */
   --text-muted: #93a0bd;
 }
 
@@ -15,7 +14,6 @@
    Manifest nav (structure-level tweaks only)
    ----------------------------- */
 .nav-content{
-  /* nav base in core, but manifest uses tighter actions */
   height: 76px;
   max-width: var(--max);
   margin: 0 auto;
@@ -33,8 +31,9 @@
   font-weight: 800;
   letter-spacing: -0.02em;
   font-size: 18px;
-  white-space: nowrap;
+  white-space: nowrap; /* desktop: keep tidy */
 }
+
 .logo-icon{
   width: 38px; height: 38px;
   background: var(--gradient-1);
@@ -45,18 +44,22 @@
   color: #071022;
   font-weight: 900;
   user-select: none;
+  flex: 0 0 auto;
 }
+
 .logo span b{
   background: var(--gradient-1);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
 .logo-sub{
   color: var(--text-muted);
   font-weight: 900;
 }
 
+/* right links */
 .nav-links{
   display:flex;
   gap: 14px;
@@ -65,6 +68,7 @@
   flex-wrap: wrap;
   justify-content:flex-end;
 }
+
 .nav-links a{
   color: var(--text-muted);
   font-weight: 800;
@@ -75,6 +79,7 @@
   transition: 0.25s ease;
   white-space: nowrap;
 }
+
 .nav-links a:hover{
   color: var(--text);
   border-color: rgba(255,255,255,0.08);
@@ -87,7 +92,7 @@
   align-items:center;
 }
 
-/* Manifest 的按钮尺寸更紧凑（不改配色/基座） */
+/* Manifest nav buttons: tighter */
 nav .cta-button,
 nav .btn-secondary{
   padding: 11px 14px;
@@ -104,7 +109,7 @@ nav .btn-secondary{
   margin: 0 auto;
 }
 
-/* Paragraph hierarchy (core gives body color; manifest controls reading density) */
+/* Paragraph hierarchy */
 p{ color: var(--text-muted); }
 strong, b{ color: var(--text); }
 
@@ -120,6 +125,7 @@ strong, b{ color: var(--text); }
   position: relative;
   overflow:hidden;
 }
+
 .hero-content{
   display:grid;
   grid-template-columns: 1.15fr 0.85fr;
@@ -129,6 +135,7 @@ strong, b{ color: var(--text); }
   transform: translateY(18px);
   animation: sxFadeInUp 0.9s ease forwards;
 }
+
 @keyframes sxFadeInUp{ to{ opacity:1; transform: translateY(0); } }
 
 .kicker{
@@ -143,6 +150,7 @@ strong, b{ color: var(--text); }
   font-size: 12px;
   margin-bottom: 14px;
 }
+
 .kicker .dot{
   width: 8px; height: 8px;
   border-radius: 999px;
@@ -161,6 +169,7 @@ strong, b{ color: var(--text); }
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
 .hero-text .subtitle{
   font-size: 15.5px;
   color: var(--text-muted);
@@ -188,11 +197,13 @@ strong, b{ color: var(--text); }
   transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
   box-shadow: var(--shadow-lg);
 }
+
 .hero-card:hover{
   transform: translateY(-8px);
   box-shadow: 0 34px 90px rgba(59,130,246,0.16);
   border-color: rgba(59,130,246,0.28);
 }
+
 .card-title{
   font-size: 12px;
   font-weight: 900;
@@ -201,6 +212,7 @@ strong, b{ color: var(--text); }
   color: #9fc3ff;
   margin-bottom: 14px;
 }
+
 .card-item{
   margin-bottom: 12px;
   padding: 14px 14px;
@@ -209,20 +221,24 @@ strong, b{ color: var(--text); }
   border: 1px solid rgba(255,255,255,0.06);
   transition: 0.25s ease;
 }
+
 .card-item:hover{
   background: rgba(59,130,246,0.07);
   border-color: rgba(59,130,246,0.22);
 }
+
 .card-item h4{
   font-size: 13px;
   margin-bottom: 6px;
   color: var(--text);
 }
+
 .card-item p{
   font-size: 12.5px;
   color: var(--text-muted);
   line-height: 1.75;
 }
+
 .trace{
   display:flex;
   gap: 10px;
@@ -231,6 +247,7 @@ strong, b{ color: var(--text); }
   color: var(--text-muted);
   font-size: 12px;
 }
+
 .trace code{
   font-family: var(--mono);
   font-size: 12px;
@@ -250,6 +267,7 @@ section{ padding: 92px 0; }
   text-align:center;
   margin-bottom: 44px;
 }
+
 .section-tag{
   display:inline-block;
   padding: 8px 16px;
@@ -263,6 +281,7 @@ section{ padding: 92px 0; }
   text-transform: uppercase;
   margin-bottom: 16px;
 }
+
 .section-title{
   font-size: clamp(28px, 3.6vw, 44px);
   font-weight: 900;
@@ -273,6 +292,7 @@ section{ padding: 92px 0; }
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
 .section-subtitle{
   font-size: 15px;
   color: var(--text-muted);
@@ -291,6 +311,7 @@ section{ padding: 92px 0; }
   margin-top: 20px;
   align-items: stretch;
 }
+
 .toc-card{
   background: linear-gradient(135deg, rgba(26,32,54,0.60), rgba(18,23,43,0.45));
   border: 1px solid rgba(255,255,255,0.10);
@@ -299,21 +320,25 @@ section{ padding: 92px 0; }
   box-shadow: var(--shadow-md);
   transition: 0.25s ease;
 }
+
 .toc-card:hover{
   transform: translateY(-5px);
   border-color: rgba(59,130,246,0.22);
   box-shadow: 0 28px 70px rgba(59,130,246,0.16);
 }
+
 .toc-card h3{
   font-size: 16px;
   margin-bottom: 10px;
   color: #dbe7ff;
 }
+
 .toc-list{
   list-style:none;
   display:grid;
   gap: 10px;
 }
+
 .toc-list a{
   display:flex;
   align-items:center;
@@ -328,11 +353,13 @@ section{ padding: 92px 0; }
   font-size: 13px;
   transition: 0.2s ease;
 }
+
 .toc-list a:hover{
   background: rgba(59,130,246,0.10);
   border-color: rgba(59,130,246,0.22);
   transform: translateY(-1px);
 }
+
 .toc-meta{
   color: var(--text-muted);
   font-weight: 900;
@@ -358,6 +385,7 @@ section{ padding: 92px 0; }
   position: relative;
   overflow: hidden;
 }
+
 .chapter-card::before{
   content:"";
   position:absolute;
@@ -366,6 +394,7 @@ section{ padding: 92px 0; }
   background: var(--gradient-1);
   opacity: 0.85;
 }
+
 .chapter-head{
   display:flex;
   flex-wrap: wrap;
@@ -374,6 +403,7 @@ section{ padding: 92px 0; }
   justify-content: space-between;
   margin-bottom: 14px;
 }
+
 .chapter-k{
   display:inline-flex;
   align-items:center;
@@ -384,6 +414,7 @@ section{ padding: 92px 0; }
   text-transform: uppercase;
   font-size: 12px;
 }
+
 .chapter-title{
   font-size: 22px;
   font-weight: 900;
@@ -391,20 +422,24 @@ section{ padding: 92px 0; }
   color: var(--text);
   margin-top: 2px;
 }
+
 .chapter-sub{
   color: var(--text-muted);
   font-size: 13.5px;
   font-weight: 900;
 }
+
 .chapter-body{
   display:grid;
   gap: 14px;
   margin-top: 14px;
 }
+
 .chapter-body p{
   font-size: 14.5px;
   line-height: 2.0;
 }
+
 .chapter-body h4{
   color: #dbe7ff;
   font-size: 14px;
@@ -425,6 +460,7 @@ section{ padding: 92px 0; }
   font-weight: 900;
   line-height: 1.9;
 }
+
 .callout span{
   display:inline-block;
   background: rgba(0,0,0,0.22);
@@ -443,6 +479,7 @@ section{ padding: 92px 0; }
   gap: 10px;
   margin-top: 6px;
 }
+
 .rule-list li{
   color: var(--text-muted);
   font-size: 14px;
@@ -450,6 +487,7 @@ section{ padding: 92px 0; }
   padding-left: 14px;
   position: relative;
 }
+
 .rule-list li:before{
   content:"•";
   position:absolute;
@@ -458,12 +496,88 @@ section{ padding: 92px 0; }
 }
 
 /* -----------------------------
-   Responsive
+   Responsive (A: mobile nav collapse)
    ----------------------------- */
+
+/* A-1: hide the right nav links early (reading page) */
 @media (max-width: 1100px){
   .nav-links{ display:none; }
 }
+
+/* A-2: mobile header must not be hard-locked to 76px;
+       allow logo to wrap naturally so Chinese never "stands up" */
 @media (max-width: 980px){
-  .hero-content{ grid-template-columns: 1fr; gap: 22px; }
-  .toc-grid{ grid-template-columns: 1fr; }
+  .nav-content{
+    height: auto;
+    padding: 12px 16px;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .logo{
+    white-space: normal; /* ✅ allow wrap */
+    line-height: 1.15;
+  }
+
+  /* keep logo text readable when it wraps */
+  .logo span{
+    display:inline-block;
+  }
+
+  /* actions stay on the right, but never force text vertical */
+  nav .cta-button,
+  nav .btn-secondary{
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .hero-content{
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .toc-grid{
+    grid-template-columns: 1fr;
+  }
+}
+
+/* A-3: very small screens: if actions are still tight, let them wrap */
+@media (max-width: 420px){
+  .nav-actions{
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+
+/* ===== mobile logo: force 2-line layout (stable) ===== */
+@media (max-width: 980px){
+  .nav-content{
+    height: auto;
+    padding: 12px 16px;
+    align-items: flex-start;
+  }
+
+  /* 左侧不要被 flex 挤得乱断 */
+  .logo{
+    flex: 0 1 auto;
+    white-space: normal;
+  }
+
+  /* 关键：把 “SynOSX” 和 “· Manifest” 强制上下两行 */
+  .logo > span{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.05;
+  }
+
+  .logo-sub{
+    margin-left: 0;   /* 防止第二行前面留空 */
+  }
+
+  /* 右侧按钮保持靠右 */
+  .nav-actions{
+    flex: 0 0 auto;
+    margin-left: auto;
+  }
 }

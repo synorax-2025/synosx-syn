@@ -19,7 +19,8 @@
         "power-capability-coupling"
       ],
       "status": "published",
-      "order": 0
+      "order": 0,
+      "case_ref": "registry/narratives/cases/case-00.json"
     },
 
     {
@@ -34,7 +35,8 @@
         "invisible-path"
       ],
       "status": "published",
-      "order": 1
+      "order": 1,
+      "case_ref": "registry/narratives/cases/case-01.json"
     },
 
     {
@@ -49,7 +51,8 @@
         "anonymous-intent"
       ],
       "status": "published",
-      "order": 2
+      "order": 2,
+      "case_ref": "registry/narratives/cases/case-02.json"
     },
 
     {
@@ -64,7 +67,8 @@
         "post-incident-governance"
       ],
       "status": "draft",
-      "order": 3
+      "order": 3,
+      "case_ref": "registry/narratives/cases/case-03.json"
     }
   ]
 }

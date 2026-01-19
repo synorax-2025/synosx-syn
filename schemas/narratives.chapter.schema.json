@@ -4,35 +4,56 @@
   "title": "Narratives Chapter Entry",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "title", "subtitle", "non_normative", "case_ref", "tags", "published_at"],
+
+  "required": ["id", "slug", "title", "subtitle", "status", "order", "case_ref"],
+
   "properties": {
     "id": {
       "type": "string",
       "pattern": "^case-\\d{2}$",
-      "description": "case-01, case-02..."
+      "description": "case-00, case-01, case-02..."
     },
+
+    "slug": {
+      "type": "string",
+      "minLength": 1
+    },
+
     "title": { "type": "string", "minLength": 1 },
     "subtitle": { "type": "string", "minLength": 1 },
-    "non_normative": {
-      "type": "boolean",
-      "const": true,
-      "description": "Must be true: narratives are illustrative, not normative."
-    },
-    "case_ref": {
+
+    "derived_from": {
       "type": "string",
-      "minLength": 1,
-      "description": "Relative path to case json, e.g. registry/narratives/case-01.json"
+      "minLength": 1
     },
-    "tags": {
+
+    "risk_category": {
       "type": "array",
       "minItems": 1,
       "items": { "type": "string", "minLength": 1 }
     },
-    "published_at": { "type": "string", "minLength": 8 },
+
+    "status": {
+      "type": "string",
+      "enum": ["draft", "published"]
+    },
+
+    "order": {
+      "type": "integer",
+      "minimum": 0
+    },
+
+    "case_ref": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^registry/narratives/cases/case-\\d{2}\\.json$",
+      "description": "Path to case json, e.g. registry/narratives/cases/case-01.json"
+    },
+
     "case_link": {
       "type": "string",
       "minLength": 1,
-      "description": "Link to template page, e.g. pages/narrative-case.html?id=case-01"
+      "description": "Optional override link, e.g. pages/narrative-case.html?id=case-01"
     }
   }
 }

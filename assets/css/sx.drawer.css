@@ -1,90 +1,131 @@
-/* sx.drawer.css — Mobile Drawer Navigation (shared)
-   ✅ Mode A: topbar dropdown (under fixed nav)
-   ✅ Does NOT cover the nav
-   ✅ Blocks background scroll while open
-   ✅ Use Cases is the only expandable node
-   ✅ Panel aligns strictly with .container (same max + same side padding)
+/* sx.drawer.css — Frozen v1 (2026-01-19)
+   ✅ iOS Safari/Chrome stable: panel internal scroll + no snapback
+   ✅ No 100vh/dvh: use --sx-vh-px from JS
+   ✅ Background locked via body fixed (JS)
+   ✅ Drawer: right narrow panel, under fixed nav
+   ✅ Use Cases only expandable node
+   ✅ Governance Narratives special block + subtitle visible
 */
 
-/* -----------------------------
-   Config (nav height + container align)
-   ----------------------------- */
 :root{
-  /* nav-content height = 76px (from index.page.css) */
-  --sx-nav-h: 76px;
+  --sx-nav-h: 76px;              /* JS 会同步真实 nav 高度 */
+  --sx-vh-px: 800px;             /* JS 会写入 window.innerHeight */
+  --sx-safe-bottom: env(safe-area-inset-bottom, 0px);
 
-  /* Match sx.core.css */
-  --sx-container-max: var(--max); /* 1200px in sx.core.css */
-  --sx-container-pad: 24px;       /* desktop container padding */
-  --sx-container-pad-sm: 18px;    /* <=980px container padding */
+  --sx-container-pad: 24px;
+  --sx-container-pad-sm: 18px;
 
-  --sx-drawer-radius: 16px;
+  --sx-drawer-radius: 18px;
+  --sx-drawer-w: 280px;
+
+  --sx-drawer-bg: rgba(10,14,26,0.95);
+  --sx-drawer-border: rgba(255,255,255,0.10);
+  --sx-drawer-shadow: 0 20px 60px rgba(0,0,0,0.60);
+
+  --sx-drawer-hover: rgba(255,255,255,0.08);
+  --sx-drawer-text: rgba(232,236,245,0.92);
+  --sx-drawer-muted: rgba(232,236,245,0.60);
+
+  /* ✅ 你只需要调这个：
+     0.62~0.72 ≈ 5 行
+     0.78      ≈ 6 行（推荐）
+     0.85      ≈ 7 行
+  */
+  --sx-drawer-open-factor: 0.78;
 }
 
 /* -----------------------------
    Mobile trigger visibility
    ----------------------------- */
-.nav-menu-btn{ display: none; }
+.nav-menu-btn{ display:none; }
 @media (max-width: 980px){
-  .nav-desktop{ display: none; }
-  .nav-menu-btn{ display: inline-flex; }
+  .nav-desktop{ display:none; }
+  .nav-menu-btn{ display:inline-flex; }
 }
 
 /* -----------------------------
-   Drawer shell (Mode A)
-   - sits UNDER the fixed nav
-   - covers the rest of viewport
+   Drawer root
    ----------------------------- */
 .sx-drawer{
   position: fixed;
-  left: 0;
-  right: 0;
-  top: var(--sx-nav-h);
-  bottom: 0;
-
-  z-index: 90; /* nav is 100; drawer stays under nav, above page */
+  inset: 0;
+  z-index: 100;
   display: none;
 }
-.sx-drawer.is-open{ display: block; }
+.sx-drawer.is-open{ display:block; }
 
-/* Backdrop covers page area under nav */
+/* Backdrop covers whole viewport */
 .sx-drawer-backdrop{
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0,0,0,0.50);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 /* -----------------------------
-   Panel (dropdown sheet)
-   ✅ Strictly aligned to .container:
-      width = min(var(--max), 100vw - 2*pad)
-      left edge aligns with container left
+   Panel (THE ONLY SCROLL CONTAINER)
+   iOS safe: max-height uses --sx-vh-px (px), not vh
    ----------------------------- */
 .sx-drawer-panel{
-  position: relative;
+  position: fixed;
+  top: calc(var(--sx-nav-h) + 10px);
+  right: var(--sx-container-pad-sm);
+  width: var(--sx-drawer-w);
 
-  /* ✅ container alignment */
-  width: min(var(--sx-container-max), calc(100vw - (var(--sx-container-pad) * 2)));
-  margin: 12px auto 0; /* center by default, but width matches container */
-  max-height: calc(100vh - var(--sx-nav-h) - 24px - var(--sx-safe-bottom));
-  overflow: auto;
+  /* ✅ 核心：把可用高度 * open-factor（你只改 factor）
+     - 8px 是顶部预留（越小越高）
+  */
+  max-height: calc(
+    (var(--sx-vh-px) - var(--sx-nav-h) - 8px - var(--sx-safe-bottom))
+    * var(--sx-drawer-open-factor)
+  );
 
-  background: rgba(10,14,26,0.96);
-  border: 1px solid rgba(255,255,255,0.10);
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+
+  background: var(--sx-drawer-bg);
+  border: 1px solid var(--sx-drawer-border);
   border-radius: var(--sx-drawer-radius);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 26px 90px rgba(0,0,0,0.45);
+  box-shadow: var(--sx-drawer-shadow);
 
-  padding: 14px 14px calc(14px + var(--sx-safe-bottom));
+  padding: 14px;
   outline: none;
+
+  /* 视觉：更像 GitHub dropdown */
+  transform: translateY(-10px);
+  opacity: 0;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+.sx-drawer.is-open .sx-drawer-panel{
+  transform: translateY(0);
+  opacity: 1;
 }
 
-/* ✅ keep exact container padding on <=980px (sx.core.css uses 18px) */
-@media (max-width: 980px){
-  .sx-drawer-panel{
-    width: min(var(--sx-container-max), calc(100vw - (var(--sx-container-pad-sm) * 2)));
-  }
+/* iPhone small */
+@media (max-width: 480px){
+  :root{ --sx-drawer-w: 260px; }
+  .sx-drawer-panel{ right: 12px; }
+}
+
+/* -----------------------------
+   Scrollbar (iOS may hide — ok)
+   ----------------------------- */
+.sx-drawer-panel{
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.22) transparent;
+}
+.sx-drawer-panel::-webkit-scrollbar{ width: 8px; }
+.sx-drawer-panel::-webkit-scrollbar-track{ background: transparent; }
+.sx-drawer-panel::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,0.22);
+  border-radius: 6px;
+}
+.sx-drawer-panel::-webkit-scrollbar-thumb:hover{
+  background: rgba(255,255,255,0.30);
 }
 
 /* -----------------------------
@@ -94,234 +135,220 @@
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap: 12px;
+  gap: 10px;
 
   padding: 6px 4px 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.10);
   margin-bottom: 10px;
 }
 
 .sx-drawer-brand{
   display:flex;
   align-items:center;
-  gap: 12px;
+  gap: 10px;
+}
+
+.sx-drawer-brand .logo-icon{
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 900;
+  font-size: 13px;
+  color: #071022;
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  flex-shrink: 0;
 }
 
 .sx-drawer-title{
   display:flex;
   flex-direction:column;
-  line-height: 1.1;
+  line-height: 1.15;
 }
-
 .sx-drawer-name{
-  font-weight: 950;
+  font-weight: 900;
   letter-spacing: -0.02em;
+  color: #fff;
+  font-size: 14.5px;
 }
-
 .sx-drawer-sub{
   font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 800;
-  opacity: .9;
+  font-weight: 700;
+  color: var(--sx-drawer-muted);
+  opacity: .95;
 }
 
+/* Close button */
 .sx-drawer-close{
-  border: 1px solid rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.04);
-  color: rgba(232,236,245,0.90);
-  border-radius: 12px;
-  padding: 8px 10px;
-  cursor: pointer;
+  color: rgba(255,255,255,0.82);
+  border-radius: 10px;
+  padding: 7px 9px;
+  cursor:pointer;
 }
 .sx-drawer-close:hover{
-  border-color: rgba(59,130,246,0.35);
-  background: rgba(59,130,246,0.10);
+  background: rgba(255,255,255,0.10);
 }
 
 /* -----------------------------
-   Nav list (directory style)
-   - NOT card-like rows
+   Nav list
    ----------------------------- */
 .sx-drawer-nav{
   display:flex;
   flex-direction:column;
-  gap: 6px;
+  gap: 2px;
   padding: 2px 2px 0;
 }
 
 .sx-drawer-nav > a{
-  display: inline-flex;            /* ✅ 不要整行“卡片感” */
-  align-items: center;
-  padding: 10px 6px;
-  border-radius: 12px;
-  color: var(--text-muted);
+  display:flex;
+  align-items:center;
+  padding: 10px 8px;
+  border-radius: 10px;
+  color: var(--sx-drawer-text);
   font-size: 14.5px;
   font-weight: 750;
 }
 .sx-drawer-nav > a:hover{
-  background: rgba(255,255,255,0.03);
-  color: var(--text);
+  background: var(--sx-drawer-hover);
 }
 
 /* -----------------------------
-   Use Cases (only expandable node)
-   - caret sits next to text (not far right)
+   Buttons reset (IMPORTANT for iOS/white)
    ----------------------------- */
+.sx-drawer-nav button,
 .sx-drawer-usecases{
-  width: fit-content;              /* ✅ 文字多长就多长 */
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;                        /* ✅ caret 紧跟文字 */
-  padding: 10px 6px;
+  appearance: none;
+  -webkit-appearance: none;
   border: none;
   background: transparent;
-  border-radius: 12px;
+  color: #fff;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+
+  display:flex;
+  align-items:center;
+  gap: 8px;
+
+  padding: 10px 8px;
+  border-radius: 10px;
 
   font-size: 14.5px;
-  font-weight: 900;
-  color: var(--text);
-
-  cursor: pointer;
+  font-weight: 850;
 }
-
+.sx-drawer-nav button:hover,
 .sx-drawer-usecases:hover{
-  background: rgba(255,255,255,0.03);
+  background: var(--sx-drawer-hover);
 }
 
+/* caret */
 .sx-usecases-caret{
+  margin-left: auto;
   font-size: 12px;
   opacity: .75;
-  transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+  transition: transform 180ms ease, opacity 180ms ease;
 }
-
 .sx-drawer-usecases[aria-expanded="true"] .sx-usecases-caret{
   transform: rotate(90deg);
-  opacity: .9;
+  opacity: .95;
 }
 
 /* -----------------------------
-   Secondary panel (Use Cases submenu)
-   - indented, lighter
+   Secondary panel (Use Cases)
    ----------------------------- */
+#sx-usecases-panel[hidden]{ display:none !important; }
+
 #sx-usecases-panel{
-  margin-top: 2px;
-  margin-left: 8px;               /* ✅ 二级缩进 */
+  margin-top: 4px;
+  margin-left: 10px;
   padding-left: 10px;
-  border-left: 1px solid rgba(255,255,255,0.08);
+  border-left: 1px solid rgba(255,255,255,0.12);
+
+  display:flex;
+  flex-direction:column;
+  gap: 2px;
 }
 
-.sx-drawer-group a{
+#sx-usecases-panel a{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap: 10px;
 
-  padding: 8px 10px;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  background: transparent;
+  padding: 8px 8px;
+  border-radius: 10px;
 
   font-size: 13px;
   font-weight: 650;
-  color: rgba(232,236,245,0.90);
+  color: rgba(232,236,245,0.78);
+}
+#sx-usecases-panel a:hover{
+  background: rgba(255,255,255,0.06);
+  color: rgba(232,236,245,0.95);
 }
 
-.sx-drawer-group a:hover{
-  background: rgba(255,255,255,0.03);
-  border-color: rgba(255,255,255,0.08);
-}
-
+/* divider */
 .sx-drawer-divider{
   height: 1px;
-  margin: 8px 4px;
-  background: rgba(255,255,255,0.08);
+  margin: 10px 6px;
+  background: rgba(255,255,255,0.10);
 }
 
-/* Narratives: appendix-style micro highlight */
+/* -----------------------------
+   Governance Narratives (special block)
+   ✅ title + subtitle both visible
+   ----------------------------- */
 .sx-drawer-narratives{
   display:flex;
   flex-direction:column;
   align-items:flex-start;
-  gap:4px;
+  gap: 4px;
 
   padding: 10px 10px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.03);
-  border-radius: 14px;
+  border-radius: 12px;
+
+  border: 1px solid rgba(59,130,246,0.28);
+  background: rgba(59,130,246,0.10);
+}
+.sx-drawer-narratives:hover{
+  background: rgba(59,130,246,0.14);
+  border-color: rgba(59,130,246,0.40);
 }
 
 .sx-drawer-narratives-title{
   font-weight: 900;
-  color: rgba(232,236,245,0.92);
+  color: rgba(255,255,255,0.95);
+  font-size: 13.5px;
 }
-
 .sx-drawer-narratives-sub{
-  font-size: 12px;
-  font-weight: 800;
-  opacity: .72;
-  color: rgba(232,236,245,0.86);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: rgba(232,236,245,0.70);
+  line-height: 1.35;
 }
 
 /* -----------------------------
-   Actions (bottom)
+   Actions area
    ----------------------------- */
 .sx-drawer-actions{
   margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+
   display:flex;
   gap: 10px;
   flex-wrap: wrap;
 
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: calc(6px + var(--sx-safe-bottom));
 }
 
+/* Let shared button styles handle visuals; just layout */
 .sx-drawer-actions .btn-secondary,
 .sx-drawer-actions .cta-button{
   flex: 1 1 auto;
   justify-content: center;
-}
-
-/* -----------------------------
-   Reduced motion
-   ----------------------------- */
-@media (prefers-reduced-motion: reduce){
-  .sx-usecases-caret{ transition: none; }
-}
-
-/* ==============================
-   Drawer scrollbar — SynOSX style
-   ============================== */
-
-/* Firefox */
-.sx-drawer-panel{
-  scrollbar-width: thin;
-  scrollbar-color: rgba(59,130,246,0.45) rgba(255,255,255,0.06);
-}
-
-/* WebKit (Chrome / Safari / Edge) */
-.sx-drawer-panel::-webkit-scrollbar{
-  width: 8px;
-}
-
-.sx-drawer-panel::-webkit-scrollbar-track{
-  background: rgba(255,255,255,0.04);
-  border-radius: 999px;
-}
-
-.sx-drawer-panel::-webkit-scrollbar-thumb{
-  background: linear-gradient(
-    180deg,
-    rgba(99,102,241,0.65),
-    rgba(59,130,246,0.55)
-  );
-  border-radius: 999px;
-  border: 2px solid rgba(10,14,26,0.9); /* 让 thumb 不贴边 */
-}
-
-.sx-drawer-panel::-webkit-scrollbar-thumb:hover{
-  background: linear-gradient(
-    180deg,
-    rgba(99,102,241,0.85),
-    rgba(59,130,246,0.75)
-  );
 }

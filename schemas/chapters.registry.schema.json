@@ -4,14 +4,41 @@
   "title": "Narratives Chapters Registry",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "updated_at", "chapters"],
+
+  "required": ["meta", "chapters"],
+
   "properties": {
-    "version": { "type": "string", "minLength": 1 },
-    "updated_at": { "type": "string", "minLength": 8 },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registry",
+        "status",
+        "description",
+        "governance_note",
+        "last_updated"
+      ],
+      "properties": {
+        "registry": { "type": "string", "minLength": 1 },
+        "status": {
+          "type": "string",
+          "enum": ["non-normative"]
+        },
+        "description": { "type": "string", "minLength": 1 },
+        "governance_note": { "type": "string", "minLength": 1 },
+        "last_updated": {
+          "type": "string",
+          "minLength": 8
+        }
+      }
+    },
+
     "chapters": {
       "type": "array",
       "minItems": 1,
-      "items": { "$ref": "narratives.chapter.schema.json" }
+      "items": {
+        "$ref": "narratives.chapter.schema.json"
+      }
     }
   }
 }

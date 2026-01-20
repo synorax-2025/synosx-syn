@@ -1,8 +1,12 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
 
   "defaults": {
-    "brand": { "name": "SynOSX", "sub": "· Governance OS", "href": "index.html" },
+    "brand": {
+      "name": "SynOSX",
+      "subtitle": "· Governance OS",
+      "href": "index.html"
+    },
 
     "desktop": {
       "links": [
@@ -21,7 +25,7 @@
           {
             "label": "Governance Narratives",
             "href": "narratives.html",
-            "sub": "Non-normative, illustrative cases"
+            "subtitle": "Non-normative, illustrative cases"
           }
         ]
       },
@@ -30,7 +34,12 @@
 
     "actions": {
       "secondary": null,
-      "primary": { "label": "预约技术对话", "href": "index.html#contact" }
+      "primary": {
+        "role": "primary",
+        "type": "link",
+        "label": "预约技术对话",
+        "href": "index.html#contact"
+      }
     },
 
     "drawer": {
@@ -50,14 +59,24 @@
           {
             "label": "Governance Narratives",
             "href": "narratives.html",
-            "sub": "Non-normative, illustrative cases"
+            "subtitle": "Non-normative, illustrative cases"
           }
         ]
       },
       "tail": [{ "label": "Contact", "href": "index.html#contact" }],
       "actions": [
-        { "kind": "secondary", "label": "返回首页", "href": "index.html" },
-        { "kind": "primary", "label": "预约技术对话", "href": "index.html#contact" }
+        {
+          "role": "secondary",
+          "type": "link",
+          "label": "返回首页",
+          "href": "index.html"
+        },
+        {
+          "role": "primary",
+          "type": "link",
+          "label": "预约技术对话",
+          "href": "index.html#contact"
+        }
       ]
     }
   },
@@ -66,7 +85,10 @@
     "index": {},
 
     "manifest": {
-      "brand": { "sub": "· Manifest", "href": "manifest.html#top" },
+      "brand": {
+        "subtitle": "· Manifest",
+        "href": "manifest.html#top"
+      },
 
       "desktop": {
         "usecases": { "enabled": false },
@@ -87,8 +109,18 @@
       },
 
       "actions": {
-        "secondary": { "label": "返回首页", "href": "index.html" },
-        "primary": { "label": "开始阅读", "href": "manifest.html#toc" }
+        "secondary": {
+          "role": "secondary",
+          "type": "link",
+          "label": "返回首页",
+          "href": "index.html"
+        },
+        "primary": {
+          "role": "primary",
+          "type": "link",
+          "label": "开始阅读",
+          "href": "manifest.html#toc"
+        }
       },
 
       "drawer": {
@@ -108,22 +140,43 @@
         ],
         "tail": [],
         "actions": [
-          { "kind": "secondary", "label": "返回首页", "href": "index.html" },
-          { "kind": "primary", "label": "开始阅读", "href": "manifest.html#toc" }
+          {
+            "role": "secondary",
+            "type": "link",
+            "label": "返回首页",
+            "href": "index.html"
+          },
+          {
+            "role": "primary",
+            "type": "link",
+            "label": "开始阅读",
+            "href": "manifest.html#toc"
+          }
         ]
       }
     },
 
     "cases": {
-      "brand": { "sub": "· Use Cases", "href": "cases.html" },
+      "brand": {
+        "subtitle": "· Use Cases",
+        "href": "cases.html"
+      },
       "actions": {
         "secondary": null,
-        "primary": { "label": "返回首页", "href": "index.html" }
+        "primary": {
+          "role": "primary",
+          "type": "link",
+          "label": "返回首页",
+          "href": "index.html"
+        }
       }
     },
 
     "replay": {
-      "brand": { "sub": "· Audit Replay", "href": "cases.html" },
+      "brand": {
+        "subtitle": "· Audit Replay",
+        "href": "cases.html"
+      },
 
       "desktop": {
         "usecases": { "enabled": false },
@@ -132,8 +185,19 @@
       },
 
       "actions": {
-        "secondary": { "label": "← 返回判例", "href": "cases.html" },
-        "primary": { "label": "▶ 回放证据", "as": "button", "id": "btn-run-replay", "class": "primary" }
+        "secondary": {
+          "role": "secondary",
+          "type": "link",
+          "label": "← 返回判例",
+          "href": "cases.html"
+        },
+        "primary": {
+          "role": "primary",
+          "type": "button",
+          "label": "▶ 回放证据",
+          "id": "btn-run-replay",
+          "class": "primary"
+        }
       },
 
       "drawer": {
@@ -143,8 +207,19 @@
         ],
         "tail": [],
         "actions": [
-          { "kind": "secondary", "label": "返回首页", "href": "index.html" },
-          { "kind": "primary", "label": "▶ 回放证据", "as": "button", "id": "btn-run-replay", "class": "primary" }
+          {
+            "role": "secondary",
+            "type": "link",
+            "label": "返回首页",
+            "href": "index.html"
+          },
+          {
+            "role": "primary",
+            "type": "button",
+            "label": "▶ 回放证据",
+            "id": "btn-run-replay",
+            "class": "primary"
+          }
         ]
       }
     }

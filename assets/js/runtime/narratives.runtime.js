@@ -1,5 +1,5 @@
 /* narratives.runtime.js
-   - Load /registry/narratives/chapters.registry.json
+   - Load /assets/data/narratives/chapters.registry.json
    - Render cards (JSON narratives)
    - Governance: only published items appear
 */
@@ -9,7 +9,7 @@
   if (!grid) return;
 
   // ✅ root-absolute: stable no matter where the page lives
-  const registryUrl = "/registry/narratives/chapters.registry.json";
+  const registryUrl = "./assets/data/narratives/chapters.registry.json";
 
   function esc(s){
     return String(s ?? "")

@@ -1,6 +1,6 @@
 /* narrative-case.runtime.js
    - Read ?id=case-01
-   - Load ../registry/narratives/chapters.registry.json to resolve case_ref
+   - Load ../assets/data/narratives/chapters.registry.json to resolve case_ref
    - Load case json and render blocks
 */
 
@@ -13,7 +13,7 @@
   const params = new URLSearchParams(location.search);
   const id = params.get("id");
 
-  const registryUrl = "../registry/narratives/chapters.registry.json";
+  const registryUrl = "../assets/data/narratives/chapters.registry.json";
 
   function esc(s){
     return String(s ?? "")

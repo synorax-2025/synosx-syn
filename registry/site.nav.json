@@ -287,7 +287,7 @@
 },
 
 "narrative-case": {
-  "brand": { "subtitle": "· Narrative", "href": "../narratives.html" },
+  "brand": { "subtitle": "· Narrative-case", "href": "../narratives.html" },
 
   "desktop": { "usecases": { "enabled": false }, "links": [], "tail": [] },
 

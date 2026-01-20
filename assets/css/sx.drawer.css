@@ -1,4 +1,4 @@
-/* sx.drawer.css — Frozen v1.1 (2026-01-19)
+/* sx.drawer.css — Frozen v1.2 (2026-01-19)
    ✅ iOS Safari/Chrome stable: panel internal scroll + no snapback
    ✅ No 100vh/dvh: use --sx-vh-px from JS
    ✅ Background locked via body fixed (JS)
@@ -40,17 +40,18 @@
    Desktop (>980): show desktop nav (1–10), hide menu
    Mobile  (<=980): hide desktop nav, show menu
    ========================================================= */
+
 .nav-menu-btn{ display:none !important; }
 
-/* 桌面：强制 desktop nav 存在（避免被 page css 干掉） */
-.nav-desktop{ display:flex !important; }
+/* 桌面：只在 navbar 内强制 desktop nav 存在（避免误伤其它结构） */
+#navbar .nav-desktop{ display:flex !important; }
 
 @media (max-width: 980px){
-  .nav-desktop{ display:none !important; }
+  #navbar .nav-desktop{ display:none !important; }
   .nav-menu-btn{ display:inline-flex !important; }
 }
 
-/* 可选但建议：桌面硬禁用 Drawer（避免任何误触/误显） */
+/* 桌面硬禁用 Drawer（避免误触/误显） */
 @media (min-width: 981px){
   #sx-mobile-menu{ display:none !important; }
 }
@@ -58,6 +59,7 @@
 /* =========================================================
    Drawer root
    ========================================================= */
+
 .sx-drawer{
   position: fixed;
   inset: 0;
@@ -74,7 +76,7 @@
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
 
-  /* 防止 iOS 上 backdrop 被当作可滚动区域 */
+  /* iOS: 避免 backdrop 被当作滚动区域 */
   touch-action: none;
 }
 
@@ -82,15 +84,13 @@
    Panel (THE ONLY SCROLL CONTAINER)
    iOS safe: max-height uses --sx-vh-px (px), not vh
    ========================================================= */
+
 .sx-drawer-panel{
   position: fixed;
   top: calc(var(--sx-nav-h) + 10px);
   right: var(--sx-container-pad-sm);
   width: var(--sx-drawer-w);
 
-  /* ✅ 核心：把可用高度 * open-factor（你只改 factor）
-     - 8px 是顶部预留（越小越高）
-  */
   max-height: calc(
     (var(--sx-vh-px) - var(--sx-nav-h) - 8px - var(--sx-safe-bottom))
     * var(--sx-drawer-open-factor)
@@ -101,7 +101,11 @@
   overflow-x: hidden;
 
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+
+  /* ✅ iOS 稳定：不要用 overscroll-behavior: contain;（不稳定）
+     拆成 y/x，避免滚动手势被吞 */
+  overscroll-behavior-y: contain;
+  overscroll-behavior-x: none;
 
   background: var(--sx-drawer-bg);
   border: 1px solid var(--sx-drawer-border);
@@ -111,17 +115,21 @@
   padding: 14px;
   outline: none;
 
-  /* 视觉：更像 GitHub dropdown */
+  /* 视觉：GitHub dropdown */
   transform: translateY(-10px);
   opacity: 0;
   transition: transform 180ms ease, opacity 180ms ease;
 
-  /* iOS: 避免子元素触摸导致页面回弹 */
+  /* ✅ iOS 关键：带 transform 的滚动容器必须加稳定器 */
+  transform: translateZ(0);
+  will-change: transform, opacity;
+
+  /* iOS: 允许 panel 内 pan-y；防止页面本体跟着滑 */
   touch-action: pan-y;
 }
 
 .sx-drawer.is-open .sx-drawer-panel{
-  transform: translateY(0);
+  transform: translateZ(0);
   opacity: 1;
 }
 
@@ -134,6 +142,7 @@
 /* =========================================================
    Scrollbar (iOS may hide — ok)
    ========================================================= */
+
 .sx-drawer-panel{
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.22) transparent;
@@ -151,6 +160,7 @@
 /* =========================================================
    Top row (brand + close)
    ========================================================= */
+
 .sx-drawer-top{
   display:flex;
   align-items:center;
@@ -218,6 +228,7 @@
 /* =========================================================
    Nav list
    ========================================================= */
+
 .sx-drawer-nav{
   display:flex;
   flex-direction:column;
@@ -241,6 +252,7 @@
 /* =========================================================
    Buttons reset (IMPORTANT for iOS/white)
    ========================================================= */
+
 .sx-drawer-nav button,
 .sx-drawer-usecases{
   appearance: none;
@@ -283,6 +295,7 @@
 /* =========================================================
    Secondary panel (Use Cases)
    ========================================================= */
+
 #sx-usecases-panel[hidden]{ display:none !important; }
 
 #sx-usecases-panel{
@@ -325,6 +338,7 @@
    Governance Narratives (special block)
    ✅ title + subtitle both visible
    ========================================================= */
+
 .sx-drawer-narratives{
   display:flex;
   flex-direction:column;
@@ -357,6 +371,7 @@
 /* =========================================================
    Actions area
    ========================================================= */
+
 .sx-drawer-actions{
   margin-top: 14px;
   padding-top: 12px;

@@ -368,3 +368,38 @@ footer{
   /* keep actions tight */
   .nav-actions{ gap: 8px; }
 }
+
+/* =========================
+   iOS dropdown scroll fix
+   (nav-drop-menu)
+   ========================= */
+
+/* 1) dropdown 容器必须可滚 */
+.nav-drop-menu{
+  max-height: min(60vh, 420px);          /* 关键：限制高度，否则不会出现滚动 */
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;    /* iOS 惯性滚动 */
+  overscroll-behavior: contain;
+}
+
+/* 2) 如果你的 nav / nav-content 里有 overflow hidden，会把滚动/点击都截掉 */
+#navbar,
+#navbar .nav-content{
+  overflow: visible;
+}
+
+/* 3) iOS 上如果 dropdown 的祖先节点用了 transform/filter，fixed/scroll 会诡异
+      这里强制：dropdown 自己不要 transform */
+.nav-drop-menu{
+  transform: none;
+}
+
+/* 4) 给 dropdown 内部每个 item 一个明确的可点区域（避免 iOS 点不到/误触） */
+.nav-drop-menu a{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  -webkit-tap-highlight-color: transparent;
+}

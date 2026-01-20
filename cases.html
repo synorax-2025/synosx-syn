@@ -17,6 +17,7 @@
   <!-- ✅ Shared CSS -->
   <link rel="stylesheet" href="assets/css/sx.core.css" />
   <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
+  <link rel="stylesheet" href="assets/css/sx.drawer.css" />
 
   <!-- ✅ Page CSS (SCOPED: body.sx-cases ...) -->
   <link rel="stylesheet" href="assets/css/pages/cases.page.css" />
@@ -26,27 +27,8 @@
 <body class="has-statusbar sx-cases">
   <div class="bg-gradient" aria-hidden="true"></div>
 
-  <!-- Nav -->
-  <nav id="navbar" aria-label="Cases Navigation">
-    <div class="nav-content">
-      <a class="logo" href="index.html" aria-label="SynOSX Home">
-        <div class="logo-icon">SX</div>
-        <span><b>SynOSX</b> <span class="logo-sub">· Cases</span></span>
-      </a>
-
-      <ul class="nav-links">
-        <li><a href="#cases">Cases</a></li>
-        <li><a href="manifest.html">Manifest</a></li>
-        <li><a href="whitepaper.html">Whitepaper</a></li>
-        <li><a href="replay.html?trace=rc_brand_15s_v1">Replay</a></li>
-      </ul>
-
-      <div class="nav-actions">
-        <a class="btn-secondary" href="index.html">返回首页</a>
-        <a class="cta-button" href="manifest.html">读 Manifest</a>
-      </div>
-    </div>
-  </nav>
+  <!-- ✅ Nav injected by tools/build-includes.mjs (SSOT: registry/site.nav.json) -->
+  <!--@include nav-->
 
   <header class="cases-hero" id="top">
     <div class="container">
@@ -166,16 +148,17 @@
   <!-- ✅ Shared JS -->
   <script src="assets/js/sx.statusbar.js"></script>
   <script src="assets/js/sx.core.js"></script>
+  <script src="assets/js/sx.drawer.js"></script>
 
-  <!-- ✅ Page runtime（registry 自动读取） -->
+  <!-- ✅ Page runtime (kept inline: cases-only registry demo card) -->
   <script>
   (function bootReplayDemoCard(){
     const linksEl = document.getElementById("replay-links");
     if (!linksEl) return;
 
-    const base = location.pathname.includes("/pages/") ? "../" : "";
-    const registryUrl = base + "registry/replay.registry.json";
-    const replayPage = base + "replay.html";
+    // cases.html is at root, so registry path is stable (no "/pages/" base logic needed)
+    const registryUrl = "registry/replay.registry.json";
+    const replayPage = "replay.html";
 
     function escapeHtml(s){
       return String(s ?? "")

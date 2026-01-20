@@ -17,6 +17,7 @@
   <!-- ✅ Shared CSS -->
   <link rel="stylesheet" href="../assets/css/sx.core.css" />
   <link rel="stylesheet" href="../assets/css/sx.statusbar.css" />
+  <link rel="stylesheet" href="../assets/css/sx.drawer.css" />
 
   <!-- ✅ Cases Shell (scoped by body.sx-cases ...) -->
   <link rel="stylesheet" href="../assets/css/pages/cases.page.css" />
@@ -25,23 +26,11 @@
   <link rel="stylesheet" href="../assets/css/pages/case-voicewall.page.css" />
 </head>
 
-<body class="has-statusbar sx-cases" data-case="voicewall">
+<body class="has-statusbar sx-cases" data-page="case-voicewall" data-case="voicewall">
   <div class="bg-gradient bg-voicewall" aria-hidden="true"></div>
 
-  <!-- ================== NAV ================== -->
-  <nav id="navbar" aria-label="VoiceWall Navigation">
-    <div class="nav-content">
-      <a class="logo" href="../cases.html" aria-label="Back to Cases">
-        <div class="logo-icon">SX</div>
-        <span><b>SynOSX</b> <span class="logo-sub">· Governance OS</span></span>
-      </a>
-
-      <div class="nav-links">
-        <a class="pill" href="../cases.html">← 返回判例目录</a>
-        <a class="pill muted" href="../index.html">返回宪法首页</a>
-      </div>
-    </div>
-  </nav>
+  <!-- ✅ Unified Nav + Mobile Drawer (from partials/nav.partial.html) -->
+  <!--@include nav-->
 
   <!-- ================== HERO ================== -->
   <header class="cases-hero case-hero" id="top">
@@ -89,6 +78,7 @@
       <div class="card reveal">
         <span class="badge">FLOW</span>
         <h2>裁决流程（Decision Flow）</h2>
+
         <div class="flow flow-arrow" role="list" aria-label="VoiceWall Decision Flow">
           <span class="step" role="listitem">外部请求 / AI 输出</span>
           <span class="arrow" aria-hidden="true">→</span>
@@ -99,7 +89,7 @@
           <span class="step" role="listitem">Audit Trace 记录</span>
           <span class="arrow" aria-hidden="true">→</span>
           <span class="step" role="listitem">允许 / 阻断 / 降级输出</span>
-      </div>
+        </div>
 
         <p class="hint">
           没有身份、没有授权、没有 trace 的发声，一律不可通过。
@@ -132,7 +122,7 @@ Audit: rc_2026-02-voicewall-0042</code></pre>
           VoiceWall 不提升“说话能力”，它限制“谁有资格代表系统说话”。
         </p>
         <p>
-          这是 SynOSX治理体系中核心判例之一：<strong>表达本身，就是一种高风险行为。</strong>
+          这是 SynOSX 治理体系中核心判例之一：<strong>表达本身，就是一种高风险行为。</strong>
         </p>
       </div>
 
@@ -181,6 +171,7 @@ Audit: rc_2026-02-voicewall-0042</code></pre>
   <!-- ✅ Shared JS -->
   <script src="../assets/js/sx.statusbar.js"></script>
   <script src="../assets/js/sx.core.js"></script>
+  <script src="../assets/js/sx.drawer.js"></script>
 
   <!-- ✅ Page Runtime -->
   <script src="../assets/js/runtime/case-voicewall.runtime.js"></script>

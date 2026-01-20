@@ -17,6 +17,7 @@
   <!-- ✅ Shared CSS -->
   <link rel="stylesheet" href="../assets/css/sx.core.css" />
   <link rel="stylesheet" href="../assets/css/sx.statusbar.css" />
+  <link rel="stylesheet" href="../assets/css/sx.drawer.css" />
 
   <!-- ✅ Page CSS -->
   <link rel="stylesheet" href="../assets/css/pages/narrative-case.page.css" />
@@ -25,19 +26,8 @@
 <body class="has-statusbar" data-page="narrative-case">
   <div class="bg-gradient" aria-hidden="true"></div>
 
-  <nav id="navbar" aria-label="Narrative Case Navigation">
-    <div class="nav-content">
-      <a class="logo" href="../narratives.html" aria-label="Back to Narratives">
-        <div class="logo-icon">SX</div>
-        <span><b>SynOSX</b> <span class="logo-sub">· Narrative Case</span></span>
-      </a>
-
-      <div class="nav-links">
-        <a class="pill" href="../narratives.html">← 返回 Narratives</a>
-        <a class="pill muted" href="../cases.html">返回 Use Cases</a>
-      </div>
-    </div>
-  </nav>
+  <!-- ✅ Unified Nav + Mobile Drawer (from partials/nav.partial.html) -->
+  <!--@include nav-->
 
   <header class="case-hero">
     <div class="container">
@@ -61,11 +51,6 @@
     <div class="container">
       <div class="card" id="case-content">
         <p>Loading case json…</p>
-      </div>
-
-      <div class="bottom-actions">
-        <a class="btn-secondary" href="../narratives.html">← 返回目录</a>
-        <a class="cta-button" href="../cases.html">回到 Use Cases</a>
       </div>
     </div>
   </main>
@@ -111,6 +96,7 @@
   <!-- ✅ Shared JS -->
   <script src="../assets/js/sx.statusbar.js"></script>
   <script src="../assets/js/sx.core.js"></script>
+  <script src="../assets/js/sx.drawer.js"></script>
 
   <!-- ✅ Page runtime -->
   <script src="../assets/js/runtime/narrative-case.runtime.js"></script>

@@ -1,8 +1,13 @@
 /* tools/build-includes.mjs — static include builder (no deps, ESM)
    ✅ Reads registry/site.nav.json (Single Source of Truth)
-   ✅ Builds per-page nav+drawer HTML and injects into root html via <!--@include nav-->
+   ✅ Builds per-page nav+drawer HTML and injects into html via <!--@include nav-->
    ✅ Recreates dist/: copies non-html assets, rebuilds html with injected nav
+   ✅ Supports nested pages (pages/** etc) with auto href prefixing
    ❌ No compatibility layer (no sub/as/kind/cta fallback)
+
+   IMPORTANT:
+   - site.nav.json 内部链接必须统一写成“站点根相对”：例如 "cases.html" / "pages/case-video.html"
+   - 不要写 "../cases.html"、"./cases.html"、"/cases.html"（否则会跳出 dist 或被二次前缀）
 */
 
 import fs from "node:fs";
@@ -57,6 +62,27 @@ function copyDir(src, dest) {
   }
 }
 
+/** Recursively list all .html files (relative paths) under root, excluding EXCLUDE_DIR_NAMES */
+function listHtmlFilesRec(absDir, relBase = "") {
+  const out = [];
+  const entries = fs.readdirSync(absDir, { withFileTypes: true });
+
+  for (const e of entries) {
+    const abs = path.join(absDir, e.name);
+
+    if (e.isDirectory()) {
+      if (EXCLUDE_DIR_NAMES.has(e.name)) continue;
+      out.push(...listHtmlFilesRec(abs, path.join(relBase, e.name)));
+      continue;
+    }
+
+    if (e.isFile() && e.name.endsWith(".html")) {
+      out.push(path.join(relBase, e.name));
+    }
+  }
+  return out;
+}
+
 function isPlainObject(x) {
   return x && typeof x === "object" && !Array.isArray(x);
 }
@@ -107,9 +133,48 @@ function joinClasses(...xs) {
     .trim();
 }
 
+/* -------------------- Href prefix (critical fix) -------------------- */
+
+function isExternalOrSpecialHref(href) {
+  if (!href) return true;
+
+  // external / special
+  if (
+    href.startsWith("http://") ||
+    href.startsWith("https://") ||
+    href.startsWith("mailto:") ||
+    href.startsWith("tel:") ||
+    href.startsWith("#")
+  )
+    return true;
+
+  // already relative => DO NOT prefix again (prevents "../../cases.html" escaping dist)
+  if (href.startsWith("../") || href.startsWith("./")) return true;
+
+  // absolute path (generally avoid in site.nav.json)
+  if (href.startsWith("/")) return true;
+
+  return false;
+}
+
+function withPrefix(href, prefix) {
+  if (!href) return href;
+  if (!prefix) return href;
+  if (isExternalOrSpecialHref(href)) return href;
+  return `${prefix}${href}`;
+}
+
+function calcPrefixForRelHtml(relHtmlPath) {
+  const p = relHtmlPath.replaceAll("\\", "/");
+  const dir = path.posix.dirname(p);
+  if (!dir || dir === ".") return "";
+  const parts = dir.split("/").filter(Boolean);
+  return "../".repeat(parts.length);
+}
+
 /* -------------------- Rendering: Desktop -------------------- */
 
-function renderDesktopNav(desktop = {}) {
+function renderDesktopNav(desktop = {}, prefix) {
   const links = desktop.links ?? [];
   const usecases = desktop.usecases ?? null;
   const tail = desktop.tail ?? [];
@@ -118,14 +183,18 @@ function renderDesktopNav(desktop = {}) {
     .concat(
       links.map(
         (l) =>
-          `<li><a href="${escapeHtml(l.href)}">${escapeHtml(l.label)}</a></li>`
+          `<li><a href="${escapeHtml(withPrefix(l.href, prefix))}">${escapeHtml(
+            l.label
+          )}</a></li>`
       )
     )
-    .concat(renderUseCasesDesktop(usecases))
+    .concat(renderUseCasesDesktop(usecases, prefix))
     .concat(
       tail.map(
         (t) =>
-          `<li><a href="${escapeHtml(t.href)}">${escapeHtml(t.label)}</a></li>`
+          `<li><a href="${escapeHtml(withPrefix(t.href, prefix))}">${escapeHtml(
+            t.label
+          )}</a></li>`
       )
     )
     .join("");
@@ -134,7 +203,7 @@ function renderDesktopNav(desktop = {}) {
   return `<ul class="nav-links nav-desktop" aria-label="Desktop Navigation">${items}</ul>`;
 }
 
-function renderUseCasesDesktop(usecases) {
+function renderUseCasesDesktop(usecases, prefix) {
   if (!usecases || usecases.enabled === false) return [];
 
   const label = usecases.label ?? "Use Cases";
@@ -149,7 +218,10 @@ function renderUseCasesDesktop(usecases) {
 
       if (it?.subtitle) {
         return `
-          <a role="menuitem"${attr("href", it.href)} class="nav-drop-narratives">
+          <a role="menuitem"${attr(
+            "href",
+            withPrefix(it.href, prefix)
+          )} class="nav-drop-narratives">
             <span>${escapeHtml(it.label)}</span>
             <span class="nav-drop-sub">${escapeHtml(it.subtitle)}</span>
           </a>
@@ -157,7 +229,7 @@ function renderUseCasesDesktop(usecases) {
       }
 
       return `
-        <a role="menuitem"${attr("href", it.href)}>
+        <a role="menuitem"${attr("href", withPrefix(it.href, prefix))}>
           <span>${escapeHtml(it.label)}</span>${ext}
         </a>
       `.trim();
@@ -184,7 +256,7 @@ function renderUseCasesDesktop(usecases) {
 
 /* -------------------- Rendering: Actions (Topbar) -------------------- */
 
-function renderTopbarActions(actions = {}) {
+function renderTopbarActions(actions = {}, prefix) {
   const secondary = actions.secondary ?? null;
   const primary = actions.primary ?? null;
 
@@ -211,9 +283,10 @@ function renderTopbarActions(actions = {}) {
       );
     }
     parts.push(
-      `<a class="btn-secondary"${attr("href", secondary.href)}>${escapeHtml(
-        secondary.label
-      )}</a>`
+      `<a class="btn-secondary"${attr(
+        "href",
+        withPrefix(secondary.href, prefix)
+      )}>${escapeHtml(secondary.label)}</a>`
     );
   }
 
@@ -230,9 +303,10 @@ function renderTopbarActions(actions = {}) {
     } else if (primary.type === "link") {
       const cls = joinClasses("cta-button", primary.class);
       parts.push(
-        `<a class="${escapeHtml(cls)}"${attr("href", primary.href)}>${escapeHtml(
-          primary.label
-        )}</a>`
+        `<a class="${escapeHtml(cls)}"${attr(
+          "href",
+          withPrefix(primary.href, prefix)
+        )}>${escapeHtml(primary.label)}</a>`
       );
     } else {
       throw new Error(
@@ -246,29 +320,29 @@ function renderTopbarActions(actions = {}) {
 
 /* -------------------- Rendering: Drawer -------------------- */
 
-function renderDrawerLinks(links = []) {
+function renderDrawerLinks(links = [], prefix) {
   return links
     .map(
       (l) =>
-        `<a href="${escapeHtml(l.href)}" data-close="sx-drawer">${escapeHtml(
-          l.label
-        )}</a>`
+        `<a href="${escapeHtml(
+          withPrefix(l.href, prefix)
+        )}" data-close="sx-drawer">${escapeHtml(l.label)}</a>`
     )
     .join("");
 }
 
-function renderDrawerTail(tail = []) {
+function renderDrawerTail(tail = [], prefix) {
   return tail
     .map(
       (l) =>
-        `<a href="${escapeHtml(l.href)}" data-close="sx-drawer">${escapeHtml(
-          l.label
-        )}</a>`
+        `<a href="${escapeHtml(
+          withPrefix(l.href, prefix)
+        )}" data-close="sx-drawer">${escapeHtml(l.label)}</a>`
     )
     .join("");
 }
 
-function renderDrawerUsecases(usecases) {
+function renderDrawerUsecases(usecases, prefix) {
   if (!usecases || usecases.enabled === false) return "";
 
   const label = usecases.label ?? "Use Cases";
@@ -281,7 +355,7 @@ function renderDrawerUsecases(usecases) {
       if (it?.subtitle) {
         return `
           <a class="sx-drawer-narratives" href="${escapeHtml(
-            it.href
+            withPrefix(it.href, prefix)
           )}" data-close="sx-drawer">
             <span class="sx-drawer-narratives-title">${escapeHtml(it.label)}</span>
             <span class="sx-drawer-narratives-sub">${escapeHtml(it.subtitle)}</span>
@@ -289,9 +363,9 @@ function renderDrawerUsecases(usecases) {
         `.trim();
       }
 
-      return `<a href="${escapeHtml(it.href)}" data-close="sx-drawer">${escapeHtml(
-        it.label
-      )}${ext}</a>`;
+      return `<a href="${escapeHtml(
+        withPrefix(it.href, prefix)
+      )}" data-close="sx-drawer">${escapeHtml(it.label)}${ext}</a>`;
     })
     .join("");
 
@@ -305,7 +379,7 @@ function renderDrawerUsecases(usecases) {
   `.trim();
 }
 
-function renderDrawerActions(actions = []) {
+function renderDrawerActions(actions = [], prefix) {
   if (!actions.length) return "";
 
   const btns = actions
@@ -324,7 +398,7 @@ function renderDrawerActions(actions = []) {
       if (a.type === "link") {
         return `<a class="${escapeHtml(cls)}"${attr(
           "href",
-          a.href
+          withPrefix(a.href, prefix)
         )} data-close="sx-drawer">${escapeHtml(a.label)}</a>`;
       }
 
@@ -339,7 +413,7 @@ function renderDrawerActions(actions = []) {
 
 /* -------------------- Shell -------------------- */
 
-function renderNavShell(resolved) {
+function renderNavShell(resolved, prefix) {
   const brand = resolved.brand || {};
   const desktop = resolved.desktop || {};
   const drawer = resolved.drawer || {};
@@ -349,7 +423,7 @@ function renderNavShell(resolved) {
   const brandHref = brand.href || "index.html";
 
   const brandHtml = `
-    <a class="logo" href="${escapeHtml(brandHref)}" aria-label="${escapeHtml(
+    <a class="logo" href="${escapeHtml(withPrefix(brandHref, prefix))}" aria-label="${escapeHtml(
     brandName
   )} Home">
       <div class="logo-icon">SX</div>
@@ -360,8 +434,8 @@ function renderNavShell(resolved) {
     </a>
   `.trim();
 
-  const desktopUl = renderDesktopNav(desktop);
-  const actions = renderTopbarActions(resolved.actions || {});
+  const desktopUl = renderDesktopNav(desktop, prefix);
+  const actions = renderTopbarActions(resolved.actions || {}, prefix);
 
   const nav = `
     <nav id="navbar" aria-label="Primary Navigation">
@@ -385,10 +459,10 @@ function renderNavShell(resolved) {
     </div>
   `.trim();
 
-  const drawerLinks = renderDrawerLinks(drawer.links || []);
-  const drawerUsecases = renderDrawerUsecases(drawer.usecases || null);
-  const drawerTail = renderDrawerTail(drawer.tail || []);
-  const drawerActions = renderDrawerActions(drawer.actions || []);
+  const drawerLinks = renderDrawerLinks(drawer.links || [], prefix);
+  const drawerUsecases = renderDrawerUsecases(drawer.usecases || null, prefix);
+  const drawerTail = renderDrawerTail(drawer.tail || [], prefix);
+  const drawerActions = renderDrawerActions(drawer.actions || [], prefix);
 
   const drawerHtml = `
     <div id="sx-mobile-menu" class="sx-drawer" aria-hidden="true">
@@ -422,20 +496,19 @@ function resolvePageNav(config, pageKey) {
   return mergeDeep(defaults, page);
 }
 
-function pageKeyFromFilename(filename) {
-  const base = path.basename(filename, ".html");
-  return base === "index" ? "index" : base;
+function pageKeyFromFilename(relPath) {
+  const p = relPath.replaceAll("\\", "/");
+  return path.posix.basename(p, ".html"); // index => index, pages/case-video.html => case-video
 }
 
 /* -------------------- Build -------------------- */
 
 function buildHtmlFiles(config) {
-  // Only root-level html pages are rebuilt (index.html, manifest.html, cases.html, replay.html, ...)
-  const files = fs.readdirSync(ROOT).filter((f) => f.endsWith(".html"));
+  const relFiles = listHtmlFilesRec(ROOT);
 
-  for (const f of files) {
-    const inPath = path.join(ROOT, f);
-    const outPath = path.join(DIST_DIR, f);
+  for (const rel of relFiles) {
+    const inPath = path.join(ROOT, rel);
+    const outPath = path.join(DIST_DIR, rel);
     const src = readText(inPath);
 
     ensureDir(path.dirname(outPath));
@@ -445,9 +518,10 @@ function buildHtmlFiles(config) {
       continue;
     }
 
-    const key = pageKeyFromFilename(f);
+    const prefix = calcPrefixForRelHtml(rel); // ✅ critical
+    const key = pageKeyFromFilename(rel);
     const resolved = resolvePageNav(config, key);
-    const navHtml = renderNavShell(resolved);
+    const navHtml = renderNavShell(resolved, prefix);
 
     const out = src.replace(INCLUDE_TOKEN, navHtml);
     fs.writeFileSync(outPath, out, "utf8");
@@ -455,12 +529,16 @@ function buildHtmlFiles(config) {
 }
 
 function assertBasicConfig(config) {
-  if (!config || typeof config !== "object") throw new Error("site.nav.json: invalid JSON root.");
+  if (!config || typeof config !== "object")
+    throw new Error("site.nav.json: invalid JSON root.");
   if (!config.defaults) throw new Error("site.nav.json: missing defaults.");
   if (!config.pages) throw new Error("site.nav.json: missing pages.");
-  if (!config.defaults.brand) throw new Error("site.nav.json: missing defaults.brand.");
+  if (!config.defaults.brand)
+    throw new Error("site.nav.json: missing defaults.brand.");
   if (!("subtitle" in config.defaults.brand))
-    throw new Error('site.nav.json: defaults.brand.subtitle is required (no "sub" allowed).');
+    throw new Error(
+      'site.nav.json: defaults.brand.subtitle is required (no "sub" allowed).'
+    );
 }
 
 function main() {
@@ -472,7 +550,8 @@ function main() {
   assertBasicConfig(config);
 
   // Recreate dist
-  if (fs.existsSync(DIST_DIR)) fs.rmSync(DIST_DIR, { recursive: true, force: true });
+  if (fs.existsSync(DIST_DIR))
+    fs.rmSync(DIST_DIR, { recursive: true, force: true });
   ensureDir(DIST_DIR);
 
   // Copy everything (excluding html + excluded source folders)

@@ -7,7 +7,7 @@
   <meta name="description" content="SynOSX Whitepaper：解释为什么复杂系统需要可验证治理，以及 SynOSX 如何用 Contracts-first 与裁决链路（Intent/Firewall/Audit）实现可追溯、可表达、可进化（零降维）。" />
 
   <!-- ✅ Statusbar Meta (6个) -->
-  <meta name="sx-runtime" content="MANIFEST" />
+  <meta name="sx-runtime" content="WHITEPAPER" />
   <meta name="sx-build-date" content="2026-01-13" />
   <meta name="sx-version" content="v1.0.4-Stable" />
   <meta name="sx-commit" content="ba...227" />
@@ -17,6 +17,7 @@
   <!-- ✅ Shared CSS -->
   <link rel="stylesheet" href="assets/css/sx.core.css" />
   <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
+  <link rel="stylesheet" href="assets/css/sx.drawer.css" />
 
   <!-- ✅ Page CSS (page-only) -->
   <link rel="stylesheet" href="assets/css/pages/whitepaper.page.css" />
@@ -25,30 +26,8 @@
 <body class="has-statusbar">
   <div class="bg-gradient" aria-hidden="true"></div>
 
-  <nav id="navbar" aria-label="Whitepaper Navigation">
-    <div class="nav-content">
-      <a class="logo" href="index.html" aria-label="SynOSX">
-        <div class="logo-icon">SX</div>
-        <span><b>SynOSX</b> <span class="logo-sub">· Whitepaper</span></span>
-      </a>
-
-      <ul class="nav-links" aria-label="Whitepaper Chapters">
-        <li><a href="#c1">Ch1</a></li>
-        <li><a href="#c2">Ch2</a></li>
-        <li><a href="#c3">Ch3</a></li>
-        <li><a href="#c4">Ch4</a></li>
-        <li><a href="#c5">Ch5</a></li>
-        <li><a href="#c6">Ch6</a></li>
-        <li><a href="#c7">Ch7</a></li>
-        <li><a href="#c8">Ch8</a></li>
-      </ul>
-
-      <div class="nav-actions">
-        <a class="btn-secondary" href="index.html">返回首页</a>
-        <a class="cta-button" href="manifest.html">阅读 Manifest</a>
-      </div>
-    </div>
-  </nav>
+  <!-- ✅ Nav injected by tools/build-includes.mjs (SSOT: registry/site.nav.json) -->
+  <!--@include nav-->
 
   <header class="hero" id="top">
     <div class="container">
@@ -520,6 +499,7 @@
   <!-- ✅ Shared JS -->
   <script src="assets/js/sx.statusbar.js"></script>
   <script src="assets/js/sx.core.js"></script>
+  <script src="assets/js/sx.drawer.js"></script>
 
   <!-- ✅ Page runtime -->
   <script src="assets/js/runtime/whitepaper.runtime.js"></script>

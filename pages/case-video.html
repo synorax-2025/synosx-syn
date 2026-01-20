@@ -17,6 +17,7 @@
   <!-- ✅ Shared CSS -->
   <link rel="stylesheet" href="../assets/css/sx.core.css" />
   <link rel="stylesheet" href="../assets/css/sx.statusbar.css" />
+  <link rel="stylesheet" href="../assets/css/sx.drawer.css" />
 
   <!-- ✅ Cases Shell CSS (scoped by body.sx-cases ...) -->
   <link rel="stylesheet" href="../assets/css/pages/cases.page.css" />
@@ -25,23 +26,11 @@
   <link rel="stylesheet" href="../assets/css/pages/case-video.page.css" />
 </head>
 
-<body class="has-statusbar sx-cases" data-case="video">
+<body class="has-statusbar sx-cases" data-page="case-video" data-case="video">
   <div class="bg-gradient" aria-hidden="true"></div>
 
-  <!-- ================== NAV ================== -->
-  <nav id="navbar" aria-label="Case Video Navigation">
-    <div class="nav-content">
-      <a class="logo" href="../cases.html" aria-label="Back to Cases">
-        <div class="logo-icon">SX</div>
-        <span><b>SynOSX</b> <span class="logo-sub">· Governance OS</span></span>
-      </a>
-
-      <div class="nav-links">
-        <a class="pill" href="../cases.html" aria-label="Back to Cases">← 返回判例目录</a>
-        <a class="pill muted" href="../index.html" aria-label="Back to Index">返回宪法首页</a>
-      </div>
-    </div>
-  </nav>
+  <!-- ✅ Unified Nav + Mobile Drawer (from partials/nav.partial.html) -->
+  <!--@include nav-->
 
   <!-- ================== HERO ================== -->
   <header class="cases-hero case-hero" id="top">
@@ -203,6 +192,7 @@
   <!-- ✅ Shared JS -->
   <script src="../assets/js/sx.statusbar.js"></script>
   <script src="../assets/js/sx.core.js"></script>
+  <script src="../assets/js/sx.drawer.js"></script>
 
   <!-- ✅ Page Runtime -->
   <script src="../assets/js/runtime/case-video.runtime.js"></script>

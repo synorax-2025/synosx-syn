@@ -8,7 +8,18 @@
 > **状态**：Frozen（结构级冻结，不允许临时偏离）
 
 ---
+## Menu = 导航；返回 = 顶栏按钮，不进 Menu。
+移动端顶栏固定三件套：
+左：Logo
+右：☰ Menu
+右：主 CTA（随页面变化，比如“返回判例”或“预约技术对话”）
+Menu 打开后只放：
+Why / Constitution / S0–S6
+Use Cases（可展开）
+Contact
+-（可选）Manifest / Whitepaper / Narratives 等
 
+这样你的 Menu 永远干净，用户不会把“返回”当成目录项。
 ## 0. 本文档的裁决结论（先读）
 
 * **Nav / Mobile Drawer 的唯一真源为：JSON Registry**

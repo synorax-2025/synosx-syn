@@ -1,0 +1,10 @@
+registry/nav/
+  defaults.json
+  pages.index.json
+  pages.manifest.json
+  pages.whitepaper.json
+  pages.cases.json
+  pages.narratives.json
+  pages.case-video.json
+  pages.case-voicewall.json
+  pages.narrative-case.json

@@ -259,3 +259,28 @@ nav{ height: var(--case-nav-h); }
     margin-left: 0; /* 两行时不需要推右 */
   }
 }
+
+/* --- FIX: kill huge gaps (override global sx.core.css) --- */
+.case-sec{
+  margin: 0 0 18px !important;
+  padding: 0 !important;
+}
+
+.case-sec:last-child{ margin-bottom: 0 !important; }
+
+.block-h{
+  margin: 16px 0 10px !important;
+}
+
+.block-p{
+  margin: 10px 0 !important;
+}
+
+.block-list{
+  margin: 10px 0 !important;     /* 关键：把默认/全局的 margin-bottom 压掉 */
+  padding-left: 18px !important;
+}
+
+.block-list li{
+  margin: 6px 0 !important;
+}

@@ -1,5 +1,5 @@
 /* runtime/replay.runtime.js — SynOSX Replay Runtime (page-only)
-   - Loads registry/replay.registry.json
+   - Loads assets/data/narratives/replay.registry.json
    - Resolves trace -> entry
    - Renders meta + media
    - Runs audit-style playback logs
@@ -12,10 +12,8 @@
   // ----------------------------
   // Config
   // ----------------------------
-  const isInPages = (location.pathname || "").includes("/pages/");
-  const REGISTRY_URL = isInPages
-    ? "../registry/replay.registry.json"
-    : "registry/replay.registry.json";
+  const REGISTRY_URL = "assets/data/narratives/replay.registry.json";
+
 
   // ----------------------------
   // Helpers

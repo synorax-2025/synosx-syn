@@ -12,7 +12,7 @@
     {
       "id": "replay.registry",
       "schema": "schemas/replay.registry.schema.json",
-      "data": "registry/replay.registry.json",
+      "data": "assets/data/narratives/replay.registry.json",
       "mode": "single"
     },
 

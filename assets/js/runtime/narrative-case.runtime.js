@@ -1,5 +1,5 @@
-/* narrative-case.runtime.js
-   - Read ?id=case-01
+/* narrative-case.runtime.js (B Standard)
+   - Read ?id=case-01 (or slug)
    - Load ../assets/data/narratives/chapters.registry.json to resolve case_ref
    - Load case json and render blocks
 */
@@ -11,8 +11,9 @@
   if (!titleEl || !subtitleEl || !contentEl) return;
 
   const params = new URLSearchParams(location.search);
-  const id = params.get("id");
+  const idRaw = (params.get("id") || "").trim();
 
+  // pages/narrative-case.html lives in /pages/, so registry is one level up
   const registryUrl = "../assets/data/narratives/chapters.registry.json";
 
   function esc(s){
@@ -34,17 +35,20 @@
     subtitleEl.textContent = "章节加载失败";
     contentEl.innerHTML = `
       <p class="block-p">${esc(msg)}</p>
-      <div class="block-code"><code>${esc("id=" + (id ?? "null"))}</code></div>
+      <div class="block-code"><code>${esc("id=" + (idRaw || "null"))}</code></div>
       <div class="block-code"><code>${esc("registry=" + registryUrl)}</code></div>
     `;
   }
 
   function renderCase(doc){
-    const pageTitle = doc?.title ? `${doc.title} · Narrative Case · SynOSX` : `Narrative Case · SynOSX`;
+    const pageTitle = doc?.title
+      ? `${doc.title} · Narrative Case · SynOSX`
+      : `Narrative Case · SynOSX`;
+
     document.title = pageTitle;
     setMetaDescription(doc?.subtitle || doc?.summary || "Non-normative illustrative case.");
 
-    titleEl.textContent = doc?.title || (id || "Unknown");
+    titleEl.textContent = doc?.title || (idRaw || "Unknown");
     subtitleEl.textContent = doc?.subtitle || (doc?.summary || "Non-normative illustrative case.");
 
     const sections = Array.isArray(doc?.sections) ? doc.sections : [];
@@ -82,7 +86,7 @@
           return `<div class="block-code"><code>${esc(b.text)}</code></div>`;
         }
 
-        // ✅ fallback: 不吞内容，至少把未知块吐出来，方便你发现 schema 问题
+        // fallback: don't swallow content
         if (b && (b.text || b.heading)){
           return `<p class="block-p">${esc(b.text || "")}</p>`;
         }
@@ -96,24 +100,41 @@
     contentEl.innerHTML = html;
   }
 
+  /**
+   * Convert a case_ref into a URL that works from /pages/
+   * Accepts:
+   *   - "/assets/..." => "../assets/..."
+   *   - "assets/..."  => "../assets/..."
+   *   - "./assets/..."=> "../assets/..."
+   *   - "../assets/..." stays
+   *   - "/registry/..." => "../registry/..."
+   *   - "registry/..."  => "../registry/..."
+   */
   function resolveCaseUrlFromRef(caseRef){
     const ref = String(caseRef || "").trim();
     if (!ref) return null;
 
-    // Normalize:
-    // - remove leading "./"
-    // - if starts with "/", treat as site-root relative: "/registry/..." => "../registry/..." from /pages/
-    // - if starts with "../", keep as-is (already relative to /pages/)
-    // - else treat as site-root relative path string, prefix "../"
-    const cleaned = ref.replace(/^\.\//, "");
+    const cleaned = ref.replaceAll("\\", "/").replace(/^\.\//, "");
 
     if (cleaned.startsWith("../")) return cleaned;
-    if (cleaned.startsWith("/")) return ".." + cleaned; // from /pages/
+
+    if (cleaned.startsWith("/")) {
+      // absolute-from-site-root => from /pages/ we need "../"
+      return ".." + cleaned;
+    }
+
+    // relative-from-site-root-like => from /pages/ we need "../"
     return "../" + cleaned;
   }
 
-  // ✅ 必须有 id，否则直接报错（不要默认 case-01）
-  if (!id){
+  function matchChapter(ch, id){
+    if (!ch) return false;
+    const cid = String(ch.id || "").trim();
+    const slug = String(ch.slug || "").trim();
+    return cid === id || slug === id;
+  }
+
+  if (!idRaw){
     renderError("Missing query param: ?id=...");
     return;
   }
@@ -125,13 +146,13 @@
     })
     .then(reg => {
       const list = Array.isArray(reg?.chapters) ? reg.chapters : [];
-      const hit = list.find(x => x && x.id === id);
+      const hit = list.find(x => matchChapter(x, idRaw));
 
-      if (!hit) throw new Error("Chapter not found in registry: " + id);
-      if (!hit.case_ref) throw new Error("Missing case_ref in registry for: " + id);
+      if (!hit) throw new Error("Chapter not found in registry: " + idRaw);
+      if (!hit.case_ref) throw new Error("Missing case_ref in registry for: " + (hit.id || hit.slug || idRaw));
 
       const caseUrl = resolveCaseUrlFromRef(hit.case_ref);
-      if (!caseUrl) throw new Error("Invalid case_ref for: " + id);
+      if (!caseUrl) throw new Error("Invalid case_ref for: " + (hit.id || hit.slug || idRaw));
 
       return fetch(caseUrl, { cache: "no-store" })
         .then(r => {

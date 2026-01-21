@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://synosx.dev/schemas/site.nav.schema.json",
+  "title": "SynOSX Site Navigation Registry",
+  "type": "object",
+  "required": ["version", "defaults", "pages"],
+
+  "properties": {
+    "version": { "type": "string" },
+
+    "defaults": { "$ref": "#/$defs/pageConfig" },
+
+    "pages": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/pageConfig" }
+    }
+  },
+
+  "$defs": {
+    "pageConfig": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "subtitle": { "type": "string" },
+            "href": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+
+        "desktop": {
+          "type": "object",
+          "properties": {
+            "links": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/navItem" }
+            },
+            "tail": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/navItem" }
+            },
+            "usecases": { "$ref": "#/$defs/usecases" }
+          },
+          "additionalProperties": false
+        },
+
+        "actions": {
+          "type": "object",
+          "properties": {
+            "primary": { "$ref": "#/$defs/action" },
+            "secondary": { "$ref": "#/$defs/action" }
+          },
+          "additionalProperties": false
+        },
+
+        "drawer": {
+          "type": "object",
+          "properties": {
+            "links": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/navItem" }
+            },
+            "tail": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/navItem" }
+            },
+            "usecases": { "$ref": "#/$defs/usecases" },
+            "actions": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/action" }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "action": {
+      "type": "object",
+      "required": ["type", "label"],
+      "properties": {
+        "role": { "enum": ["primary", "secondary"] },
+        "type": { "enum": ["link", "button"] },
+        "label": { "type": "string" },
+        "href": { "type": "string" },
+        "id": { "type": "string" },
+        "class": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "usecases": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "label": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/navItem" }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "navItem": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": ["group", "divider"]
+        },
+        "label": { "type": "string" },
+        "href": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "id": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/navItem" }
+        },
+        "onlyOn": {
+          "enum": ["mobile"]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

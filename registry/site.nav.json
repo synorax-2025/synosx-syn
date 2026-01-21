@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.3",
 
   "defaults": {
     "brand": {
@@ -44,7 +44,7 @@
 
     "drawer": {
       "links": [
-        { "label": "返回首页", "href": "index.html" },
+        { "label": "返回首页", "href": "index.html", "onlyOn": "mobile" },
         { "type": "divider" },
         { "label": "Why", "href": "index.html#why" },
         { "label": "Constitution", "href": "index.html#constitution" },
@@ -112,7 +112,7 @@
       "drawer": {
         "usecases": { "enabled": false },
         "links": [
-          { "label": "返回首页", "href": "index.html" },
+          { "label": "返回首页", "href": "index.html", "onlyOn": "mobile" },
           { "type": "divider" },
           {
             "label": "目录",
@@ -174,7 +174,7 @@
       "drawer": {
         "usecases": { "enabled": false },
         "links": [
-          { "label": "返回首页", "href": "index.html" },
+          { "label": "返回首页", "href": "index.html", "onlyOn": "mobile" },
           { "label": "打开 Manifest", "href": "manifest.html" },
           { "type": "divider" },
           {
@@ -219,7 +219,7 @@
 
       "drawer": {
         "links": [
-          { "label": "返回首页", "href": "index.html" },
+          { "label": "返回首页", "href": "index.html", "onlyOn": "mobile" },
           { "label": "Narratives", "href": "narratives.html" },
           { "type": "divider" },
           { "label": "Manifest", "href": "manifest.html" },
@@ -244,21 +244,20 @@
         "secondary": {
           "role": "secondary",
           "type": "link",
-          "label": "返回Use Cases",
-          "href": "cases.html"
+          "label": "返回首页",
+          "href": "index.html"
         },
         "primary": {
           "role": "primary",
           "type": "link",
-          "label": "返回首页",
-          "href": "index.html"
+          "label": "返回判例",
+          "href": "cases.html"
         }
       },
 
       "drawer": {
         "links": [
-          { "label": "返回首页", "href": "index.html" },
-          { "label": "Use Cases", "href": "cases.html" },
+          { "label": "返回首页", "href": "index.html", "onlyOn": "mobile" },
           { "type": "divider" },
           { "label": "Manifest", "href": "manifest.html" },
           { "label": "Whitepaper", "href": "whitepaper.html" }
@@ -278,22 +277,21 @@
         "secondary": {
           "role": "secondary",
           "type": "link",
-          "label": "返回判例",
-          "href": "cases.html"
+          "label": "返回首页",
+          "href": "index.html"
         },
         "primary": {
           "role": "primary",
           "type": "link",
-          "label": "返回首页",
-          "href": "index.html"
+          "label": "返回判例",
+          "href": "cases.html"
         }
       },
 
       "drawer": {
         "usecases": { "enabled": false },
         "links": [
-          { "label": "返回首页", "href": "index.html" },
-          { "label": "Use Cases", "href": "cases.html" },
+          { "label": "返回首页", "href": "index.html", "onlyOn": "mobile" },
           { "label": "Narratives", "href": "narratives.html" }
         ],
         "tail": [],
@@ -310,22 +308,21 @@
         "secondary": {
           "role": "secondary",
           "type": "link",
-          "label": "返回判例",
-          "href": "cases.html"
+          "label": "返回首页",
+          "href": "index.html"
         },
         "primary": {
           "role": "primary",
           "type": "link",
-          "label": "返回首页",
-          "href": "index.html"
+          "label": "返回判例",
+          "href": "cases.html"
         }
       },
 
       "drawer": {
         "usecases": { "enabled": false },
         "links": [
-          { "label": "返回首页", "href": "index.html" },
-          { "label": "Use Cases", "href": "cases.html" },
+          { "label": "返回首页", "href": "index.html", "onlyOn": "mobile" },
           { "label": "Narratives", "href": "narratives.html" }
         ],
         "tail": [],
@@ -356,9 +353,8 @@
       "drawer": {
         "usecases": { "enabled": false },
         "links": [
-          { "label": "返回首页", "href": "index.html" },
-          { "label": "返回目录", "href": "narratives.html" },
-          { "label": "返回判例", "href": "cases.html" }
+          { "label": "返回首页", "href": "index.html", "onlyOn": "mobile" },
+          { "label": "返回目录", "href": "narratives.html", "onlyOn": "mobile" }
         ],
         "tail": [],
         "actions": []
@@ -389,8 +385,8 @@
       "drawer": {
         "usecases": { "enabled": false },
         "links": [
-          { "label": "返回首页", "href": "index.html" },
-          { "label": "返回判例", "href": "cases.html" }
+          { "label": "返回首页", "href": "index.html", "onlyOn": "mobile" },
+          { "label": "返回判例", "href": "cases.html", "onlyOn": "mobile" }
         ],
         "tail": [],
         "actions": []

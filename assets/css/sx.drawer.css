@@ -1,4 +1,4 @@
-/* sx.drawer.css — Frozen v1.3 (2026-01-21)
+/* sx.drawer.css — Frozen v1.3.1 (2026-01-21)
    ✅ iOS Safari/Chrome stable: panel internal scroll + no snapback
    ✅ No 100vh/dvh: use --sx-vh-px from JS
    ✅ Background locked via body fixed (JS)
@@ -6,6 +6,10 @@
    ✅ Expandable nodes: Use Cases + generic group (目录等)
    ✅ Governance Narratives special block + subtitle visible
    ✅ NAV visibility constitution (desktop 1–10, mobile menu only)
+   ✅ Responsive CTA policy:
+      - Desktop: allow secondary CTA in topbar
+      - Mobile: hide secondary CTA; keep its path in drawer if needed
+      - Drawer-only-mobile items supported via .sx-only-mobile
 */
 
 :root{
@@ -41,8 +45,8 @@
 
 /* =========================================================
    NAV visibility constitution (三态锁死)
-   Desktop (>980): show desktop nav (1–10), hide menu
-   Mobile  (<=980): hide desktop nav, show menu
+   Desktop (>980): show desktop nav (1–10), hide menu button
+   Mobile  (<=980): hide desktop nav, show menu button
    ========================================================= */
 
 .nav-menu-btn{ display:none !important; }
@@ -55,9 +59,22 @@
   .nav-menu-btn{ display:inline-flex !important; }
 }
 
-/* 桌面硬禁用 Drawer（避免误触/误显） */
+/* =========================================================
+   Responsive CTA policy (关键新增)
+   - secondary CTA in topbar: desktop-only
+   - drawer items that should exist only on mobile: .sx-only-mobile
+   ========================================================= */
+
+/* Mobile: hide topbar secondary CTA; show mobile-only drawer items */
+@media (max-width: 980px){
+  .sx-cta-secondary{ display:none !important; }
+  .sx-only-mobile{ display:block; }
+}
+
+/* Desktop: show topbar secondary CTA; hide mobile-only drawer items */
 @media (min-width: 981px){
-  #sx-mobile-menu{ display:none !important; }
+  .sx-cta-secondary{ display:inline-flex; }
+  .sx-only-mobile{ display:none !important; }
 }
 
 /* =========================================================

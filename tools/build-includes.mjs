@@ -5,11 +5,11 @@
    ✅ Supports nested pages (pages/** etc) with auto href prefixing
    ✅ Supports desktop+drawer: link / divider / group (dropdown & collapsible)
    ✅ Supports desktop actions: primary + secondary (2 CTAs on desktop)
-   ✅ Auto-degrades actions.secondary into Drawer (Menu) as well (mobile sees it in Menu)
-
-   IMPORTANT:
-   - site.nav.json 内部链接必须统一写成“站点根相对”：例如 "cases.html" / "pages/case-video.html"
-   - 不要写 "../cases.html"、"./cases.html"、"/cases.html"（否则会跳出 dist 或被二次前缀）
+   ✅ Responsive policy:
+      - Topbar secondary auto gets class "sx-cta-secondary" (CSS hides on mobile)
+      - actions.secondary auto-degrades into Drawer as mobile-only link (class "sx-only-mobile")
+      - Drawer dedup is by href (not by label)
+      - Drawer never repeats Topbar primary (when primary is a link)
 */
 
 import fs from "node:fs";
@@ -164,6 +164,10 @@ function isExternalOrSpecialHref(href) {
   return false;
 }
 
+function isComparableHref(href) {
+  return !!href && !isExternalOrSpecialHref(href);
+}
+
 function withPrefix(href, prefix) {
   if (!href) return href;
   if (!prefix) return href;
@@ -184,7 +188,10 @@ function calcPrefixForRelHtml(relHtmlPath) {
 /**
  * Policy normalization:
  * - Ensure drawer exists.
- * - Auto-degrade actions.secondary into drawer.links as well (mobile sees it in Menu).
+ * - Auto-degrade actions.secondary into drawer.links as a MOBILE-ONLY link
+ *   (so desktop doesn't duplicate topbar).
+ * - Drawer dedup by href (not label).
+ * - Drawer must not repeat topbar primary when primary is a link.
  */
 function normalizeResolved(resolved) {
   const out = resolved || {};
@@ -192,28 +199,65 @@ function normalizeResolved(resolved) {
   out.drawer.links = Array.isArray(out.drawer.links) ? out.drawer.links : [];
 
   const sec = out.actions?.secondary;
-  if (sec && sec.type === "link") {
+  const pri = out.actions?.primary;
+
+  // 1) Never repeat Topbar primary (when it's a link) inside drawer.links (by href)
+  if (pri && pri.type === "link" && isComparableHref(pri.href)) {
+    out.drawer.links = out.drawer.links.filter((x) => {
+      if (!x) return false;
+      if (x.type === "divider" || x.type === "group") return true;
+      return x.href !== pri.href;
+    });
+  }
+
+  // 2) Auto-degrade secondary into drawer as mobile-only (by href)
+  if (sec && sec.type === "link" && isComparableHref(sec.href)) {
     const href = sec.href;
     const label = sec.label;
-    const exists = out.drawer.links.some(
-      (x) =>
-        x &&
-        x.type !== "divider" &&
-        x.type !== "group" &&
-        x.href === href &&
-        x.label === label
+
+    // If exists by href, mark it mobile-only; otherwise unshift new mobile-only link.
+    const idx = out.drawer.links.findIndex(
+      (x) => x && x.type !== "divider" && x.type !== "group" && x.href === href
     );
-    if (!exists) {
-      out.drawer.links.unshift({ label, href });
+
+    if (idx >= 0) {
+      const cur = out.drawer.links[idx];
+      // keep existing label if present; else fallback to secondary label
+      out.drawer.links[idx] = {
+        ...cur,
+        label: cur.label || label,
+        onlyOn: cur.onlyOn || cur.showOn || "mobile",
+      };
+    } else {
+      out.drawer.links.unshift({ label, href, onlyOn: "mobile" });
     }
   }
 
-  // ✅ Hard rule: drop empty groups (avoid “按钮在、内容不在”)
+  // 3) Drop empty groups
   out.drawer.links = out.drawer.links.filter((it) => {
     if (!it) return false;
     if (it.type !== "group") return true;
     return Array.isArray(it.items) && it.items.length > 0;
   });
+
+  // 4) Dedup drawer plain links by href (keep first occurrence), preserve dividers/groups order
+  const seen = new Set();
+  const deduped = [];
+  for (const it of out.drawer.links) {
+    if (!it) continue;
+    if (it.type === "divider" || it.type === "group") {
+      deduped.push(it);
+      continue;
+    }
+    if (!isComparableHref(it.href)) {
+      deduped.push(it);
+      continue;
+    }
+    if (seen.has(it.href)) continue;
+    seen.add(it.href);
+    deduped.push(it);
+  }
+  out.drawer.links = deduped;
 
   return out;
 }
@@ -366,12 +410,14 @@ function renderTopbarActions(actions = {}, prefix) {
   `.trim()
   );
 
+  // Desktop may show 2 CTAs; mobile will hide secondary via CSS (.sx-cta-secondary)
   if (secondary) {
     if (secondary.type !== "link") {
       throw new Error(`actions.secondary must be {type:"link", ...}. Got type="${secondary.type}".`);
     }
+    const cls = joinClasses("btn-secondary", "cta-secondary", "sx-cta-secondary", secondary.class);
     parts.push(
-      `<a class="btn-secondary cta-secondary"${attr("href", withPrefix(secondary.href, prefix))}>${escapeHtml(secondary.label)}</a>`
+      `<a class="${escapeHtml(cls)}"${attr("href", withPrefix(secondary.href, prefix))}>${escapeHtml(secondary.label)}</a>`
     );
   }
 
@@ -401,6 +447,11 @@ function renderDrawerLinks(links = [], prefix) {
     .map((it) => renderDrawerItem(it, prefix))
     .filter(Boolean)
     .join("\n"); // ✅ 强制换行，降低浏览器重排概率
+}
+
+function isMobileOnly(it) {
+  const v = it?.onlyOn || it?.showOn;
+  return v === "mobile";
 }
 
 function renderDrawerItem(it, prefix) {
@@ -437,7 +488,8 @@ ${children}
     `.trim();
   }
 
-  return `<a href="${escapeHtml(withPrefix(it.href, prefix))}" data-close="sx-drawer">${escapeHtml(it.label)}</a>`;
+  const cls = joinClasses(isMobileOnly(it) ? "sx-only-mobile" : null, it.class);
+  return `<a${attr("class", cls)} href="${escapeHtml(withPrefix(it.href, prefix))}" data-close="sx-drawer">${escapeHtml(it.label)}</a>`;
 }
 
 function renderDrawerTail(tail = [], prefix) {

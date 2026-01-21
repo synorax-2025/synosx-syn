@@ -20,7 +20,7 @@
       ],
       "status": "published",
       "order": 0,
-      "case_ref": "registry/narratives/cases/case-00.json"
+      "case_ref": "assets/data/narratives/cases/case-00.json"
     },
 
     {
@@ -36,7 +36,7 @@
       ],
       "status": "published",
       "order": 1,
-      "case_ref": "registry/narratives/cases/case-01.json"
+      "case_ref": "assets/data/narratives/cases/case-01.json"
     },
 
     {
@@ -52,7 +52,7 @@
       ],
       "status": "published",
       "order": 2,
-      "case_ref": "registry/narratives/cases/case-02.json"
+      "case_ref": "assets/data/narratives/cases/case-02.json"
     },
 
     {
@@ -66,9 +66,9 @@
         "traceability",
         "post-incident-governance"
       ],
-      "status": "draft",
+      "status": "published",
       "order": 3,
-      "case_ref": "registry/narratives/cases/case-03.json"
+      "case_ref": "assets/data/narratives/cases/case-03.json"
     }
   ]
 }

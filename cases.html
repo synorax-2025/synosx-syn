@@ -50,7 +50,7 @@
           <span class="badge">REPLAY · DEMO</span>
           <h2>Brand Film · Replay</h2>
           <p>
-            本卡片从 <code>assets/data/narratives/replay.registry.json</code> 自动读取品牌回放列表。<br/>
+            本卡片从 <code>assets/data/replay/replay.registry.json</code> 自动读取品牌回放列表。<br/>
             新增 v3/v4 只需要更新 registry，不需要改本页代码。
           </p>
 
@@ -157,7 +157,7 @@
     if (!linksEl) return;
 
     // cases.html is at root, so registry path is stable (no "/pages/" base logic needed)
-    const registryUrl = "assets/data/narratives/replay.registry.json";
+    const registryUrl = "assets/data/replay/replay.registry.json";
     const replayPage = "replay.html";
 
     function escapeHtml(s){

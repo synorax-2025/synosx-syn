@@ -5,7 +5,7 @@
     "map": "registry/schemas.map.json",
     "files": 7,
     "failed": 0,
-    "generatedAt": "2026-01-21T21:54:37.187Z"
+    "generatedAt": "2026-01-21T22:04:07.486Z"
   },
   "results": [
     {
@@ -18,7 +18,7 @@
     {
       "id": "replay.registry",
       "mode": "single",
-      "file": "assets/data/narratives/replay.registry.json",
+      "file": "assets/data/replay/replay.registry.json",
       "ok": true,
       "errors": []
     },

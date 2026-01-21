@@ -1,0 +1,61 @@
+{
+  "name": "verify-schemas",
+  "ok": true,
+  "summary": {
+    "map": "registry/schemas.map.json",
+    "files": 7,
+    "failed": 0,
+    "generatedAt": "2026-01-21T21:26:38.608Z"
+  },
+  "results": [
+    {
+      "id": "site.nav",
+      "mode": "single",
+      "file": "registry/site.nav.json",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "id": "replay.registry",
+      "mode": "single",
+      "file": "registry/replay.registry.json",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "id": "chapters.registry",
+      "mode": "single",
+      "file": "assets/data/narratives/chapters.registry.json",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "id": "narratives.cases",
+      "mode": "glob",
+      "file": "assets/data/narratives/cases/case-00.json",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "id": "narratives.cases",
+      "mode": "glob",
+      "file": "assets/data/narratives/cases/case-01.json",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "id": "narratives.cases",
+      "mode": "glob",
+      "file": "assets/data/narratives/cases/case-02.json",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "id": "narratives.cases",
+      "mode": "glob",
+      "file": "assets/data/narratives/cases/case-03.json",
+      "ok": true,
+      "errors": []
+    }
+  ]
+}

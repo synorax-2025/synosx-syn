@@ -1,0 +1,33 @@
+{
+  "version": "1.0.1",
+
+  "entries": [
+    {
+      "id": "site.nav",
+      "schema": "schemas/site.nav.schema.json",
+      "data": "registry/site.nav.json",
+      "mode": "single"
+    },
+
+    {
+      "id": "replay.registry",
+      "schema": "schemas/replay.registry.schema.json",
+      "data": "registry/replay.registry.json",
+      "mode": "single"
+    },
+
+    {
+      "id": "chapters.registry",
+      "schema": "schemas/chapters.registry.schema.json",
+      "data": "assets/data/narratives/chapters.registry.json",
+      "mode": "single"
+    },
+
+    {
+      "id": "narratives.cases",
+      "schema": "schemas/narratives.case.schema.json",
+      "data": "assets/data/narratives/cases/*.json",
+      "mode": "glob"
+    }
+  ]
+}

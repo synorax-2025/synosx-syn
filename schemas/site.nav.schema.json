@@ -47,13 +47,13 @@
         },
 
         "actions": {
-          "type": "object",
-          "properties": {
-            "primary": { "$ref": "#/$defs/action" },
-            "secondary": { "$ref": "#/$defs/action" }
-          },
-          "additionalProperties": false
-        },
+  "type": "object",
+  "properties": {
+    "primary": { "anyOf": [ { "$ref": "#/$defs/action" }, { "type": "null" } ] },
+    "secondary": { "anyOf": [ { "$ref": "#/$defs/action" }, { "type": "null" } ] }
+  },
+  "additionalProperties": false
+},
 
         "drawer": {
           "type": "object",

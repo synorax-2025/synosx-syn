@@ -1,31 +1,35 @@
 {
-  "$id": "https://synosx.dev/schemas/narratives.chapter.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Narratives Chapter Entry",
+  "$id": "https://synosx.dev/schemas/narratives.chapter.entry.schema.json",
+  "title": "Narratives Chapter Registry Entry",
   "type": "object",
   "additionalProperties": false,
 
-  "required": ["id", "slug", "title", "subtitle", "status", "order", "case_ref"],
+  "required": [
+    "id",
+    "slug",
+    "title",
+    "subtitle",
+    "derived_from",
+    "risk_category",
+    "status",
+    "order",
+    "case_ref"
+  ],
 
   "properties": {
     "id": {
       "type": "string",
-      "pattern": "^case-\\d{2}$",
-      "description": "case-00, case-01, case-02..."
+      "pattern": "^case-\\d{2}$"
     },
 
-    "slug": {
-      "type": "string",
-      "minLength": 1
-    },
+    "slug": { "type": "string", "minLength": 1 },
 
     "title": { "type": "string", "minLength": 1 },
+
     "subtitle": { "type": "string", "minLength": 1 },
 
-    "derived_from": {
-      "type": "string",
-      "minLength": 1
-    },
+    "derived_from": { "type": "string", "minLength": 1 },
 
     "risk_category": {
       "type": "array",
@@ -35,25 +39,14 @@
 
     "status": {
       "type": "string",
-      "enum": ["draft", "published"]
+      "enum": ["draft", "published", "deprecated"]
     },
 
-    "order": {
-      "type": "integer",
-      "minimum": 0
-    },
+    "order": { "type": "integer", "minimum": 0 },
 
     "case_ref": {
       "type": "string",
-      "minLength": 1,
-      "pattern": "^registry/narratives/cases/case-\\d{2}\\.json$",
-      "description": "Path to case json, e.g. registry/narratives/cases/case-01.json"
-    },
-
-    "case_link": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Optional override link, e.g. pages/narrative-case.html?id=case-01"
+      "pattern": "^assets/data/narratives/cases/case-\\d{2}\\.json$"
     }
   }
 }

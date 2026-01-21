@@ -1,6 +1,6 @@
 {
-  "$id": "https://synosx.dev/schemas/chapters.registry.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://synosx.dev/schemas/chapters.registry.schema.json",
   "title": "Narratives Chapters Registry",
   "type": "object",
   "additionalProperties": false,
@@ -20,16 +20,10 @@
       ],
       "properties": {
         "registry": { "type": "string", "minLength": 1 },
-        "status": {
-          "type": "string",
-          "enum": ["non-normative"]
-        },
+        "status": { "type": "string", "enum": ["non-normative"] },
         "description": { "type": "string", "minLength": 1 },
         "governance_note": { "type": "string", "minLength": 1 },
-        "last_updated": {
-          "type": "string",
-          "minLength": 8
-        }
+        "last_updated": { "type": "string", "minLength": 8 }
       }
     },
 
@@ -37,7 +31,7 @@
       "type": "array",
       "minItems": 1,
       "items": {
-        "$ref": "narratives.chapter.schema.json"
+        "$ref": "./narratives.chapter.entry.schema.json"
       }
     }
   }

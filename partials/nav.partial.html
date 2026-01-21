@@ -1,59 +1,25 @@
-<!-- nav.partial.html — SynOSX NAV + Mobile Drawer (Shared / Frozen v1)
-     ✅ Shared across ALL pages (index / manifest / cases / replay / narratives)
-     ✅ Cross-page anchors always target index.html#...
+<!-- nav.partial.html — SynOSX NAV + Mobile Drawer (Shell / Frozen v1.0.1)
+     ✅ MUST be generated from registry/site.nav.json (Single Source of Truth)
+     ✅ This file is a SHELL only: no page-specific links, no hardcoded CTA, no group content
 -->
 
 <nav id="navbar" aria-label="Primary Navigation">
   <div class="nav-content">
-    <!-- Brand -->
-    <a class="logo" href="index.html" aria-label="SynOSX Home">
+    <!-- Brand (filled by build from JSON: brand.name / brand.subtitle / brand.href) -->
+    <a class="logo" data-sx="brand" href="index.html" aria-label="SynOSX Home">
       <div class="logo-icon">SX</div>
-      <span>
-        <b>SynOSX</b>
-        <span class="logo-sub" data-sx="nav-sub">· Governance OS</span>
+      <span class="logo-text">
+        <b data-sx="brand-name">SynOSX</b>
+        <span class="logo-sub" data-sx="nav-sub"></span>
       </span>
     </a>
 
-    <!-- Desktop nav -->
-    <ul class="nav-links nav-desktop" aria-label="Desktop Navigation">
-      <li><a href="index.html#why">Why</a></li>
-      <li><a href="index.html#constitution">Constitution</a></li>
-      <li><a href="index.html#families">S0–S6</a></li>
-
-      <!-- Desktop Use Cases dropdown -->
-      <li class="nav-dropdown">
-        <a href="cases.html"
-           class="nav-drop-trigger"
-           aria-haspopup="true"
-           aria-expanded="false"
-           aria-controls="usecases-menu">
-          Use Cases <span aria-hidden="true" class="nav-caret">▾</span>
-        </a>
-
-        <div id="usecases-menu" class="nav-drop-menu" role="menu" aria-label="Use Cases Submenu">
-          <a role="menuitem" href="cases.html#enterprise-governance">
-            <span>Enterprise Governance</span><span aria-hidden="true">↗</span>
-          </a>
-          <a role="menuitem" href="cases.html#ai-controlled-workflows">
-            <span>AI-Controlled Workflows</span><span aria-hidden="true">↗</span>
-          </a>
-          <a role="menuitem" href="cases.html#video-content-governance">
-            <span>Video / Content Governance</span><span aria-hidden="true">↗</span>
-          </a>
-
-          <div class="nav-drop-divider" aria-hidden="true"></div>
-
-          <a role="menuitem" href="narratives.html" class="nav-drop-narratives">
-            <span>Governance Narratives</span>
-            <span class="nav-drop-sub">Non-normative, illustrative cases</span>
-          </a>
-        </div>
-      </li>
-
-      <li><a href="index.html#contact">Contact</a></li>
+    <!-- Desktop nav (build injects <li>...</li> based on desktop.links/usecases/tail) -->
+    <ul class="nav-links nav-desktop" aria-label="Desktop Navigation" data-sx="desktop-links">
+      <!-- injected -->
     </ul>
 
-    <!-- Right actions -->
+    <!-- Right actions: Menu fixed, Desktop may show 2 CTAs (secondary + primary) -->
     <div class="nav-actions">
       <button
         id="sxMenuBtn"
@@ -65,12 +31,20 @@
         ☰ Menu
       </button>
 
-      <a class="cta-button" data-sx="nav-cta" href="index.html#contact">预约技术对话</a>
+      <!-- build injects desktop secondary (optional). Mobile should hide this via CSS -->
+      <span data-sx="nav-cta-secondary">
+        <!-- injected -->
+      </span>
+
+      <!-- build injects primary CTA here (link/button/empty) -->
+      <span data-sx="nav-cta-primary">
+        <!-- injected -->
+      </span>
     </div>
   </div>
 </nav>
 
-<!-- Mobile Drawer — GitHub Style -->
+<!-- Mobile Drawer -->
 <div id="sx-mobile-menu" class="sx-drawer" aria-hidden="true">
   <div class="sx-drawer-backdrop" data-close="sx-drawer" aria-hidden="true"></div>
 
@@ -79,53 +53,22 @@
       <div class="sx-drawer-brand">
         <div class="logo-icon">SX</div>
         <div class="sx-drawer-title">
-          <div class="sx-drawer-name">SynOSX</div>
-          <div class="sx-drawer-sub" data-sx="drawer-sub">Governance OS</div>
+          <div class="sx-drawer-name" data-sx="brand-name">SynOSX</div>
+          <div class="sx-drawer-sub" data-sx="drawer-sub"></div>
         </div>
       </div>
 
       <button class="sx-drawer-close" type="button" data-close="sx-drawer" aria-label="Close Menu">✕</button>
     </div>
 
-    <nav class="sx-drawer-nav" aria-label="Mobile Links">
-      <a href="index.html#why" data-close="sx-drawer">Why</a>
-      <a href="index.html#constitution" data-close="sx-drawer">Constitution</a>
-      <a href="index.html#families" data-close="sx-drawer">S0–S6</a>
-
-      <button
-        class="sx-drawer-usecases"
-        type="button"
-        aria-expanded="false"
-        aria-controls="sx-usecases-panel">
-        Use Cases
-        <span class="sx-usecases-caret" aria-hidden="true">▸</span>
-      </button>
-
-      <div id="sx-usecases-panel" hidden>
-        <a href="cases.html#enterprise-governance" data-close="sx-drawer">
-          Enterprise Governance<span aria-hidden="true"> ↗</span>
-        </a>
-        <a href="cases.html#ai-controlled-workflows" data-close="sx-drawer">
-          AI-Controlled Workflows<span aria-hidden="true"> ↗</span>
-        </a>
-        <a href="cases.html#video-content-governance" data-close="sx-drawer">
-          Video / Content Governance<span aria-hidden="true"> ↗</span>
-        </a>
-
-        <div class="sx-drawer-divider"></div>
-
-        <a class="sx-drawer-narratives" href="narratives.html" data-close="sx-drawer">
-          <span class="sx-drawer-narratives-title">Governance Narratives</span>
-          <span class="sx-drawer-narratives-sub">Non-normative, illustrative cases</span>
-        </a>
-      </div>
-
-      <a href="index.html#contact" data-close="sx-drawer">Contact</a>
+    <!-- Drawer links: build injects links + divider + group + (optional) usecases fold -->
+    <nav class="sx-drawer-nav" aria-label="Mobile Links" data-sx="drawer-links">
+      <!-- injected -->
     </nav>
 
-    <div class="sx-drawer-actions">
-      <a class="btn-secondary" href="index.html" data-close="sx-drawer">返回首页</a>
-      <a class="cta-button" data-sx="drawer-cta" href="index.html#contact" data-close="sx-drawer">预约技术对话</a>
+    <!-- Drawer actions: build injects optional action buttons/links (can be empty) -->
+    <div class="sx-drawer-actions" data-sx="drawer-actions">
+      <!-- injected -->
     </div>
   </aside>
 </div>

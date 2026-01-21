@@ -3,7 +3,9 @@
    ✅ Builds per-page nav+drawer HTML and injects into html via <!--@include nav-->
    ✅ Recreates dist/: copies non-html assets, rebuilds html with injected nav
    ✅ Supports nested pages (pages/** etc) with auto href prefixing
-   ❌ No compatibility layer (no sub/as/kind/cta fallback)
+   ✅ Supports desktop+drawer: link / divider / group (dropdown & collapsible)
+   ✅ Supports desktop actions: primary + secondary (2 CTAs on desktop)
+   ✅ Auto-degrades actions.secondary into Drawer (Menu) as well (mobile sees it in Menu)
 
    IMPORTANT:
    - site.nav.json 内部链接必须统一写成“站点根相对”：例如 "cases.html" / "pages/case-video.html"
@@ -133,25 +135,30 @@ function joinClasses(...xs) {
     .trim();
 }
 
-/* -------------------- Href prefix (critical fix) -------------------- */
+function safeId(s, fallback = "sx-id") {
+  const raw = String(s || "").trim();
+  const cleaned = raw
+    .toLowerCase()
+    .replaceAll(/[^a-z0-9\-_:.]+/g, "-")
+    .replaceAll(/-+/g, "-")
+    .replaceAll(/^-|-$/g, "");
+  return cleaned ? cleaned : fallback;
+}
+
+/* -------------------- Href prefix -------------------- */
 
 function isExternalOrSpecialHref(href) {
   if (!href) return true;
 
-  // external / special
   if (
     href.startsWith("http://") ||
     href.startsWith("https://") ||
     href.startsWith("mailto:") ||
     href.startsWith("tel:") ||
     href.startsWith("#")
-  )
-    return true;
+  ) return true;
 
-  // already relative => DO NOT prefix again (prevents "../../cases.html" escaping dist)
   if (href.startsWith("../") || href.startsWith("./")) return true;
-
-  // absolute path (generally avoid in site.nav.json)
   if (href.startsWith("/")) return true;
 
   return false;
@@ -172,6 +179,45 @@ function calcPrefixForRelHtml(relHtmlPath) {
   return "../".repeat(parts.length);
 }
 
+/* -------------------- Normalize resolved page config -------------------- */
+
+/**
+ * Policy normalization:
+ * - Ensure drawer exists.
+ * - Auto-degrade actions.secondary into drawer.links as well (mobile sees it in Menu).
+ */
+function normalizeResolved(resolved) {
+  const out = resolved || {};
+  out.drawer = out.drawer || {};
+  out.drawer.links = Array.isArray(out.drawer.links) ? out.drawer.links : [];
+
+  const sec = out.actions?.secondary;
+  if (sec && sec.type === "link") {
+    const href = sec.href;
+    const label = sec.label;
+    const exists = out.drawer.links.some(
+      (x) =>
+        x &&
+        x.type !== "divider" &&
+        x.type !== "group" &&
+        x.href === href &&
+        x.label === label
+    );
+    if (!exists) {
+      out.drawer.links.unshift({ label, href });
+    }
+  }
+
+  // ✅ Hard rule: drop empty groups (avoid “按钮在、内容不在”)
+  out.drawer.links = out.drawer.links.filter((it) => {
+    if (!it) return false;
+    if (it.type !== "group") return true;
+    return Array.isArray(it.items) && it.items.length > 0;
+  });
+
+  return out;
+}
+
 /* -------------------- Rendering: Desktop -------------------- */
 
 function renderDesktopNav(desktop = {}, prefix) {
@@ -180,27 +226,73 @@ function renderDesktopNav(desktop = {}, prefix) {
   const tail = desktop.tail ?? [];
 
   const items = []
-    .concat(
-      links.map(
-        (l) =>
-          `<li><a href="${escapeHtml(withPrefix(l.href, prefix))}">${escapeHtml(
-            l.label
-          )}</a></li>`
-      )
-    )
+    .concat(renderDesktopItems(links, prefix))
     .concat(renderUseCasesDesktop(usecases, prefix))
-    .concat(
-      tail.map(
-        (t) =>
-          `<li><a href="${escapeHtml(withPrefix(t.href, prefix))}">${escapeHtml(
-            t.label
-          )}</a></li>`
-      )
-    )
+    .concat(renderDesktopItems(tail, prefix))
     .join("");
 
   if (!items) return "";
   return `<ul class="nav-links nav-desktop" aria-label="Desktop Navigation">${items}</ul>`;
+}
+
+function renderDesktopItems(items = [], prefix) {
+  return (items ?? [])
+    .map((it) => renderDesktopItem(it, prefix))
+    .filter(Boolean);
+}
+
+function renderDesktopItem(it, prefix) {
+  if (!it) return "";
+
+  if (it.type === "divider") {
+    return `<li class="nav-sep" aria-hidden="true"></li>`;
+  }
+
+  if (it.type === "group") {
+    const baseId = safeId(it.id || it.label || "group");
+    const menuId = `sx-dd-${baseId}`;
+    const label = it.label ?? "Group";
+
+    const children = (it.items ?? [])
+      .map((c) => {
+        if (!c) return "";
+        if (c.type === "divider") {
+          return `<div class="nav-drop-divider" role="separator" aria-hidden="true"></div>`;
+        }
+
+        if (c.subtitle) {
+          return `
+            <a role="menuitem"${attr("href", withPrefix(c.href, prefix))} class="nav-drop-narratives">
+              <span>${escapeHtml(c.label)}</span>
+              <span class="nav-drop-sub">${escapeHtml(c.subtitle)}</span>
+            </a>
+          `.trim();
+        }
+
+        return `<a role="menuitem"${attr("href", withPrefix(c.href, prefix))}>
+                  <span>${escapeHtml(c.label)}</span>
+                </a>`;
+      })
+      .filter(Boolean)
+      .join("");
+
+    return `
+      <li class="nav-dropdown">
+        <a href="#${escapeHtml(menuId)}"
+           class="nav-drop-trigger"
+           aria-haspopup="true"
+           aria-expanded="false"
+           aria-controls="${escapeHtml(menuId)}">
+          ${escapeHtml(label)} <span aria-hidden="true" class="nav-caret">▾</span>
+        </a>
+        <div id="${escapeHtml(menuId)}" class="nav-drop-menu" role="menu" aria-label="${escapeHtml(label)} Submenu">
+          ${children}
+        </div>
+      </li>
+    `.trim();
+  }
+
+  return `<li><a href="${escapeHtml(withPrefix(it.href, prefix))}">${escapeHtml(it.label)}</a></li>`;
 }
 
 function renderUseCasesDesktop(usecases, prefix) {
@@ -209,8 +301,9 @@ function renderUseCasesDesktop(usecases, prefix) {
   const label = usecases.label ?? "Use Cases";
   const items = (usecases.items ?? [])
     .map((it) => {
-      if (it?.type === "divider")
+      if (it?.type === "divider") {
         return `<div class="nav-drop-divider" role="separator" aria-hidden="true"></div>`;
+      }
 
       const ext = it?.externalMark
         ? `<span aria-hidden="true">↗</span>`
@@ -218,10 +311,7 @@ function renderUseCasesDesktop(usecases, prefix) {
 
       if (it?.subtitle) {
         return `
-          <a role="menuitem"${attr(
-            "href",
-            withPrefix(it.href, prefix)
-          )} class="nav-drop-narratives">
+          <a role="menuitem"${attr("href", withPrefix(it.href, prefix))} class="nav-drop-narratives">
             <span>${escapeHtml(it.label)}</span>
             <span class="nav-drop-sub">${escapeHtml(it.subtitle)}</span>
           </a>
@@ -236,17 +326,19 @@ function renderUseCasesDesktop(usecases, prefix) {
     })
     .join("");
 
+  const menuId = "usecases-menu";
+
   return [
     `
       <li class="nav-dropdown">
-        <a href="#usecases"
+        <a href="#${escapeHtml(menuId)}"
            class="nav-drop-trigger"
            aria-haspopup="true"
            aria-expanded="false"
-           aria-controls="usecases-menu">
+           aria-controls="${escapeHtml(menuId)}">
           ${escapeHtml(label)} <span aria-hidden="true" class="nav-caret">▾</span>
         </a>
-        <div id="usecases-menu" class="nav-drop-menu" role="menu" aria-label="Use Cases Submenu">
+        <div id="${escapeHtml(menuId)}" class="nav-drop-menu" role="menu" aria-label="Use Cases Submenu">
           ${items}
         </div>
       </li>
@@ -262,7 +354,6 @@ function renderTopbarActions(actions = {}, prefix) {
 
   const parts = [];
 
-  // Mobile menu trigger always exists; visibility controlled by CSS
   parts.push(
     `
     <button
@@ -275,43 +366,28 @@ function renderTopbarActions(actions = {}, prefix) {
   `.trim()
   );
 
-  // Secondary
   if (secondary) {
     if (secondary.type !== "link") {
-      throw new Error(
-        `actions.secondary must be {type:"link", ...}. Got type="${secondary.type}".`
-      );
+      throw new Error(`actions.secondary must be {type:"link", ...}. Got type="${secondary.type}".`);
     }
     parts.push(
-      `<a class="btn-secondary"${attr(
-        "href",
-        withPrefix(secondary.href, prefix)
-      )}>${escapeHtml(secondary.label)}</a>`
+      `<a class="btn-secondary cta-secondary"${attr("href", withPrefix(secondary.href, prefix))}>${escapeHtml(secondary.label)}</a>`
     );
   }
 
-  // Primary
   if (primary) {
     if (primary.type === "button") {
       const cls = joinClasses("cta-button", primary.class);
       parts.push(
-        `<button class="${escapeHtml(cls)}"${attr(
-          "id",
-          primary.id
-        )} type="button">${escapeHtml(primary.label)}</button>`
+        `<button class="${escapeHtml(cls)}"${attr("id", primary.id)} type="button">${escapeHtml(primary.label)}</button>`
       );
     } else if (primary.type === "link") {
       const cls = joinClasses("cta-button", primary.class);
       parts.push(
-        `<a class="${escapeHtml(cls)}"${attr(
-          "href",
-          withPrefix(primary.href, prefix)
-        )}>${escapeHtml(primary.label)}</a>`
+        `<a class="${escapeHtml(cls)}"${attr("href", withPrefix(primary.href, prefix))}>${escapeHtml(primary.label)}</a>`
       );
     } else {
-      throw new Error(
-        `actions.primary must be type "link" or "button". Got "${primary.type}".`
-      );
+      throw new Error(`actions.primary must be type "link" or "button". Got "${primary.type}".`);
     }
   }
 
@@ -321,25 +397,58 @@ function renderTopbarActions(actions = {}, prefix) {
 /* -------------------- Rendering: Drawer -------------------- */
 
 function renderDrawerLinks(links = [], prefix) {
-  return links
-    .map(
-      (l) =>
-        `<a href="${escapeHtml(
-          withPrefix(l.href, prefix)
-        )}" data-close="sx-drawer">${escapeHtml(l.label)}</a>`
-    )
-    .join("");
+  return (links ?? [])
+    .map((it) => renderDrawerItem(it, prefix))
+    .filter(Boolean)
+    .join("\n"); // ✅ 强制换行，降低浏览器重排概率
+}
+
+function renderDrawerItem(it, prefix) {
+  if (!it) return "";
+
+  if (it.type === "divider") {
+    return `<div class="sx-drawer-divider" aria-hidden="true"></div>`;
+  }
+
+  if (it.type === "group") {
+    const baseId = safeId(it.id || it.label || "group");
+    const panelId = `sx-group-${baseId}`;
+    const label = it.label ?? "Group";
+
+    const children = (it.items ?? [])
+      .map((c) => renderDrawerItem(c, prefix))
+      .filter(Boolean)
+      .join("\n");
+
+    // ✅ 硬规则：空 group 不允许输出
+    if (!children.trim()) return "";
+
+    return `
+      <button class="sx-drawer-group"
+              type="button"
+              aria-expanded="false"
+              aria-controls="${escapeHtml(panelId)}">
+        ${escapeHtml(label)}
+        <span class="sx-usecases-caret" aria-hidden="true">▸</span>
+      </button>
+      <div id="${escapeHtml(panelId)}" class="sx-drawer-group-panel" hidden>
+${children}
+      </div>
+    `.trim();
+  }
+
+  return `<a href="${escapeHtml(withPrefix(it.href, prefix))}" data-close="sx-drawer">${escapeHtml(it.label)}</a>`;
 }
 
 function renderDrawerTail(tail = [], prefix) {
-  return tail
-    .map(
-      (l) =>
-        `<a href="${escapeHtml(
-          withPrefix(l.href, prefix)
-        )}" data-close="sx-drawer">${escapeHtml(l.label)}</a>`
-    )
-    .join("");
+  return (tail ?? [])
+    .map((l) => {
+      if (!l) return "";
+      if (l.type === "divider") return `<div class="sx-drawer-divider" aria-hidden="true"></div>`;
+      return renderDrawerItem(l, prefix);
+    })
+    .filter(Boolean)
+    .join("\n");
 }
 
 function renderDrawerUsecases(usecases, prefix) {
@@ -354,27 +463,25 @@ function renderDrawerUsecases(usecases, prefix) {
 
       if (it?.subtitle) {
         return `
-          <a class="sx-drawer-narratives" href="${escapeHtml(
-            withPrefix(it.href, prefix)
-          )}" data-close="sx-drawer">
+          <a class="sx-drawer-narratives" href="${escapeHtml(withPrefix(it.href, prefix))}" data-close="sx-drawer">
             <span class="sx-drawer-narratives-title">${escapeHtml(it.label)}</span>
             <span class="sx-drawer-narratives-sub">${escapeHtml(it.subtitle)}</span>
           </a>
         `.trim();
       }
 
-      return `<a href="${escapeHtml(
-        withPrefix(it.href, prefix)
-      )}" data-close="sx-drawer">${escapeHtml(it.label)}${ext}</a>`;
+      return `<a href="${escapeHtml(withPrefix(it.href, prefix))}" data-close="sx-drawer">${escapeHtml(it.label)}${ext}</a>`;
     })
-    .join("");
+    .join("\n");
+
+  const panelId = "sx-usecases-panel";
 
   return `
-    <button class="sx-drawer-usecases" type="button" aria-expanded="false" aria-controls="sx-usecases-panel">
+    <button class="sx-drawer-usecases" type="button" aria-expanded="false" aria-controls="${escapeHtml(panelId)}">
       ${escapeHtml(label)} <span class="sx-usecases-caret" aria-hidden="true">▸</span>
     </button>
-    <div id="sx-usecases-panel" hidden>
-      ${items}
+    <div id="${escapeHtml(panelId)}" class="sx-drawer-group-panel" hidden>
+${items}
     </div>
   `.trim();
 }
@@ -384,36 +491,32 @@ function renderDrawerActions(actions = [], prefix) {
 
   const btns = actions
     .map((a) => {
+      if (!a) return "";
       const role = a.role || "secondary";
       const baseCls = role === "primary" ? "cta-button" : "btn-secondary";
       const cls = joinClasses(baseCls, a.class);
 
       if (a.type === "button") {
-        return `<button class="${escapeHtml(cls)}"${attr(
-          "id",
-          a.id
-        )} type="button">${escapeHtml(a.label)}</button>`;
+        return `<button class="${escapeHtml(cls)}"${attr("id", a.id)} type="button">${escapeHtml(a.label)}</button>`;
       }
 
       if (a.type === "link") {
-        return `<a class="${escapeHtml(cls)}"${attr(
-          "href",
-          withPrefix(a.href, prefix)
-        )} data-close="sx-drawer">${escapeHtml(a.label)}</a>`;
+        return `<a class="${escapeHtml(cls)}"${attr("href", withPrefix(a.href, prefix))} data-close="sx-drawer">${escapeHtml(a.label)}</a>`;
       }
 
-      throw new Error(
-        `drawer.actions[] must be type "link" or "button". Got "${a.type}".`
-      );
+      throw new Error(`drawer.actions[] must be type "link" or "button". Got "${a.type}".`);
     })
-    .join("");
+    .filter(Boolean)
+    .join("\n");
 
   return `<div class="sx-drawer-actions">${btns}</div>`;
 }
 
-/* -------------------- Shell -------------------- */
+/* -------------------- Shell (Generated HTML) -------------------- */
 
-function renderNavShell(resolved, prefix) {
+function renderNavShell(resolvedRaw, prefix) {
+  const resolved = normalizeResolved(resolvedRaw);
+
   const brand = resolved.brand || {};
   const desktop = resolved.desktop || {};
   const drawer = resolved.drawer || {};
@@ -423,9 +526,7 @@ function renderNavShell(resolved, prefix) {
   const brandHref = brand.href || "index.html";
 
   const brandHtml = `
-    <a class="logo" href="${escapeHtml(withPrefix(brandHref, prefix))}" aria-label="${escapeHtml(
-    brandName
-  )} Home">
+    <a class="logo" href="${escapeHtml(withPrefix(brandHref, prefix))}" aria-label="${escapeHtml(brandName)} Home">
       <div class="logo-icon">SX</div>
       <span>
         <b>${escapeHtml(brandName)}</b>
@@ -452,9 +553,7 @@ function renderNavShell(resolved, prefix) {
       <div class="logo-icon">SX</div>
       <div class="sx-drawer-title">
         <div class="sx-drawer-name">${escapeHtml(brandName)}</div>
-        <div class="sx-drawer-sub" data-sx="drawer-sub">${escapeHtml(
-          brandSubtitle.replace(/^·\s*/, "")
-        )}</div>
+        <div class="sx-drawer-sub" data-sx="drawer-sub">${escapeHtml(brandSubtitle)}</div>
       </div>
     </div>
   `.trim();
@@ -475,9 +574,9 @@ function renderNavShell(resolved, prefix) {
         </div>
 
         <nav class="sx-drawer-nav" aria-label="Mobile Links">
-          ${drawerLinks}
-          ${drawerUsecases}
-          ${drawerTail}
+${drawerLinks}
+${drawerUsecases ? "\n" + drawerUsecases : ""}
+${drawerTail ? "\n" + drawerTail : ""}
         </nav>
 
         ${drawerActions}
@@ -498,7 +597,7 @@ function resolvePageNav(config, pageKey) {
 
 function pageKeyFromFilename(relPath) {
   const p = relPath.replaceAll("\\", "/");
-  return path.posix.basename(p, ".html"); // index => index, pages/case-video.html => case-video
+  return path.posix.basename(p, ".html");
 }
 
 /* -------------------- Build -------------------- */
@@ -518,7 +617,7 @@ function buildHtmlFiles(config) {
       continue;
     }
 
-    const prefix = calcPrefixForRelHtml(rel); // ✅ critical
+    const prefix = calcPrefixForRelHtml(rel);
     const key = pageKeyFromFilename(rel);
     const resolved = resolvePageNav(config, key);
     const navHtml = renderNavShell(resolved, prefix);
@@ -536,9 +635,7 @@ function assertBasicConfig(config) {
   if (!config.defaults.brand)
     throw new Error("site.nav.json: missing defaults.brand.");
   if (!("subtitle" in config.defaults.brand))
-    throw new Error(
-      'site.nav.json: defaults.brand.subtitle is required (no "sub" allowed).'
-    );
+    throw new Error('site.nav.json: defaults.brand.subtitle is required (no "sub" allowed).');
 }
 
 function main() {
@@ -549,15 +646,11 @@ function main() {
   const config = readJson(NAV_CONFIG_PATH);
   assertBasicConfig(config);
 
-  // Recreate dist
   if (fs.existsSync(DIST_DIR))
     fs.rmSync(DIST_DIR, { recursive: true, force: true });
   ensureDir(DIST_DIR);
 
-  // Copy everything (excluding html + excluded source folders)
   copyDir(ROOT, DIST_DIR);
-
-  // Build html with per-page nav
   buildHtmlFiles(config);
 
   console.log("✅ build-includes: dist/ generated.");

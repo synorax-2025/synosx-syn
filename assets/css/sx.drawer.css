@@ -1,9 +1,9 @@
-/* sx.drawer.css — Frozen v1.2 (2026-01-19)
+/* sx.drawer.css — Frozen v1.3 (2026-01-21)
    ✅ iOS Safari/Chrome stable: panel internal scroll + no snapback
    ✅ No 100vh/dvh: use --sx-vh-px from JS
    ✅ Background locked via body fixed (JS)
    ✅ Drawer: right narrow panel, under fixed nav
-   ✅ Use Cases only expandable node
+   ✅ Expandable nodes: Use Cases + generic group (目录等)
    ✅ Governance Narratives special block + subtitle visible
    ✅ NAV visibility constitution (desktop 1–10, mobile menu only)
 */
@@ -27,12 +27,16 @@
   --sx-drawer-text: rgba(232,236,245,0.92);
   --sx-drawer-muted: rgba(232,236,245,0.60);
 
-  /* ✅ 你只需要调这个：
-     0.62~0.72 ≈ 5 行
-     0.78      ≈ 6 行（推荐）
-     0.85      ≈ 7 行
+  /* ✅ Drawer panel 可视高度（整体框高）
+     0.78 ≈ 6 行在部分机型仍偏短
+     0.88~0.92 更稳：目录展开能看见更多条目
   */
-  --sx-drawer-open-factor: 0.78;
+  --sx-drawer-open-factor: 0.90;
+
+  /* ✅ Group(目录)展开区：最多显示约 6 行后内部滚动（更精确）
+     320~420 调整即可
+  */
+  --sx-drawer-group-maxh: 360px;
 }
 
 /* =========================================================
@@ -291,6 +295,11 @@
   transform: rotate(90deg);
   opacity: .95;
 }
+/* ✅ generic group caret rotate (目录等) */
+.sx-drawer-group[aria-expanded="true"] .sx-usecases-caret{
+  transform: rotate(90deg);
+  opacity: .95;
+}
 
 /* =========================================================
    Secondary panel (Use Cases)
@@ -323,6 +332,51 @@
   color: rgba(232,236,245,0.78);
 }
 #sx-usecases-panel a:hover{
+  background: rgba(255,255,255,0.06);
+  color: rgba(232,236,245,0.95);
+}
+
+/* =========================================================
+   Group panels (e.g. 目录) — vertical list + 6-row viewport
+   Build output: <button class="sx-drawer-group" ...> + <div id="sx-group-xxx" hidden>...</div>
+   ========================================================= */
+
+.sx-drawer-nav > div[hidden]{ display:none !important; }
+
+/* group open panel container */
+.sx-drawer-nav > div:not([hidden]){
+  margin-top: 4px;
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(255,255,255,0.12);
+
+  display:flex;
+  flex-direction:column;
+  gap: 2px;
+
+  /* ✅ 至少可见 ~6 行，超出内部滚动 */
+  max-height: var(--sx-drawer-group-maxh);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+
+  padding-right: 4px;
+}
+
+/* ✅ 关键：每个 Ch.* 独占一行（避免挤成一排） */
+.sx-drawer-nav > div:not([hidden]) > a{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+
+  padding: 8px 8px;
+  border-radius: 10px;
+
+  font-size: 13px;
+  font-weight: 650;
+  color: rgba(232,236,245,0.78);
+}
+.sx-drawer-nav > div:not([hidden]) > a:hover{
   background: rgba(255,255,255,0.06);
   color: rgba(232,236,245,0.95);
 }

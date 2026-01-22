@@ -1,199 +1,212 @@
-/* ======================================================
-   sx.floatlog.css — Floating Runtime Log Panel
-   Frozen v1.0.2 · Constitution-aligned
-   ====================================================== */
+/* sx.floatlog.css — FloatLog Console (Scheme B)
+   - fixed + draggable by top handle
+   - collapse / close
+   - should NOT redefine global tokens; only scope .sx-floatlog*
+*/
 
-/* --------------------------------------------------
-   Root tokens (NO hard z-index here)
-   -------------------------------------------------- */
 :root{
-  /* width */
-  --sx-floatlog-w: 92vw;
-  --sx-floatlog-maxw: 520px;
+  /* 允许被 sx.core.css 覆盖：这里只是兜底 */
+  --sx-floatlog-z: 9999;
+  --sx-floatlog-w: 420px;
+  --sx-floatlog-max-h: 360px;
 
-  /* height */
-  --sx-floatlog-maxh: 56vh;
-
-  /* spacing */
-  --sx-floatlog-right: 14px;
-  --sx-floatlog-bottom: 86px;
-
-  /* visuals */
-  --sx-floatlog-bg: rgba(0,0,0,0.88);
-  --sx-floatlog-border: rgba(88,160,255,0.55);
-  --sx-floatlog-shadow: 0 18px 50px rgba(0,0,0,0.55);
-
+  --sx-floatlog-bg: rgba(0,0,0,0.78);
+  --sx-floatlog-border: rgba(120,170,255,0.55);
+  --sx-floatlog-border-soft: rgba(255,255,255,0.10);
   --sx-floatlog-text: rgba(232,236,245,0.92);
-  --sx-floatlog-muted: rgba(232,236,245,0.65);
+  --sx-floatlog-muted: rgba(232,236,245,0.55);
 
-  /* handle */
-  --sx-floatlog-handle-w: 46px;
-  --sx-floatlog-handle-h: 92px;
-  --sx-floatlog-handle-bg: rgba(0,0,0,0.70);
-  --sx-floatlog-handle-border: rgba(255,255,255,0.14);
-
-  /* body padding (JS controlled) */
-  --sx-floatlog-pad-bottom: 0px;
-
-  /* safe area */
-  --sx-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --sx-floatlog-accent: rgba(90,170,255,0.95);
+  --sx-floatlog-accent-soft: rgba(90,170,255,0.25);
+  --sx-floatlog-radius: 14px;
+  --sx-floatlog-shadow: 0 22px 80px rgba(0,0,0,0.45);
 }
 
-/* --------------------------------------------------
-   Layout padding when open
-   -------------------------------------------------- */
-body.sx-floatlog-pad{
-  padding-bottom: var(--sx-floatlog-pad-bottom);
-}
-
-/* --------------------------------------------------
-   Handle
-   -------------------------------------------------- */
-.sx-floatlog-handle{
+/* Root anchor (default: right/bottom). After drag -> data-mode="free" uses left/top */
+.sx-floatlog{
   position: fixed;
-  right: 8px;
-  bottom: calc(var(--sx-floatlog-bottom) + var(--sx-safe-bottom) + 6px);
+  right: 24px;
+  bottom: 24px;
+  z-index: var(--sx-floatlog-z);
 
-  z-index: var(--sx-z-floatlog);
-  pointer-events: auto;
+  width: var(--sx-floatlog-w);
+  max-width: min(var(--sx-floatlog-w), calc(100vw - 24px));
+}
 
-  width: var(--sx-floatlog-handle-w);
-  height: var(--sx-floatlog-handle-h);
+.sx-floatlog[data-mode="free"]{
+  right: auto;
+  bottom: auto;
+}
+
+/* Panel */
+.sx-floatlog__panel{
+  border-radius: var(--sx-floatlog-radius);
+  border: 1px solid var(--sx-floatlog-border);
+  background: var(--sx-floatlog-bg);
+  box-shadow: var(--sx-floatlog-shadow);
+  overflow: hidden;
+
+  /* subtle inner glow */
+  outline: 1px solid rgba(255,255,255,0.06);
+  outline-offset: -2px;
+}
+
+/* Top handle (Scheme B) */
+.sx-floatlog__handle{
+  height: 28px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.06),
+    rgba(255,255,255,0.02)
+  );
+  border-bottom: 1px solid var(--sx-floatlog-border-soft);
+
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none; /* critical for touch drag */
+}
+
+.sx-floatlog.is-dragging .sx-floatlog__handle{
+  cursor: grabbing;
+}
+
+.sx-floatlog__title{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: var(--sx-floatlog-muted);
+  opacity: 0.95;
+}
+
+/* small status dot (optional) */
+.sx-floatlog__dot{
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--sx-floatlog-accent);
+  box-shadow: 0 0 12px var(--sx-floatlog-accent-soft);
+  opacity: 0.9;
+}
+
+/* actions */
+.sx-floatlog__actions{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sx-floatlog__btn{
+  all: unset;
+  cursor: pointer;
+
+  height: 20px;
+  min-width: 22px;
+  padding: 0 6px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 20px;
-  border: 1px solid var(--sx-floatlog-handle-border);
-  background: var(--sx-floatlog-handle-bg);
-  box-shadow: 0 10px 28px rgba(0,0,0,0.38);
-
-  color: rgba(232,236,245,0.92);
-  font-size: 22px;
-  font-weight: 900;
-
-  cursor: pointer;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
+  border-radius: 8px;
+  color: var(--sx-floatlog-muted);
+  opacity: 0.85;
 }
 
-.sx-floatlog-handle::before{
-  content: "›";
-  transform: translateX(1px);
-}
-
-/* --------------------------------------------------
-   Panel
-   -------------------------------------------------- */
-.sx-floatlog{
-  position: fixed;
-  right: var(--sx-floatlog-right);
-  bottom: calc(var(--sx-floatlog-bottom) + var(--sx-safe-bottom));
-
-  z-index: calc(var(--sx-z-floatlog) + 1);
-  pointer-events: auto;
-
-  width: min(var(--sx-floatlog-w), var(--sx-floatlog-maxw));
-  max-height: min(
-    var(--sx-floatlog-maxh),
-    calc(100vh - (var(--sx-floatlog-bottom) + 16px))
-  );
-
-  border-radius: 22px;
-  border: 1px solid var(--sx-floatlog-border);
-  background: var(--sx-floatlog-bg);
-  box-shadow: var(--sx-floatlog-shadow);
-
-  overflow: hidden;
-
-  transform: translateX(0);
+.sx-floatlog__btn:hover{
   opacity: 1;
-  transition: transform 180ms ease, opacity 180ms ease;
-
-  overscroll-behavior: contain;
+  color: var(--sx-floatlog-text);
+  background: rgba(255,255,255,0.08);
 }
 
-.sx-floatlog[hidden]{
-  display: none !important;
+.sx-floatlog__btn:active{
+  transform: translateY(1px);
 }
 
-.sx-floatlog.is-collapsing{
-  transform: translateX(calc(100% + 26px));
-  opacity: 0.6;
-}
+/* Body (terminal area) */
+.sx-floatlog__body{
+  padding: 12px 12px 12px 12px;
+  color: var(--sx-floatlog-text);
 
-/* --------------------------------------------------
-   Head
-   -------------------------------------------------- */
-.sx-floatlog-head{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-
-  padding: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.10);
-
-  background: linear-gradient(
-    180deg,
-    rgba(59,130,246,0.12),
-    rgba(0,0,0,0)
-  );
-}
-
-.sx-floatlog-title b{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   font-size: 12px;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: rgba(90,170,255,0.95);
+  line-height: 1.55;
+
+  max-height: var(--sx-floatlog-max-h);
+  overflow: auto;
+
+  /* nicer scroll in dark */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.25) rgba(0,0,0,0.15);
 }
 
-.sx-floatlog-title span{
-  font-size: 11.5px;
+.sx-floatlog__body::-webkit-scrollbar{ width: 10px; }
+.sx-floatlog__body::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,0.18);
+  border-radius: 999px;
+  border: 3px solid rgba(0,0,0,0.0);
+  background-clip: padding-box;
+}
+.sx-floatlog__body::-webkit-scrollbar-track{
+  background: rgba(0,0,0,0.12);
+}
+
+/* Lines */
+.sx-floatlog__line{
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 2px 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.sx-floatlog__mark{
+  width: 16px;
+  flex: 0 0 16px;
+  color: var(--sx-floatlog-accent);
+  opacity: 0.95;
+}
+
+.sx-floatlog__text{
+  flex: 1 1 auto;
+}
+
+.sx-floatlog__line.is-muted .sx-floatlog__text{
   color: var(--sx-floatlog-muted);
 }
 
-/* --------------------------------------------------
-   Actions
-   -------------------------------------------------- */
-.sx-floatlog-actions{
-  display: flex;
-  gap: 8px;
-}
-
-.sx-floatlog-btn{
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.06);
-  color: rgba(232,236,245,0.90);
-
-  border-radius: 12px;
-  padding: 7px 10px;
-  font-size: 12px;
-  font-weight: 850;
-
-  cursor: pointer;
-}
-
-.sx-floatlog-btn:hover{
+.sx-floatlog__hr{
+  margin: 10px 0;
+  height: 1px;
   background: rgba(255,255,255,0.10);
 }
 
-/* --------------------------------------------------
-   Body
-   -------------------------------------------------- */
-.sx-floatlog-body{
-  padding: 12px;
-  overflow: auto;
-
-  font-family: ui-monospace, Menlo, Consolas, monospace;
-  font-size: 12.5px;
-  line-height: 1.55;
-
-  color: var(--sx-floatlog-text);
+/* Collapsed mode: hide body */
+.sx-floatlog.is-collapsed .sx-floatlog__body{
+  display: none;
 }
 
-/* Legacy log compatibility */
-.sx-floatlog-body .log-line.ok{ color: rgba(191,247,214,0.92); }
-.sx-floatlog-body .log-line.warn{ color: rgba(255,233,168,0.92); }
-.sx-floatlog-body .log-line.bad{ color: rgba(255,210,210,0.92); }
+/* Hidden state (close) */
+.sx-floatlog.is-hidden{
+  display: none;
+}
+
+/* Mobile tweaks */
+@media (max-width: 520px){
+  .sx-floatlog{
+    width: min(92vw, 420px);
+    right: 12px;
+    bottom: 12px;
+  }
+}

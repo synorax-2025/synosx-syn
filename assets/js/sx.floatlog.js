@@ -1,266 +1,370 @@
-/* sx.floatlog.js — Floating Runtime Log Panel (Unified) v1.0.2 (Frozen)
-   What this fixes:
-   - ✅ Single log sink: prefers #log-container, fallback to [data-sx-floatlog-body]
-   - ✅ append(line, {autoOpen:true}) supported (so runtime can auto-open)
-   - ✅ Close clears pad; Open adds pad
-   - ✅ X closes, Collapse animates to right then closes, Handle toggles
+/* sx.floatlog.js — FloatLog Console (Scheme B) — FIXED
+   - Fix: buttons inside handle should still click (do not start drag when target is [data-action])
+   - window.SXFloatLog API:
+       open(), close(), toggle()
+       collapse(), expand(), toggleCollapse()
+       clear(), append({mark,text,muted}), hr()
+       setTitle(text), setDot(on)
+       resetPosition()
 */
 
-(function(){
-  "use strict";
+(function SXFloatLogBundle(){
+  const KEY_POS = "sx.floatlog.pos.v1";
+  const KEY_STATE = "sx.floatlog.state.v1"; // collapsed, hidden
 
-  const STORE_KEY = "sx.floatlog.open"; // "1" or "0"
+  function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
 
-  function qs(root, sel){ return root ? root.querySelector(sel) : null; }
-  function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
-
-  function boot(){
-    const panel = document.getElementById("audit-drawer");
-    const handle = document.querySelector('[data-sx-floatlog-handle]');
-
-    // safe no-op
-    if (!panel || !handle) return false;
-
-    const body = document.body;
-
-    const headTitleMain = qs(panel, "[data-sx-floatlog-title-main]");
-    const headTitleSub  = qs(panel, "[data-sx-floatlog-title-sub]");
-
-    // ✅ log sink unification:
-    // Prefer #log-container (runtime contract), fallback to floatlog body slot
-    const bodyBoxWrap = qs(panel, "[data-sx-floatlog-body]");
-    const logSink = qs(panel, "#log-container") || bodyBoxWrap;
-
-    const btnClose    = qs(panel, "[data-sx-floatlog-close]");
-    const btnCollapse = qs(panel, "[data-sx-floatlog-collapse]");
-
-    let isOpen = false;
-
-    // touch swipe
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touching = false;
-
-    // --------------------
-    // Layout: prevent cover (OPEN only)
-    // --------------------
-    function applyPad(open){
-      if (open){
-        body.classList.add("sx-floatlog-pad");
-
-        const bottomCss = getComputedStyle(document.documentElement)
-          .getPropertyValue("--sx-floatlog-bottom")
-          .trim();
-
-        const bottom = Number.parseInt(bottomCss || "86", 10) || 86;
-        const pad = clamp(bottom + 80, 120, 220);
-
-        document.documentElement.style.setProperty("--sx-floatlog-pad-bottom", pad + "px");
-      }else{
-        body.classList.remove("sx-floatlog-pad");
-        document.documentElement.style.setProperty("--sx-floatlog-pad-bottom", "0px");
-      }
-    }
-
-    function setOpenState(next){
-      isOpen = !!next;
-      try { localStorage.setItem(STORE_KEY, isOpen ? "1" : "0"); } catch(_){}
-
-      if (isOpen){
-        panel.hidden = false;
-        panel.classList.remove("is-collapsing");
-        handle.setAttribute("aria-expanded", "true");
-        panel.setAttribute("aria-hidden", "false");
-      }else{
-        panel.classList.remove("is-collapsing");
-        panel.hidden = true;
-        handle.setAttribute("aria-expanded", "false");
-        panel.setAttribute("aria-hidden", "true");
-      }
-
-      applyPad(isOpen);
-    }
-
-    function open(){ setOpenState(true); }
-    function close(){ setOpenState(false); }
-    function toggle(){ isOpen ? close() : open(); }
-
-    function collapseAnimated(){
-      if (!isOpen) return;
-      panel.classList.add("is-collapsing");
-      window.setTimeout(() => close(), 180);
-    }
-
-    // --------------------
-    // Rendering lines
-    // --------------------
-    function normalizeLine(x){
-      // Accept:
-      // - string
-      // - { mark?:">", text:"...", muted?:true }
-      if (typeof x === "string"){
-        return { mark: ">", text: x, muted: false };
-      }
-      if (x && typeof x === "object"){
-        const mark = typeof x.mark === "string" ? x.mark : ">";
-        const text = typeof x.text === "string" ? x.text : JSON.stringify(x);
-        const muted = !!x.muted;
-        return { mark, text, muted };
-      }
-      return { mark: ">", text: String(x), muted: false };
-    }
-
-    function renderLineEl(line){
-      const row = document.createElement("div");
-      row.className = "sx-floatlog-line" + (line.muted ? " is-muted" : "");
-
-      const mark = document.createElement("span");
-      mark.className = "sx-floatlog-mark";
-      mark.textContent = line.mark;
-
-      const text = document.createElement("span");
-      text.className = "sx-floatlog-text";
-      text.textContent = line.text;
-
-      row.appendChild(mark);
-      row.appendChild(text);
-      return row;
-    }
-
-    function scrollToBottom(){
-      try{
-        if (!logSink) return;
-        logSink.scrollTop = logSink.scrollHeight;
-      }catch(_){}
-    }
-
-    function renderLines(lines){
-      if (!logSink) return;
-      logSink.innerHTML = "";
-
-      const arr = Array.isArray(lines) ? lines : [];
-      for (const item of arr){
-        const line = normalizeLine(item);
-        logSink.appendChild(renderLineEl(line));
-      }
-
-      scrollToBottom();
-    }
-
-    // ✅ append supports opts.autoOpen
-    function append(line, opts){
-      if (!logSink) return;
-
-      const nl = normalizeLine(line);
-      logSink.appendChild(renderLineEl(nl));
-      scrollToBottom();
-
-      if (opts && opts.autoOpen && !isOpen) open();
-    }
-
-    function clear(){
-      if (!logSink) return;
-      logSink.innerHTML = "";
-    }
-
-    function setTitle(main, sub){
-      if (headTitleMain) headTitleMain.textContent = main || "RUNTIME";
-      if (headTitleSub)  headTitleSub.textContent  = sub || "";
-    }
-
-    // --------------------
-    // Events
-    // --------------------
-    handle.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      toggle();
-    });
-
-    if (btnClose){
-      btnClose.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        close();
-      });
-    }
-
-    if (btnCollapse){
-      btnCollapse.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        collapseAnimated();
-      });
-    }
-
-    // touch swipe right on panel
-    panel.addEventListener("touchstart", (e) => {
-      if (!isOpen) return;
-      if (!e.touches || !e.touches[0]) return;
-      touching = true;
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-    }, { passive: true });
-
-    panel.addEventListener("touchmove", (e) => {
-      if (!isOpen || !touching) return;
-      if (!e.touches || !e.touches[0]) return;
-
-      const dx = e.touches[0].clientX - touchStartX;
-      const dy = e.touches[0].clientY - touchStartY;
-
-      if (Math.abs(dy) > Math.abs(dx)) return;
-
-      if (dx > 18){
-        e.preventDefault();
-      }
-    }, { passive: false });
-
-    panel.addEventListener("touchend", (e) => {
-      if (!isOpen || !touching) return;
-      touching = false;
-
-      const t = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0] : null;
-      if (!t) return;
-
-      const dx = t.clientX - touchStartX;
-      const dy = t.clientY - touchStartY;
-
-      if (dx > 70 && Math.abs(dy) < 60){
-        collapseAnimated();
-      }
-    }, { passive: true });
-
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && isOpen) close();
-    });
-
-    // Restore open state
-    let saved = "0";
-    try { saved = localStorage.getItem(STORE_KEY) || "0"; } catch(_){}
-    setOpenState(saved === "1");
-
-    // --------------------
-    // Public API
-    // --------------------
-    window.SXFloatLog = {
-      open,
-      close,
-      toggle,
-      setTitle,
-      setLines(lines, opts){
-        renderLines(lines);
-        if (opts && opts.autoOpen) open();
-      },
-      append,   // append(line, {autoOpen?:true})
-      clear,
-      isOpen(){ return isOpen; }
-    };
-
-    return true;
+  function readJsonSafe(key){
+    try { return JSON.parse(localStorage.getItem(key) || "null"); }
+    catch { return null; }
+  }
+  function writeJsonSafe(key, val){
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
   }
 
-  if (!boot()){
-    document.addEventListener("DOMContentLoaded", boot, { once: true });
+  function ensureRoot(){
+    let root = document.querySelector(".sx-floatlog");
+    if (root) return root;
+
+    // Create minimal DOM if missing
+    root = document.createElement("div");
+    root.className = "sx-floatlog";
+    root.innerHTML = `
+      <div class="sx-floatlog__panel">
+        <div class="sx-floatlog__handle">
+          <span class="sx-floatlog__title">
+            <i class="sx-floatlog__dot" aria-hidden="true"></i>
+            <span class="sx-floatlog__titleText">AUDIT ENGINE</span>
+          </span>
+          <div class="sx-floatlog__actions">
+            <button class="sx-floatlog__btn" type="button" data-action="collapse" title="Collapse">—</button>
+            <button class="sx-floatlog__btn" type="button" data-action="close" title="Close">×</button>
+          </div>
+        </div>
+        <div class="sx-floatlog__body" aria-live="polite"></div>
+      </div>
+    `;
+    document.body.appendChild(root);
+    return root;
+  }
+
+  function getParts(root){
+    return {
+      panel: root.querySelector(".sx-floatlog__panel"),
+      handle: root.querySelector(".sx-floatlog__handle"),
+      body: root.querySelector(".sx-floatlog__body"),
+      titleText: root.querySelector(".sx-floatlog__titleText"),
+      dot: root.querySelector(".sx-floatlog__dot"),
+    };
+  }
+
+  function applyState(root){
+    const st = readJsonSafe(KEY_STATE) || {};
+    if (st.hidden) root.classList.add("is-hidden");
+    else root.classList.remove("is-hidden");
+
+    if (st.collapsed) root.classList.add("is-collapsed");
+    else root.classList.remove("is-collapsed");
+  }
+
+  function saveState(root){
+    writeJsonSafe(KEY_STATE, {
+      hidden: root.classList.contains("is-hidden"),
+      collapsed: root.classList.contains("is-collapsed"),
+    });
+  }
+
+  function restorePos(root){
+    const pos = readJsonSafe(KEY_POS);
+    if (!pos || !Number.isFinite(pos.left) || !Number.isFinite(pos.top)) return;
+
+    root.dataset.mode = "free";
+    root.style.left = pos.left + "px";
+    root.style.top  = pos.top + "px";
+  }
+
+  function savePosFromRect(root){
+    const rect = root.getBoundingClientRect();
+    writeJsonSafe(KEY_POS, { left: Math.round(rect.left), top: Math.round(rect.top) });
+  }
+
+  function clampIntoViewport(root){
+    const rect = root.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    const left = clamp(rect.left, 8, vw - rect.width - 8);
+    const top  = clamp(rect.top, 8, vh - rect.height - 8);
+
+    root.dataset.mode = "free";
+    root.style.left = Math.round(left) + "px";
+    root.style.top  = Math.round(top) + "px";
+    savePosFromRect(root);
+  }
+
+  function initDraggable(root){
+    const { handle } = getParts(root);
+    if (!handle) return;
+
+    let dragging = false;
+    let startX = 0, startY = 0;
+    let startLeft = 0, startTop = 0;
+    let pid = null;
+
+    function isOnActionButton(target){
+      return !!(target && target.closest && target.closest("[data-action]"));
+    }
+
+    function onDown(e){
+      // ✅ FIX: clicking collapse/close should NOT start drag
+      if (isOnActionButton(e.target)) return;
+
+      // Only allow left-click / touch
+      if (e.button != null && e.button !== 0) return;
+
+      dragging = true;
+      pid = e.pointerId;
+
+      root.classList.add("is-dragging");
+
+      const rect = root.getBoundingClientRect();
+      startLeft = rect.left;
+      startTop  = rect.top;
+      startX = e.clientX;
+      startY = e.clientY;
+
+      // Switch to free mode
+      root.dataset.mode = "free";
+      root.style.left = startLeft + "px";
+      root.style.top  = startTop + "px";
+
+      try { handle.setPointerCapture(pid); } catch {}
+
+      // prevent text selection / scroll
+      e.preventDefault();
+    }
+
+    function onMove(e){
+      if (!dragging) return;
+
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+
+      const rect = root.getBoundingClientRect();
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      const newLeft = clamp(startLeft + dx, 8, vw - rect.width - 8);
+      const newTop  = clamp(startTop  + dy, 8, vh - rect.height - 8);
+
+      root.style.left = newLeft + "px";
+      root.style.top  = newTop + "px";
+    }
+
+    function onUp(){
+      if (!dragging) return;
+      dragging = false;
+      root.classList.remove("is-dragging");
+
+      savePosFromRect(root);
+
+      try { handle.releasePointerCapture(pid); } catch {}
+      pid = null;
+    }
+
+    handle.addEventListener("pointerdown", onDown);
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+
+    window.addEventListener("resize", () => {
+      const pos = readJsonSafe(KEY_POS);
+      if (pos) clampIntoViewport(root);
+    });
+  }
+
+  function initActions(root){
+    // Use CAPTURE at document level to avoid any other preventDefault/stopPropagation surprises
+    function onClick(e){
+      const btn = e.target.closest("[data-action]");
+      if (!btn) return;
+
+      const action = btn.dataset.action;
+      const host = btn.closest(".sx-floatlog");
+      if (!host) return;
+
+      if (action === "close") {
+        host.classList.add("is-hidden");
+        saveState(host);
+        return;
+      }
+      if (action === "collapse") {
+        host.classList.toggle("is-collapsed");
+        saveState(host);
+        return;
+      }
+    }
+
+    // Bind once
+    if (!document.documentElement.dataset.sxFloatlogClickBound){
+      document.documentElement.dataset.sxFloatlogClickBound = "1";
+      document.addEventListener("click", onClick, true);
+    }
+  }
+
+  function scrollToBottom(body){
+    if (!body) return;
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
+  }
+
+  function mkLine({ mark=">", text="", muted=false }){
+    const line = document.createElement("div");
+    line.className = "sx-floatlog__line" + (muted ? " is-muted" : "");
+    line.innerHTML = `
+      <span class="sx-floatlog__mark">${escapeHtml(mark)}</span>
+      <span class="sx-floatlog__text">${escapeHtml(text)}</span>
+    `;
+    return line;
+  }
+
+  function mkHr(){
+    const hr = document.createElement("div");
+    hr.className = "sx-floatlog__hr";
+    return hr;
+  }
+
+  // ---------- Public API ----------
+  const api = {
+    ensure(){
+      const root = ensureRoot();
+      const parts = getParts(root);
+
+      applyState(root);
+      restorePos(root);
+
+      if (!root.dataset.inited){
+        root.dataset.inited = "1";
+        initDraggable(root);
+        initActions(root);
+
+        const pos = readJsonSafe(KEY_POS);
+        if (pos) clampIntoViewport(root);
+      }
+      return { root, parts };
+    },
+
+    open(){
+      const { root } = this.ensure();
+      root.classList.remove("is-hidden");
+      saveState(root);
+      return this;
+    },
+
+    close(){
+      const { root } = this.ensure();
+      root.classList.add("is-hidden");
+      saveState(root);
+      return this;
+    },
+
+    toggle(){
+      const { root } = this.ensure();
+      root.classList.toggle("is-hidden");
+      saveState(root);
+      return this;
+    },
+
+    collapse(){
+      const { root } = this.ensure();
+      root.classList.add("is-collapsed");
+      saveState(root);
+      return this;
+    },
+
+    expand(){
+      const { root } = this.ensure();
+      root.classList.remove("is-collapsed");
+      saveState(root);
+      return this;
+    },
+
+    toggleCollapse(){
+      const { root } = this.ensure();
+      root.classList.toggle("is-collapsed");
+      saveState(root);
+      return this;
+    },
+
+    clear(){
+      const { parts } = this.ensure();
+      if (parts.body) parts.body.innerHTML = "";
+      return this;
+    },
+
+    hr(){
+      const { parts } = this.ensure();
+      if (!parts.body) return this;
+      parts.body.appendChild(mkHr());
+      return this;
+    },
+
+    append(entry){
+      const { root, parts } = this.ensure();
+
+      // auto-open for your "default floating window" behavior
+      root.classList.remove("is-hidden");
+      saveState(root);
+
+      if (!parts.body) return this;
+
+      // strict: expects object with {mark,text,muted}
+      const e = entry || {};
+      parts.body.appendChild(mkLine({
+        mark: e.mark ?? ">",
+        text: e.text ?? "",
+        muted: !!e.muted
+      }));
+
+      scrollToBottom(parts.body);
+      return this;
+    },
+
+    setTitle(text){
+      const { parts } = this.ensure();
+      if (parts.titleText) parts.titleText.textContent = String(text ?? "");
+      return this;
+    },
+
+    setDot(on){
+      const { parts } = this.ensure();
+      if (!parts.dot) return this;
+      parts.dot.style.opacity = on ? "0.9" : "0.15";
+      return this;
+    },
+
+    resetPosition(){
+      const { root } = this.ensure();
+      root.dataset.mode = "";
+      root.style.left = "";
+      root.style.top = "";
+      try { localStorage.removeItem(KEY_POS); } catch {}
+      return this;
+    }
+  };
+
+  window.SXFloatLog = window.SXFloatLog || api;
+
+  if (document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", () => api.ensure());
+  } else {
+    api.ensure();
   }
 })();

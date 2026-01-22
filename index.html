@@ -15,8 +15,9 @@
 
   <!-- ✅ Shared (制度层) -->
   <link rel="stylesheet" href="assets/css/sx.core.css" />
-  <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
   <link rel="stylesheet" href="assets/css/sx.drawer.css" />
+  <link rel="stylesheet" href="assets/css/sx.floatlog.css" />
+  <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
 
   <!-- ✅ Page (页面私有) -->
   <link rel="stylesheet" href="assets/css/pages/index.page.css" />
@@ -100,10 +101,30 @@
     </div>
   </section>
 
-  <div id="audit-drawer">
-    <div style="color:var(--accent-blue); margin-bottom:12px; font-weight:900; border-bottom:1px solid #333; padding-bottom:6px;">> AUDIT ENGINE ANALYZING...</div>
-    <div id="log-container"></div>
+<!-- ✅ FloatLog Panel (Scheme B / single protocol) -->
+<div class="sx-floatlog" aria-label="audit console">
+  <div class="sx-floatlog__panel">
+
+    <!-- ✅ draggable handle (only this area draggable) -->
+    <div class="sx-floatlog__handle">
+      <span class="sx-floatlog__title">
+        <i class="sx-floatlog__dot" aria-hidden="true"></i>
+        <span class="sx-floatlog__titleText">AUDIT ENGINE</span>
+      </span>
+
+      <div class="sx-floatlog__actions">
+        <button class="sx-floatlog__btn" type="button" data-action="collapse" title="Collapse">—</button>
+        <button class="sx-floatlog__btn" type="button" data-action="close" title="Close">×</button>
+      </div>
+    </div>
+
+    <!-- ✅ terminal body -->
+    <div class="sx-floatlog__body" aria-live="polite"></div>
+
   </div>
+</div>
+
+
 
   <section id="why">
     <div class="container">
@@ -442,8 +463,9 @@
 
   <!-- ✅ Shared JS -->
   <script src="assets/js/sx.core.js"></script>
-  <script src="assets/js/sx.statusbar.js"></script>
   <script src="assets/js/sx.drawer.js"></script>
+  <script src="assets/js/sx.floatlog.js"></script>
+  <script src="assets/js/sx.statusbar.js"></script>
 
   <!-- ✅ Page runtime -->
   <script src="assets/js/runtime/index.runtime.js"></script>

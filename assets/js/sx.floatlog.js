@@ -1,16 +1,35 @@
-/* sx.floatlog.js — FloatLog Console (Scheme B) — FIXED
-   - Fix: buttons inside handle should still click (do not start drag when target is [data-action])
-   - window.SXFloatLog API:
+/* sx.floatlog.js — FloatLog Console (Scheme B + Edge Dock v2 + Snap Animation)
+   - States:
+       OPEN        : normal (body visible)
+       COLLAPSED   : mini bar (body hidden) via "—"
+       DOCKED      : edge handle (auto when near edge; forces COLLAPSED)
+   - Behaviors:
+       - draggable by .sx-floatlog__handle (buttons still clickable)
+       - auto-dock when dragged near viewport edge (no need to press "—")
+       - snap animation (120ms ease-out) on dock
+       - click handle while DOCKED -> undock + expand (back to OPEN)
+       - close (×) hides panel; append/open will auto-show again
+   - Storage:
+       - position persisted (left/top) in localStorage ONLY for free mode
+       - state persisted (hidden/collapsed) in localStorage
+       - dock state NOT persisted (intentional: transient UX)
+   - Public API: window.SXFloatLog
        open(), close(), toggle()
        collapse(), expand(), toggleCollapse()
-       clear(), append({mark,text,muted}), hr()
+       clear(), append({mark,text,muted}|string), hr()
        setTitle(text), setDot(on)
        resetPosition()
 */
 
 (function SXFloatLogBundle(){
-  const KEY_POS = "sx.floatlog.pos.v1";
-  const KEY_STATE = "sx.floatlog.state.v1"; // collapsed, hidden
+  "use strict";
+
+  const KEY_POS   = "sx.floatlog.pos.v1";
+  const KEY_STATE = "sx.floatlog.state.v1";
+
+  const EDGE_THRESHOLD = 40;   // 吸附阈值（像系统磁吸）
+  const EDGE_PAD = 2;          // 允许贴边到 2px（左边吸附关键）
+  const SNAP_MS  = 120;        // 吸附动画时长
 
   function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
 
@@ -26,7 +45,7 @@
     let root = document.querySelector(".sx-floatlog");
     if (root) return root;
 
-    // Create minimal DOM if missing
+    // Minimal DOM if user didn't place HTML
     root = document.createElement("div");
     root.className = "sx-floatlog";
     root.innerHTML = `
@@ -50,7 +69,6 @@
 
   function getParts(root){
     return {
-      panel: root.querySelector(".sx-floatlog__panel"),
       handle: root.querySelector(".sx-floatlog__handle"),
       body: root.querySelector(".sx-floatlog__body"),
       titleText: root.querySelector(".sx-floatlog__titleText"),
@@ -60,11 +78,8 @@
 
   function applyState(root){
     const st = readJsonSafe(KEY_STATE) || {};
-    if (st.hidden) root.classList.add("is-hidden");
-    else root.classList.remove("is-hidden");
-
-    if (st.collapsed) root.classList.add("is-collapsed");
-    else root.classList.remove("is-collapsed");
+    root.classList.toggle("is-hidden", !!st.hidden);
+    root.classList.toggle("is-collapsed", !!st.collapsed);
   }
 
   function saveState(root){
@@ -77,10 +92,9 @@
   function restorePos(root){
     const pos = readJsonSafe(KEY_POS);
     if (!pos || !Number.isFinite(pos.left) || !Number.isFinite(pos.top)) return;
-
     root.dataset.mode = "free";
     root.style.left = pos.left + "px";
-    root.style.top  = pos.top + "px";
+    root.style.top  = pos.top  + "px";
   }
 
   function savePosFromRect(root){
@@ -93,15 +107,90 @@
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
-    const left = clamp(rect.left, 8, vw - rect.width - 8);
-    const top  = clamp(rect.top, 8, vh - rect.height - 8);
+    const left = clamp(rect.left, EDGE_PAD, vw - rect.width - EDGE_PAD);
+    const top  = clamp(rect.top,  EDGE_PAD, vh - rect.height - EDGE_PAD);
 
     root.dataset.mode = "free";
     root.style.left = Math.round(left) + "px";
-    root.style.top  = Math.round(top) + "px";
+    root.style.top  = Math.round(top)  + "px";
     savePosFromRect(root);
   }
 
+  // -----------------------------
+  // Dock helpers (Edge Snap)
+  // -----------------------------
+  function getDockSideFromPointer(x, y, thresholdPx){
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    const dLeft = x;
+    const dRight = vw - x;
+    const dTop = y;
+    const dBottom = vh - y;
+
+    const min = Math.min(dLeft, dRight, dTop, dBottom);
+    if (min > thresholdPx) return null;
+
+    if (min === dLeft) return "left";
+    if (min === dRight) return "right";
+    if (min === dTop) return "top";
+    return "bottom";
+  }
+
+  function withSnapTransition(root, fn){
+    // 只在吸附瞬间加 transition，不污染拖拽
+    const prev = root.style.transition;
+    root.style.transition = `left ${SNAP_MS}ms ease-out, top ${SNAP_MS}ms ease-out`;
+    try { fn(); } finally {
+      // 下一帧移除 transition（避免后续拖动“橡皮筋”）
+      requestAnimationFrame(() => { root.style.transition = prev || ""; });
+    }
+  }
+
+  function snapDock(root, side){
+    // ✅ 贴边即吸附：吸附时强制变把手（collapsed）
+    root.classList.add("is-collapsed");
+    root.classList.add("is-docked");
+    root.dataset.dock = side;
+
+    // 让 CSS（docked 宽度收窄）生效后再算 rect
+    root.offsetHeight;
+
+    const rect = root.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    let left = rect.left;
+    let top  = rect.top;
+
+    if (side === "left")   left = EDGE_PAD;
+    if (side === "right")  left = vw - rect.width - EDGE_PAD;
+    if (side === "top")    top  = EDGE_PAD;
+    if (side === "bottom") top  = vh - rect.height - EDGE_PAD;
+
+    left = clamp(left, EDGE_PAD, vw - rect.width - EDGE_PAD);
+    top  = clamp(top,  EDGE_PAD, vh - rect.height - EDGE_PAD);
+
+    root.dataset.mode = "free";
+
+    withSnapTransition(root, () => {
+      root.style.left = Math.round(left) + "px";
+      root.style.top  = Math.round(top)  + "px";
+    });
+
+    // dock 是瞬态：不写 KEY_POS（避免 transform/rect 造成下次偏移）
+    saveState(root);
+  }
+
+  function undock(root){
+    if (!root.classList.contains("is-docked")) return;
+    root.classList.remove("is-docked");
+    delete root.dataset.dock;
+  }
+
+  // -----------------------------
+  // Draggable
+  // -----------------------------
   function initDraggable(root){
     const { handle } = getParts(root);
     if (!handle) return;
@@ -111,19 +200,25 @@
     let startLeft = 0, startTop = 0;
     let pid = null;
 
+    let lastClientX = 0;
+    let lastClientY = 0;
+
     function isOnActionButton(target){
       return !!(target && target.closest && target.closest("[data-action]"));
     }
 
     function onDown(e){
-      // ✅ FIX: clicking collapse/close should NOT start drag
+      // ✅ buttons inside handle must remain clickable
       if (isOnActionButton(e.target)) return;
 
-      // Only allow left-click / touch
+      // Only allow left click / touch
       if (e.button != null && e.button !== 0) return;
 
       dragging = true;
       pid = e.pointerId;
+
+      // start dragging -> undock (so it becomes free)
+      undock(root);
 
       root.classList.add("is-dragging");
 
@@ -133,19 +228,22 @@
       startX = e.clientX;
       startY = e.clientY;
 
-      // Switch to free mode
+      lastClientX = e.clientX;
+      lastClientY = e.clientY;
+
       root.dataset.mode = "free";
       root.style.left = startLeft + "px";
-      root.style.top  = startTop + "px";
+      root.style.top  = startTop  + "px";
 
       try { handle.setPointerCapture(pid); } catch {}
-
-      // prevent text selection / scroll
       e.preventDefault();
     }
 
     function onMove(e){
       if (!dragging) return;
+
+      lastClientX = e.clientX;
+      lastClientY = e.clientY;
 
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
@@ -154,11 +252,12 @@
       const vw = window.innerWidth;
       const vh = window.innerHeight;
 
-      const newLeft = clamp(startLeft + dx, 8, vw - rect.width - 8);
-      const newTop  = clamp(startTop  + dy, 8, vh - rect.height - 8);
+      // ✅ 允许贴边（EDGE_PAD），左侧也能“吸进去”
+      const newLeft = clamp(startLeft + dx, EDGE_PAD, vw - rect.width - EDGE_PAD);
+      const newTop  = clamp(startTop  + dy, EDGE_PAD, vh - rect.height - EDGE_PAD);
 
       root.style.left = newLeft + "px";
-      root.style.top  = newTop + "px";
+      root.style.top  = newTop  + "px";
     }
 
     function onUp(){
@@ -166,7 +265,15 @@
       dragging = false;
       root.classList.remove("is-dragging");
 
-      savePosFromRect(root);
+      // ✅ 用 pointer 坐标判断吸附边（不受 rect 宽度/布局干扰）
+      const side = getDockSideFromPointer(lastClientX, lastClientY, EDGE_THRESHOLD);
+
+      if (side){
+        snapDock(root, side);
+        // dock 不保存 pos
+      } else {
+        savePosFromRect(root);
+      }
 
       try { handle.releasePointerCapture(pid); } catch {}
       pid = null;
@@ -182,35 +289,53 @@
     });
   }
 
-  function initActions(root){
-    // Use CAPTURE at document level to avoid any other preventDefault/stopPropagation surprises
+  // -----------------------------
+  // Actions
+  // -----------------------------
+  function initActions(){
     function onClick(e){
+      const root = e.target.closest(".sx-floatlog");
+      if (!root) return;
+
+      const onHandle = e.target.closest(".sx-floatlog__handle");
       const btn = e.target.closest("[data-action]");
-      if (!btn) return;
 
-      const action = btn.dataset.action;
-      const host = btn.closest(".sx-floatlog");
-      if (!host) return;
-
-      if (action === "close") {
-        host.classList.add("is-hidden");
-        saveState(host);
+      // DOCKED: click handle -> undock + expand
+      if (root.classList.contains("is-docked") && onHandle && !btn){
+        undock(root);
+        root.classList.remove("is-collapsed");
+        root.classList.remove("is-hidden");
+        saveState(root);
         return;
       }
-      if (action === "collapse") {
-        host.classList.toggle("is-collapsed");
-        saveState(host);
+
+      if (!btn) return;
+      const action = btn.dataset.action;
+
+      if (action === "close"){
+        undock(root);
+        root.classList.add("is-hidden");
+        saveState(root);
+        return;
+      }
+
+      if (action === "collapse"){
+        root.classList.toggle("is-collapsed");
+        if (!root.classList.contains("is-collapsed")) undock(root);
+        saveState(root);
         return;
       }
     }
 
-    // Bind once
     if (!document.documentElement.dataset.sxFloatlogClickBound){
       document.documentElement.dataset.sxFloatlogClickBound = "1";
       document.addEventListener("click", onClick, true);
     }
   }
 
+  // -----------------------------
+  // Rendering helpers
+  // -----------------------------
   function scrollToBottom(body){
     if (!body) return;
     body.scrollTop = body.scrollHeight;
@@ -241,7 +366,9 @@
     return hr;
   }
 
-  // ---------- Public API ----------
+  // -----------------------------
+  // Public API
+  // -----------------------------
   const api = {
     ensure(){
       const root = ensureRoot();
@@ -253,11 +380,12 @@
       if (!root.dataset.inited){
         root.dataset.inited = "1";
         initDraggable(root);
-        initActions(root);
+        initActions();
 
         const pos = readJsonSafe(KEY_POS);
         if (pos) clampIntoViewport(root);
       }
+
       return { root, parts };
     },
 
@@ -270,6 +398,7 @@
 
     close(){
       const { root } = this.ensure();
+      undock(root);
       root.classList.add("is-hidden");
       saveState(root);
       return this;
@@ -277,6 +406,7 @@
 
     toggle(){
       const { root } = this.ensure();
+      undock(root);
       root.classList.toggle("is-hidden");
       saveState(root);
       return this;
@@ -291,6 +421,7 @@
 
     expand(){
       const { root } = this.ensure();
+      undock(root);
       root.classList.remove("is-collapsed");
       saveState(root);
       return this;
@@ -299,6 +430,7 @@
     toggleCollapse(){
       const { root } = this.ensure();
       root.classList.toggle("is-collapsed");
+      if (!root.classList.contains("is-collapsed")) undock(root);
       saveState(root);
       return this;
     },
@@ -319,13 +451,19 @@
     append(entry){
       const { root, parts } = this.ensure();
 
-      // auto-open for your "default floating window" behavior
+      // auto-open
       root.classList.remove("is-hidden");
       saveState(root);
 
       if (!parts.body) return this;
 
-      // strict: expects object with {mark,text,muted}
+      // allow string shorthand
+      if (typeof entry === "string"){
+        parts.body.appendChild(mkLine({ mark: ">", text: entry, muted: false }));
+        scrollToBottom(parts.body);
+        return this;
+      }
+
       const e = entry || {};
       parts.body.appendChild(mkLine({
         mark: e.mark ?? ">",
@@ -352,6 +490,7 @@
 
     resetPosition(){
       const { root } = this.ensure();
+      undock(root);
       root.dataset.mode = "";
       root.style.left = "";
       root.style.top = "";
@@ -362,6 +501,7 @@
 
   window.SXFloatLog = window.SXFloatLog || api;
 
+  // Eager init
   if (document.readyState === "loading"){
     document.addEventListener("DOMContentLoaded", () => api.ensure());
   } else {

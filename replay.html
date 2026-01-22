@@ -41,48 +41,37 @@
 
   <!--@include nav-->
 
-  <!-- ======================================================
-       ✅ Floatlog (Frozen v1.0.1)
-       - handle toggles panel
-       - panel id is audit-drawer (single source)
-       - log sink remains #log-container (runtime contract)
-       ====================================================== -->
-  <div class="sx-floatlog-handle"
-       data-sx-floatlog-handle
-       aria-label="open runtime log"></div>
-
-  <div id="audit-drawer"
-       class="sx-floatlog"
-       hidden
-       aria-label="audit drawer">
-
-    <div class="sx-floatlog-head">
-      <div class="sx-floatlog-title">
-        <b data-sx-floatlog-title-main>Audit Replay</b>
-        <span data-sx-floatlog-title-sub>Runtime Log Panel</span>
-      </div>
-
-      <div class="sx-floatlog-actions">
-        <button class="sx-floatlog-btn"
-                type="button"
-                data-sx-floatlog-collapse
-                title="Collapse">—</button>
-
-        <button class="sx-floatlog-btn"
-                type="button"
-                data-sx-floatlog-close
-                title="Close">×</button>
+ <!-- ✅ FloatLog Panel (Scheme B / single protocol) -->
+<div class="sx-floatlog" aria-label="audit console">
+  <div class="sx-floatlog__panel">
+    <div class="sx-floatlog__handle">
+      <span class="sx-floatlog__title">
+        <i class="sx-floatlog__dot" aria-hidden="true"></i>
+        <span class="sx-floatlog__titleText">AUDIT ENGINE</span>
+      </span>
+      <div class="sx-floatlog__actions">
+        <button class="sx-floatlog__btn" type="button" data-action="collapse">—</button>
+        <button class="sx-floatlog__btn" type="button" data-action="close">×</button>
       </div>
     </div>
-
-    <div class="sx-floatlog-body" data-sx-floatlog-body>
-      <div id="log-container"></div>
-    </div>
+    <div class="sx-floatlog__body"></div>
   </div>
+</div>
+
 
   <main class="replay-main">
     <header class="container">
-      <div class="kicker"><span class="dot"></span> 回放环境 · 以 trace_id 进入 · URL 即证据入口</div>
+      <div
+  class="kicker"
+  id="replay-context-pill"
+  role="button"
+  tabindex="0"
+  title="Open Audit Console"
+>
+  <span class="dot"></span>
+  回放环境 · 以 trace_id 进入 · URL 即证据入口
+</div>
+
       <div class="title">治理行为回放（Audit Replay）</div>
       <div class="subtitle">
         这是 SynOSX 的「回放运行时」。你不是在“看视频”，你是在回放一次已经被 <b>Intent → Firewall → Audit</b> 裁决并记录的行为证据。

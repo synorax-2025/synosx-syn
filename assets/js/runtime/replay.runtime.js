@@ -1,9 +1,10 @@
-/* runtime/replay.runtime.js — SynOSX Replay Runtime (page-only) (Frozen v1.0.1)
-   - Loads assets/data/replay/replay.registry.json (root/pages safe)
+/* runtime/replay.runtime.js — SynOSX Replay Runtime (page-only) (Frozen v1.0.2)
+   - Loads assets/data/replay/replay.registry.json
    - Resolves trace -> entry
    - Renders meta + media
-   - Runs audit-style playback logs via SXFloatLog (single authority)
+   - Logs via SXFloatLog (single authority)
    - Syncs Statusbar via window.SX_STATUSBAR (if present)
+   - ✅ Context Pill: click to open/expand Audit Console (explicit entry)
 */
 
 (function sxReplayRuntimeBoot(){
@@ -13,8 +14,6 @@
   // Config (root-safe)
   // ----------------------------
   const isInPages = location.pathname.includes("/pages/");
-
-  // registry：根页用 assets/，二级页用 ../assets/
   const REGISTRY_PATH = (isInPages ? "../" : "") + "assets/data/replay/replay.registry.json";
   const REGISTRY_URL  = new URL(REGISTRY_PATH, location.href).toString();
 
@@ -23,40 +22,42 @@
   // ----------------------------
   const $ = (id) => document.getElementById(id);
 
-  function openAudit(){
-    try{ window.SXFloatLog?.open?.(); return; }catch(_){}
-    const d = $("audit-drawer"); if (d) d.hidden = false;
-  }
-  function closeAudit(){
-    try{ window.SXFloatLog?.close?.(); return; }catch(_){}
-    const d = $("audit-drawer"); if (d) d.hidden = true;
-  }
-  function resetAudit(){
-    try{ window.SXFloatLog?.clear?.(); return; }catch(_){}
-    const c = $("log-container"); if (c) c.innerHTML = "";
+  function FL(){ return window.SXFloatLog || null; }
+
+  function auditOpen(){
+    const f = FL();
+    if (!f) return null;
+    try{ f.open(); }catch(_){}
+    return f;
   }
 
-  function logLine(msg, type="ok"){
-    const prefix =
-      (type === "bad")  ? "✖"
-      : (type === "warn") ? "!"
-      : "✓";
+  function auditClear(){
+    const f = FL();
+    if (!f) return;
+    try{ f.clear(); }catch(_){}
+  }
 
-    const text = `${prefix} ${String(msg ?? "")}`.trim();
+  function auditHr(){
+    const f = FL();
+    if (!f || typeof f.hr !== "function") return;
+    try{ f.hr(); }catch(_){}
+  }
 
-    // ✅ Frozen: single authority is SXFloatLog
+  function auditLine(msg, type="ok"){
+    const f = auditOpen();
+    if (!f) return;
+
+    const t = String(msg ?? "");
+    const isWarn = type === "warn";
+    const isBad  = type === "bad";
+
     try{
-      window.SXFloatLog?.append?.(text);
-      return;
+      f.append({
+        mark: isBad ? "✖" : isWarn ? "!" : "✓",
+        text: t,
+        muted: isWarn ? true : false
+      });
     }catch(_){}
-
-    // fallback (should rarely happen)
-    const c = $("log-container");
-    if (!c) return;
-    const line = document.createElement("div");
-    line.textContent = `> ${text}`;
-    c.appendChild(line);
-    c.scrollTop = c.scrollHeight;
   }
 
   async function copyText(text){
@@ -116,7 +117,7 @@
   }
 
   // ----------------------------
-  // DOM refs (optional-safe)
+  // DOM refs
   // ----------------------------
   const elMeta     = $("meta-block");
   const chipStatus = $("chip-status");
@@ -124,12 +125,12 @@
   const mediaNote  = $("media-note");
   const videoEl    = $("replay-video");
 
-  const sbTrace   = $("sb-trace");     // in card copy button
-  const sbTrace2  = $("sb-trace2");    // in statusbar
+  const sbTrace   = $("sb-trace");
+  const sbTrace2  = $("sb-trace2");
   const sbHash    = $("sb-hash");
   const sbVerdict = $("sb-verdict");
 
-  const led1 = $("led-verdict"); // only this one exists in replay.html
+  const led1 = $("led-verdict");
 
   function setLedClass(mode){
     const all = ["verified","blocked","unverified"];
@@ -144,7 +145,6 @@
     if (sbVerdict) sbVerdict.textContent = vv;
     if (chipStatus) chipStatus.textContent = vv;
 
-    // statusbar sync
     setStatusbarVerdict(vv);
 
     if (vv === "VERIFIED") setLedClass("verified");
@@ -259,7 +259,6 @@
 
     while(videoEl.firstChild) videoEl.removeChild(videoEl.firstChild);
 
-    // 兼容：media.src / poster 支持相对、上级相对、绝对 URL
     const toAbs = (p) => {
       if (!p) return "";
       const s = String(p);
@@ -277,45 +276,48 @@
   }
 
   async function runReplay(entry){
-    openAudit();
-    resetAudit();
+    auditOpen();
+    auditClear();
 
-    logLine("ENTER REPLAY RUNTIME", "ok");
-    logLine(`PAGE: ${location.pathname}`, "warn");
-    logLine(`PROTO: ${location.protocol}`, "warn");
-    logLine(`TRACE RESOLUTION: ${entry.trace_id}`, "ok");
-    logLine(`FETCH INTENT: [${entry.intent}]`, "ok");
-    logLine(`VERIFY DAG CONSTITUTION... ${entry.dag}`, entry.dag === "OK" ? "ok" : "warn");
+    auditLine("ENTER REPLAY RUNTIME", "ok");
+    auditLine(`PAGE: ${location.pathname}`, "warn");
+    auditLine(`PROTO: ${location.protocol}`, "warn");
+    auditHr();
+
+    auditLine(`TRACE RESOLUTION: ${entry.trace_id}`, "ok");
+    auditLine(`FETCH INTENT: [${entry.intent}]`, "ok");
+    auditLine(`VERIFY DAG CONSTITUTION... ${entry.dag}`, entry.dag === "OK" ? "ok" : "warn");
 
     if (entry.firewall === "DENIED"){
-      logLine("CONSULT FIREWALL (S2)... DENIED", "warn");
-      logLine("REPLAY POLICY: BLOCKED TRACE IS STILL REPLAYABLE (EVIDENCE ONLY)", "ok");
+      auditLine("CONSULT FIREWALL (S2)... DENIED", "warn");
+      auditLine("REPLAY POLICY: BLOCKED TRACE IS STILL REPLAYABLE (EVIDENCE ONLY)", "ok");
       setStatusbarPolicy("AUDIT REPLAY CONSTITUTION · BLOCKED TRACE");
     }else{
-      logLine("CONSULT FIREWALL (S2)... GRANTED", "ok");
+      auditLine("CONSULT FIREWALL (S2)... GRANTED", "ok");
       setStatusbarPolicy("AUDIT REPLAY CONSTITUTION · GRANTED TRACE");
     }
 
-    logLine(`VERIFY AUDIT (S3)... ${entry.audit}`, "ok");
-    logLine(`EVIDENCE HASH: ${entry.evidence_hash}`, "ok");
+    auditLine(`VERIFY AUDIT (S3)... ${entry.audit}`, "ok");
+    auditLine(`EVIDENCE HASH: ${entry.evidence_hash}`, "ok");
+    auditHr();
 
     const m = entry.media;
     if (!m || !m.src){
-      logLine("MEDIA: NONE (cannot play)", "bad");
+      auditLine("MEDIA: NONE (cannot play)", "bad");
       return;
     }
 
-    // Browsers may require a user gesture; run button provides gesture.
+    // playback (may require gesture)
     try{
       await videoEl.play();
-      logLine("MEDIA PLAYBACK: START", "ok");
+      auditLine("MEDIA PLAYBACK: START", "ok");
     }catch(_e){
-      logLine("MEDIA PLAYBACK: BLOCKED BY BROWSER (gesture required?)", "warn");
+      auditLine("MEDIA PLAYBACK: BLOCKED BY BROWSER (gesture required?)", "warn");
     }
 
     const onEnded = () => {
-      logLine("MEDIA PLAYBACK: END", "ok");
-      logLine("REPLAY COMPLETE", "ok");
+      auditLine("MEDIA PLAYBACK: END", "ok");
+      auditLine("REPLAY COMPLETE", "ok");
       videoEl.removeEventListener("ended", onEnded);
     };
     videoEl.addEventListener("ended", onEnded);
@@ -325,9 +327,38 @@
   // Boot
   // ----------------------------
   (async function boot(){
-    // Back link adapt (root vs pages/)
+    // back link adapt
     const back = $("lnk-back-index");
     if (back) back.href = isInPages ? "../index.html" : "index.html";
+
+    // ✅ Context banner explicit entry: click -> open/expand audit console
+    // You must set replay.html element id="replay-context-pill"
+    (function bindContextPill(){
+      const pill = $("replay-context-pill");
+      if (!pill) return;
+
+      // make it feel clickable even if it's a div
+      pill.style.cursor = "pointer";
+      pill.setAttribute("role", pill.getAttribute("role") || "button");
+      pill.setAttribute("tabindex", pill.getAttribute("tabindex") || "0");
+      pill.setAttribute("title", pill.getAttribute("title") || "Open Audit Console");
+
+      const open = () => {
+        const f = FL();
+        if (!f) return;
+        try{ f.open(); }catch(_){}
+        // if your floatlog supports expand(), call it
+        try{ f.expand?.(); }catch(_){}
+      };
+
+      pill.addEventListener("click", open);
+      pill.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " "){
+          e.preventDefault();
+          open();
+        }
+      });
+    })();
 
     setVerdict("UNVERIFIED");
 
@@ -347,13 +378,14 @@
     try{
       registry = await loadRegistry();
     }catch(e){
-      openAudit();
-      resetAudit();
-      logLine("AUDIT REPLAY RUNTIME", "ok");
-      logLine(`REGISTRY LOAD FAILED: ${REGISTRY_URL}`, "bad");
-      logLine(`PAGE: ${location.pathname}`, "warn");
-      logLine(`PROTO: ${location.protocol}`, "warn");
-      logLine(`ERROR: ${String(e?.message || e)}`, "warn");
+      auditOpen();
+      auditClear();
+
+      auditLine("AUDIT REPLAY RUNTIME", "ok");
+      auditLine(`REGISTRY LOAD FAILED: ${REGISTRY_URL}`, "bad");
+      auditLine(`PAGE: ${location.pathname}`, "warn");
+      auditLine(`PROTO: ${location.protocol}`, "warn");
+      auditLine(`ERROR: ${String(e?.message || e)}`, "warn");
 
       const isFile = (location.protocol || "") === "file:";
       renderUnverified(
@@ -376,28 +408,25 @@
     renderMeta(entry);
     renderMedia(entry);
 
-    // Bind UI (optional; depends on whether you have these buttons in replay.html)
+    // Optional buttons (if present)
     const btnRun = $("btn-run-replay");
     if (btnRun) btnRun.addEventListener("click", () => runReplay(entry));
-
-    const btnAudit = $("btn-open-audit");
-    if (btnAudit) btnAudit.addEventListener("click", () => {
-      const open = !!window.SXFloatLog?.isOpen?.();
-      if (open) closeAudit(); else openAudit();
-    });
 
     const btnCopyTrace = $("btn-copy-trace");
     if (btnCopyTrace) btnCopyTrace.addEventListener("click", async () => {
       const ok = await copyText(entry.trace_id || trace);
-      openAudit();
-      logLine(ok ? `COPIED TRACE: ${entry.trace_id || trace}` : "COPY FAILED (TRACE)", ok ? "ok" : "warn");
+      auditOpen();
+      auditLine(ok ? `COPIED TRACE: ${entry.trace_id || trace}` : "COPY FAILED (TRACE)", ok ? "ok" : "warn");
     });
 
     const btnCopyHash = $("btn-copy-hash");
     if (btnCopyHash) btnCopyHash.addEventListener("click", async () => {
       const ok = await copyText(entry.evidence_hash || "");
-      openAudit();
-      logLine(ok ? `COPIED HASH: ${entry.evidence_hash}` : "COPY FAILED (HASH)", ok ? "ok" : "warn");
+      auditOpen();
+      auditLine(ok ? `COPIED HASH: ${entry.evidence_hash}` : "COPY FAILED (HASH)", ok ? "ok" : "warn");
     });
+
+    // Auto-run once (optional): uncomment if you want it to start immediately
+    // runReplay(entry);
   })();
 })();

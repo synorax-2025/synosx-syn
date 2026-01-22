@@ -1,77 +1,14 @@
 /* index.page.css — Index page specific styles
-   ✅ Only page layout/sections/components that are unique to index.html
+   ✅ Only page layout/sections/components unique to index.html
+   ✅ MUST NOT redefine nav skeleton (.nav-content/.logo/.nav-actions) — those live in sx.core.css
    ✅ Requires sx.core.css + sx.statusbar.css + sx.drawer.css
 */
 
 /* -----------------------------
-   Navbar (index layout)
+   Navbar (index-only additions)
+   - ONLY: desktop Use Cases dropdown visuals
+   - DO NOT redefine: .nav-content / .logo / .logo-icon / .logo-sub / .nav-actions / .nav-links layout
    ----------------------------- */
-.nav-content{
-  height: 76px;
-  max-width: var(--max);
-  margin: 0 auto;
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-}
-
-.logo{
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  font-size: 18px;
-}
-
-.logo-icon{
-  width: 38px;
-  height: 38px;
-  background: var(--gradient-1);
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 10px 24px rgba(59,130,246,0.22);
-  color: #071022;
-  font-weight: 900;
-}
-
-/* Sub brand in logo line */
-.logo-sub{
-  color: var(--text-muted);
-  font-weight: 800;
-}
-
-.logo span b{
-  background: var(--gradient-1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.nav-links{
-  display: flex;
-  gap: 28px;
-  list-style: none;
-  align-items: center;
-}
-
-.nav-links a{
-  color: var(--text-muted);
-  font-weight: 600;
-  font-size: 13px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  transition: 0.25s ease;
-}
-.nav-links a:hover{
-  color: var(--text);
-  border-color: rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.03);
-}
 
 /* ✅ Desktop only: Use Cases dropdown */
 .nav-dropdown{ position: relative; }
@@ -91,6 +28,7 @@
   display: none;
   z-index: 120;
 }
+
 .nav-drop-menu a{
   display:flex;
   align-items:center;
@@ -102,15 +40,18 @@
   color: rgba(232,236,245,0.92);
   border: 1px solid transparent;
 }
+
 .nav-drop-menu a:hover{
   background: rgba(255,255,255,0.03);
   border-color: rgba(255,255,255,0.08);
 }
+
 .nav-drop-divider{
   height: 1px;
   margin: 8px 6px;
   background: rgba(255,255,255,0.08);
 }
+
 .nav-drop-narratives{
   display:flex;
   flex-direction:column;
@@ -121,6 +62,7 @@
   background: rgba(59,130,246,0.06);
   color: rgba(159,195,255,0.95) !important;
 }
+
 .nav-drop-sub{
   font-size: 12px;
   font-weight: 800;
@@ -130,13 +72,6 @@
 /* show dropdown on hover (desktop) */
 @media (min-width: 981px){
   .nav-dropdown:hover .nav-drop-menu{ display: block; }
-}
-
-/* nav actions */
-.nav-actions{
-  display:flex;
-  gap: 10px;
-  align-items:center;
 }
 
 /* -----------------------------
@@ -885,7 +820,10 @@
    ----------------------------- */
 @media (max-width: 980px){
   .hero-content{ grid-template-columns: 1fr; gap: 22px; }
-  .nav-links{ display: none; } /* desktop links hidden */
+
+  /* ✅ Mobile: hide desktop links (drawer takes over) */
+  .nav-links{ display: none; }
+
   .constitution-grid{ grid-template-columns: 1fr; }
   .contact-grid{ grid-template-columns: 1fr; }
   .rule-card{ grid-column: span 12; }

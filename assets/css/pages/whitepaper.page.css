@@ -1,14 +1,16 @@
 /* whitepaper.page.css — page-only (thin shell)
    - Do NOT redefine global tokens/baseline/container/nav/button/reveal/footer
-   - Only: whitepaper layout + toc + paper typography + page nav composition
+   - Only: whitepaper layout + toc + paper typography + (scoped) page nav composition
 */
 
+/* =============================
+   Page-local variables (DO NOT touch global --max)
+   ============================= */
 :root{
-  /* 本页可覆盖的布局制度 */
-  --max: 1200px;         /* whitepaper 仍然用 1200，如果想窄一点改这里 */
-  --wp-nav-h: 76px;
+  --wp-nav-h: 76px;         /* ✅ fixed: no broken var name */
+  --wp-max: 1200px;         /* ✅ page-local max width (if you need it) */
 
-  /* 本页阅读语气：让正文更“法典白皮书” */
+  /* Reading tone (allowed override) */
   --text-muted: #93a0bd;
 
   --toc-w: 300px;
@@ -17,92 +19,28 @@
   --panel2: rgba(0,0,0,0.35);
 }
 
-/* -----------------------------
+/* =============================
    Page nav composition (SCOPED)
-   ✅ ONLY style the top navbar (#navbar)
-   ✅ DO NOT touch drawer nav (.sx-drawer-nav)
-   ----------------------------- */
+   ✅ Only minor constraints; do NOT restyle logo/buttons here
+   ============================= */
+#navbar{
+  height: var(--wp-nav-h);
+}
 
-/* ❌ 原来你写 nav{ height: ... } 会误伤 drawer 里的 <nav class="sx-drawer-nav"> */
-#navbar{ height: var(--wp-nav-h); }
-
+/* keep nav-content aligned but inherit layout from sx.core.css */
 #navbar .nav-content{
   height: var(--wp-nav-h);
-  max-width: var(--max);
-  margin: 0 auto;
-  padding: 0 24px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 14px;
+  max-width: var(--wp-max);
 }
 
-#navbar .logo{
-  display:flex; align-items:center; gap: 12px;
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  font-size: 18px;
-  white-space: nowrap;
-}
-
-#navbar .logo-icon{
-  width: 38px; height: 38px;
-  background: var(--gradient-1);
-  border-radius: 12px;
-  display:grid; place-items:center;
-  box-shadow: 0 10px 24px rgba(59,130,246,0.22);
-  color: #071022;
-  font-weight: 900;
-}
-
-#navbar .logo span b{
-  background: var(--gradient-1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-#navbar .logo-sub{
-  color: var(--text-muted);
-  font-weight: 900;
-}
-
-#navbar .nav-links{
-  display:flex;
-  gap: 18px;
-  list-style:none;
-  align-items:center;
-}
-
-#navbar .nav-links a{
-  color: var(--text-muted);
-  font-weight: 800;
-  font-size: 13px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  transition: .25s ease;
-}
-
-#navbar .nav-links a:hover{
-  color: var(--text);
-  border-color: rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.03);
-}
-
-#navbar .nav-actions{
-  display:flex;
-  gap: 10px;
-  align-items:center;
-}
-
-/* -----------------------------
+/* =============================
    Hero (page-only spacing)
-   ----------------------------- */
+   ============================= */
 .hero{
-  padding-top: 110px;    /* 避开 fixed nav */
+  padding-top: 110px; /* avoid fixed nav */
   padding-bottom: 46px;
 }
+
 .hero h1{
   font-size: clamp(34px, 4.6vw, 60px);
   font-weight: 950;
@@ -114,6 +52,7 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
 .hero .subtitle{
   font-size: 15px;
   color: var(--text-muted);
@@ -121,6 +60,7 @@
   line-height: 1.95;
   margin-bottom: 18px;
 }
+
 .hero-actions{
   display:flex;
   gap: 12px;
@@ -128,9 +68,9 @@
   margin-top: 10px;
 }
 
-/* -----------------------------
+/* =============================
    Layout: toc + paper
-   ----------------------------- */
+   ============================= */
 .layout{
   display:grid;
   grid-template-columns: var(--toc-w) 1fr;
@@ -148,6 +88,7 @@
   box-shadow: var(--shadow-md);
   overflow: hidden;
 }
+
 .toc-header{
   padding: 16px 16px 12px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -156,6 +97,7 @@
   justify-content:space-between;
   gap: 10px;
 }
+
 .toc-title{
   font-weight: 900;
   font-size: 12px;
@@ -163,6 +105,7 @@
   text-transform: uppercase;
   color: #9fc3ff;
 }
+
 .toc-badge{
   font-family: var(--mono);
   font-size: 11px;
@@ -173,6 +116,7 @@
   background: rgba(255,255,255,0.04);
   white-space: nowrap;
 }
+
 .toc-body{
   padding: 10px 10px 12px;
   display:grid;
@@ -180,6 +124,7 @@
   max-height: calc(100vh - 170px);
   overflow:auto;
 }
+
 .toc a{
   display:flex;
   align-items:center;
@@ -192,16 +137,19 @@
   font-weight: 850;
   transition: .22s ease;
 }
+
 .toc a:hover{
   color: var(--text);
   background: rgba(255,255,255,0.03);
   border-color: rgba(255,255,255,0.06);
 }
+
 .toc a.active{
   color: var(--text);
   background: rgba(59,130,246,0.10);
   border-color: rgba(59,130,246,0.24);
 }
+
 .toc .num{
   width: 26px;
   height: 26px;
@@ -216,9 +164,9 @@
   flex-shrink: 0;
 }
 
-/* -----------------------------
+/* =============================
    Paper
-   ----------------------------- */
+   ============================= */
 .paper{
   border-radius: var(--radius);
   border: 1px solid rgba(255,255,255,0.10);
@@ -227,6 +175,7 @@
   box-shadow: var(--shadow-lg);
   overflow: hidden;
 }
+
 .paper-head{
   padding: 22px 22px 18px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -236,6 +185,7 @@
   justify-content: space-between;
   gap: 12px;
 }
+
 .paper-meta{
   display:flex;
   gap: 12px;
@@ -244,6 +194,7 @@
   color: var(--text-muted);
   font-size: 12px;
 }
+
 .paper-meta .sep{ opacity: .75; }
 
 .pill{
@@ -273,6 +224,7 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
 .section h3{
   font-size: 15px;
   font-weight: 950;
@@ -280,6 +232,7 @@
   margin-bottom: 8px;
   color: #dbe7ff;
 }
+
 .section p{
   color: var(--text-muted);
   font-size: 13.5px;
@@ -359,6 +312,7 @@
   gap: 10px;
   margin-top: 12px;
 }
+
 .step{
   display:inline-flex;
   align-items:center;
@@ -371,6 +325,7 @@
   font-size: 13px;
   font-weight: 900;
 }
+
 .arrow{
   color: rgba(159,179,255,0.9);
   font-weight: 900;
@@ -385,6 +340,7 @@
   flex-wrap: wrap;
   margin-top: 12px;
 }
+
 .mini-links a{
   display:inline-flex;
   align-items:center;
@@ -398,6 +354,7 @@
   font-weight: 950;
   transition: .22s ease;
 }
+
 .mini-links a:hover{
   background: rgba(59,130,246,0.10);
   border-color: rgba(59,130,246,0.24);
@@ -411,11 +368,13 @@
   font-weight: 950;
 }
 
-/* -----------------------------
+/* =============================
    Responsive
-   ----------------------------- */
+   ============================= */
 @media (max-width: 980px){
+  /* ✅ reading page: hide desktop nav links (scoped), keep drawer/menu intact */
   #navbar .nav-links{ display:none; }
+
   .layout{ grid-template-columns: 1fr; }
   .toc{ position: relative; top: auto; }
   .grid.two{ grid-template-columns: 1fr; }

@@ -1,5 +1,5 @@
 <!--
-  replay.html — SynOSX Audit Replay Runtime
+  replay.html — SynOSX Audit Replay Runtime (Frozen v1.0.1)
 
   用法示例：
   replay.html?trace=rc_brand_15s_v1
@@ -25,10 +25,12 @@
   <meta name="sx-policy" content="AUDIT REPLAY CONSTITUTION" />
   <meta name="sx-statusbar-layout" content="governance" />
 
-  <!-- ✅ Shared CSS -->
+  <!-- ✅ Shared CSS (Frozen order) -->
   <link rel="stylesheet" href="assets/css/sx.core.css" />
+  <link rel="stylesheet" href="assets/css/sx.layers.css" /> <!-- 新增 -->
   <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
   <link rel="stylesheet" href="assets/css/sx.drawer.css" />
+  <link rel="stylesheet" href="assets/css/sx.floatlog.css" />
 
   <!-- ✅ Page CSS -->
   <link rel="stylesheet" href="assets/css/pages/replay.page.css" />
@@ -40,11 +42,42 @@
   <!--@include nav-->
 
   <!-- ======================================================
-       原来的 Audit Drawer（运行时审计终端）保留
+       ✅ Floatlog (Frozen v1.0.1)
+       - handle toggles panel
+       - panel id is audit-drawer (single source)
+       - log sink remains #log-container (runtime contract)
        ====================================================== -->
-  <div id="audit-drawer" aria-label="audit drawer">
-    <div class="audit-title">> AUDIT REPLAY RUNTIME</div>
-    <div id="log-container"></div>
+  <div class="sx-floatlog-handle"
+       data-sx-floatlog-handle
+       aria-label="open runtime log"></div>
+
+  <div id="audit-drawer"
+       class="sx-floatlog"
+       hidden
+       aria-label="audit drawer">
+
+    <div class="sx-floatlog-head">
+      <div class="sx-floatlog-title">
+        <b data-sx-floatlog-title-main>Audit Replay</b>
+        <span data-sx-floatlog-title-sub>Runtime Log Panel</span>
+      </div>
+
+      <div class="sx-floatlog-actions">
+        <button class="sx-floatlog-btn"
+                type="button"
+                data-sx-floatlog-collapse
+                title="Collapse">—</button>
+
+        <button class="sx-floatlog-btn"
+                type="button"
+                data-sx-floatlog-close
+                title="Close">×</button>
+      </div>
+    </div>
+
+    <div class="sx-floatlog-body" data-sx-floatlog-body>
+      <div id="log-container"></div>
+    </div>
   </div>
 
   <main class="replay-main">
@@ -143,10 +176,11 @@
     </div>
   </div>
 
-  <!-- ✅ Shared JS -->
-  <script src="assets/js/sx.statusbar.js"></script>
+  <!-- ✅ Shared JS (Frozen order) -->
   <script src="assets/js/sx.core.js"></script>
   <script src="assets/js/sx.drawer.js"></script>
+  <script src="assets/js/sx.floatlog.js"></script>
+  <script src="assets/js/sx.statusbar.js"></script>
 
   <!-- ✅ Page runtime -->
   <script src="assets/js/runtime/replay.runtime.js"></script>

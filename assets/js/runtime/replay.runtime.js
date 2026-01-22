@@ -1,8 +1,8 @@
-/* runtime/replay.runtime.js — SynOSX Replay Runtime (page-only)
-   - Loads assets/data/replay/replay.registry.json
+/* runtime/replay.runtime.js — SynOSX Replay Runtime (page-only) (Frozen v1.0.1)
+   - Loads assets/data/replay/replay.registry.json (root/pages safe)
    - Resolves trace -> entry
    - Renders meta + media
-   - Runs audit-style playback logs
+   - Runs audit-style playback logs via SXFloatLog (single authority)
    - Syncs Statusbar via window.SX_STATUSBAR (if present)
 */
 
@@ -10,26 +10,51 @@
   "use strict";
 
   // ----------------------------
-  // Config
+  // Config (root-safe)
   // ----------------------------
-  const REGISTRY_URL = "assets/data/replay/replay.registry.json";
+  const isInPages = location.pathname.includes("/pages/");
 
+  // registry：根页用 assets/，二级页用 ../assets/
+  const REGISTRY_PATH = (isInPages ? "../" : "") + "assets/data/replay/replay.registry.json";
+  const REGISTRY_URL  = new URL(REGISTRY_PATH, location.href).toString();
 
   // ----------------------------
   // Helpers
   // ----------------------------
   const $ = (id) => document.getElementById(id);
 
-  function openAudit(){ const d = $("audit-drawer"); if (d) d.style.display = "block"; }
-  function closeAudit(){ const d = $("audit-drawer"); if (d) d.style.display = "none"; }
-  function resetAudit(){ const c = $("log-container"); if (c) c.innerHTML = ""; }
+  function openAudit(){
+    try{ window.SXFloatLog?.open?.(); return; }catch(_){}
+    const d = $("audit-drawer"); if (d) d.hidden = false;
+  }
+  function closeAudit(){
+    try{ window.SXFloatLog?.close?.(); return; }catch(_){}
+    const d = $("audit-drawer"); if (d) d.hidden = true;
+  }
+  function resetAudit(){
+    try{ window.SXFloatLog?.clear?.(); return; }catch(_){}
+    const c = $("log-container"); if (c) c.innerHTML = "";
+  }
 
   function logLine(msg, type="ok"){
+    const prefix =
+      (type === "bad")  ? "✖"
+      : (type === "warn") ? "!"
+      : "✓";
+
+    const text = `${prefix} ${String(msg ?? "")}`.trim();
+
+    // ✅ Frozen: single authority is SXFloatLog
+    try{
+      window.SXFloatLog?.append?.(text);
+      return;
+    }catch(_){}
+
+    // fallback (should rarely happen)
     const c = $("log-container");
     if (!c) return;
     const line = document.createElement("div");
-    line.className = `log-line ${type}`;
-    line.textContent = `> ${msg}`;
+    line.textContent = `> ${text}`;
     c.appendChild(line);
     c.scrollTop = c.scrollHeight;
   }
@@ -83,11 +108,9 @@
   function setStatusbarTrace(trace){
     try{ window.SX_STATUSBAR?.setTrace?.(trace); }catch(_){}
   }
-
   function setStatusbarVerdict(verdict){
     try{ window.SX_STATUSBAR?.setVerdict?.(verdict); }catch(_){}
   }
-
   function setStatusbarPolicy(policy){
     try{ window.SX_STATUSBAR?.setPolicy?.(policy); }catch(_){}
   }
@@ -95,30 +118,24 @@
   // ----------------------------
   // DOM refs (optional-safe)
   // ----------------------------
-  const elMeta = $("meta-block");
+  const elMeta     = $("meta-block");
   const chipStatus = $("chip-status");
-  const chipMedia = $("chip-media");
-  const mediaNote = $("media-note");
-  const videoEl = $("replay-video");
+  const chipMedia  = $("chip-media");
+  const mediaNote  = $("media-note");
+  const videoEl    = $("replay-video");
 
-  const sbTrace = $("sb-trace");     // in card copy button
-  const sbTrace2 = $("sb-trace2");   // in statusbar
-  const sbHash = $("sb-hash");
+  const sbTrace   = $("sb-trace");     // in card copy button
+  const sbTrace2  = $("sb-trace2");    // in statusbar
+  const sbHash    = $("sb-hash");
   const sbVerdict = $("sb-verdict");
 
-  const led1 = $("led-verdict");
-  const led2 = $("led-verdict2");
+  const led1 = $("led-verdict"); // only this one exists in replay.html
 
   function setLedClass(mode){
     const all = ["verified","blocked","unverified"];
-    if (led1){
-      all.forEach(c=>led1.classList.remove(c));
-      led1.classList.add(mode);
-    }
-    if (led2){
-      all.forEach(c=>led2.classList.remove(c));
-      led2.classList.add(mode);
-    }
+    if (!led1) return;
+    all.forEach(c=>led1.classList.remove(c));
+    led1.classList.add(mode);
   }
 
   function setVerdict(v){
@@ -189,7 +206,7 @@
     if (chipMedia) chipMedia.textContent = "MEDIA: NONE";
     if (mediaNote){
       mediaNote.innerHTML = `<span class="chip">NOTE</span>
-未找到对应回放载体。请检查 trace 是否正确，或把该 trace 写入 <b>${escapeHtml(REGISTRY_URL)}</b>。`;
+未找到对应回放载体。请检查 trace 是否正确，或把该 trace 写入 <b>${escapeHtml(REGISTRY_PATH)}</b>。`;
     }
 
     clearVideo();
@@ -242,10 +259,18 @@
 
     while(videoEl.firstChild) videoEl.removeChild(videoEl.firstChild);
 
-    if (m.poster) videoEl.setAttribute("poster", m.poster);
+    // 兼容：media.src / poster 支持相对、上级相对、绝对 URL
+    const toAbs = (p) => {
+      if (!p) return "";
+      const s = String(p);
+      if (/^(https?:)?\/\//i.test(s)) return s;
+      return new URL(s, location.href).toString();
+    };
+
+    if (m.poster) videoEl.setAttribute("poster", toAbs(m.poster));
 
     const src = document.createElement("source");
-    src.src = m.src;
+    src.src = toAbs(m.src);
     src.type = m.type || "video/mp4";
     videoEl.appendChild(src);
     videoEl.load();
@@ -256,6 +281,8 @@
     resetAudit();
 
     logLine("ENTER REPLAY RUNTIME", "ok");
+    logLine(`PAGE: ${location.pathname}`, "warn");
+    logLine(`PROTO: ${location.protocol}`, "warn");
     logLine(`TRACE RESOLUTION: ${entry.trace_id}`, "ok");
     logLine(`FETCH INTENT: [${entry.intent}]`, "ok");
     logLine(`VERIFY DAG CONSTITUTION... ${entry.dag}`, entry.dag === "OK" ? "ok" : "warn");
@@ -322,10 +349,12 @@
     }catch(e){
       openAudit();
       resetAudit();
+      logLine("AUDIT REPLAY RUNTIME", "ok");
       logLine(`REGISTRY LOAD FAILED: ${REGISTRY_URL}`, "bad");
-      logLine(String(e && e.message ? e.message : e), "warn");
+      logLine(`PAGE: ${location.pathname}`, "warn");
+      logLine(`PROTO: ${location.protocol}`, "warn");
+      logLine(`ERROR: ${String(e?.message || e)}`, "warn");
 
-      // Most common failure: file:// cannot fetch
       const isFile = (location.protocol || "") === "file:";
       renderUnverified(
         trace,
@@ -342,21 +371,19 @@
       return;
     }
 
-    // Ensure trace_id exists
     entry.trace_id = entry.trace_id || trace;
 
     renderMeta(entry);
     renderMedia(entry);
 
-    // Bind UI
+    // Bind UI (optional; depends on whether you have these buttons in replay.html)
     const btnRun = $("btn-run-replay");
     if (btnRun) btnRun.addEventListener("click", () => runReplay(entry));
 
     const btnAudit = $("btn-open-audit");
     if (btnAudit) btnAudit.addEventListener("click", () => {
-      const d = $("audit-drawer");
-      if (!d) return;
-      if (d.style.display === "block") closeAudit(); else openAudit();
+      const open = !!window.SXFloatLog?.isOpen?.();
+      if (open) closeAudit(); else openAudit();
     });
 
     const btnCopyTrace = $("btn-copy-trace");

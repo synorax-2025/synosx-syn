@@ -1,0 +1,51 @@
+/* ======================================================
+   sx.layers.css — Layer Constitution (Frozen v1.0)
+   ------------------------------------------------------
+   Purpose:
+   - Single source of truth for z-index across SynOSX
+   - Prevent hidden / unclickable UI due to stacking chaos
+   - No visual styles, variables only
+   ------------------------------------------------------
+   Usage:
+   - Import after sx.core.css
+   - Components must reference variables, not raw numbers
+   ====================================================== */
+
+:root{
+  /* --------------------------------------------------
+     L0 · Background & Base
+     -------------------------------------------------- */
+  --sx-z-bg:          0;     /* gradients / decorative backgrounds */
+  --sx-z-content:    10;    /* normal page content */
+
+  /* --------------------------------------------------
+     L1 · Fixed Layout
+     -------------------------------------------------- */
+  --sx-z-header:     100;   /* top nav / header */
+  --sx-z-footer:     110;   /* footer */
+  --sx-z-statusbar:  120;   /* bottom system status bar */
+
+  /* --------------------------------------------------
+     L2 · Overlays / Drawers
+     -------------------------------------------------- */
+  --sx-z-drawer:     300;   /* mobile drawer / side panels */
+  --sx-z-mask:       350;   /* overlay mask */
+
+  /* --------------------------------------------------
+     L3 · Inspectors / Tools
+     -------------------------------------------------- */
+  --sx-z-floatlog:   500;   /* audit log / inspector panel */
+  --sx-z-tooltip:   520;   /* tooltips / hints */
+  --sx-z-toast:     540;   /* toasts / snackbars */
+
+  /* --------------------------------------------------
+     L4 · Modals / Critical
+     -------------------------------------------------- */
+  --sx-z-modal:      800;   /* modal dialogs */
+  --sx-z-alert:      900;   /* critical alerts / blocks */
+
+  /* --------------------------------------------------
+     L5 · Dev / Emergency
+     -------------------------------------------------- */
+  --sx-z-debug:      9999;  /* debug overlays (dev only) */
+}

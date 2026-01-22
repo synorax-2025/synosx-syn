@@ -1,104 +1,13 @@
 /* pages/manifest.page.css — Manifest page-only styles
-   ✅ Thin: only manifest-specific layout & reading typography.
-   ✅ DOES NOT include sx.drawer (Manifest is a reading page, not a nav hub)
+   ✅ Thin: ONLY manifest-specific layout & reading typography.
+   ✅ DOES NOT override shared nav/buttons/logo skeleton in sx.core.css
 */
 
 :root{
   --max-reading: 980px;
 
-  /* Reading-mode override: dim body text (restore hierarchy) */
+  /* Reading-mode: dim paragraphs, keep strong as main */
   --text-muted: #93a0bd;
-}
-
-/* -----------------------------
-   Manifest nav (structure-level tweaks only)
-   ----------------------------- */
-.nav-content{
-  height: 76px;
-  max-width: var(--max);
-  margin: 0 auto;
-  padding: 0 24px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 18px;
-}
-
-.logo{
-  display:flex;
-  align-items:center;
-  gap: 12px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  font-size: 18px;
-  white-space: nowrap; /* desktop: keep tidy */
-}
-
-.logo-icon{
-  width: 38px; height: 38px;
-  background: var(--gradient-1);
-  border-radius: 12px;
-  display:grid;
-  place-items:center;
-  box-shadow: 0 10px 24px rgba(59,130,246,0.22);
-  color: #071022;
-  font-weight: 900;
-  user-select: none;
-  flex: 0 0 auto;
-}
-
-.logo span b{
-  background: var(--gradient-1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.logo-sub{
-  color: var(--text-muted);
-  font-weight: 900;
-}
-
-/* right links */
-.nav-links{
-  display:flex;
-  gap: 14px;
-  list-style:none;
-  align-items:center;
-  flex-wrap: wrap;
-  justify-content:flex-end;
-}
-
-.nav-links a{
-  color: var(--text-muted);
-  font-weight: 800;
-  font-size: 12px;
-  padding: 7px 9px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  transition: 0.25s ease;
-  white-space: nowrap;
-}
-
-.nav-links a:hover{
-  color: var(--text);
-  border-color: rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.03);
-}
-
-.nav-actions{
-  display:flex;
-  gap: 10px;
-  align-items:center;
-}
-
-/* Manifest nav buttons: tighter */
-nav .cta-button,
-nav .btn-secondary{
-  padding: 11px 14px;
-  font-weight: 900;
-  font-size: 12px;
-  white-space: nowrap;
 }
 
 /* -----------------------------
@@ -110,8 +19,27 @@ nav .btn-secondary{
 }
 
 /* Paragraph hierarchy */
-p{ color: var(--text-muted); }
-strong, b{ color: var(--text); }
+.reading p{ color: var(--text-muted); }
+.reading strong,
+.reading b{ color: var(--text); }
+
+/* -----------------------------
+   (Optional) Reading-page nav tweaks — SCOPED
+   说明：只对 manifest 页生效，不污染全站
+   ----------------------------- */
+
+/* 读书页：中间 nav links 可以提前隐藏（避免拥挤） */
+@media (max-width: 1100px){
+  body[data-page="manifest"] .nav-links{ display:none; }
+}
+
+/* 读书页：超小屏时按钮允许换行，但不改按钮尺寸制度 */
+@media (max-width: 420px){
+  body[data-page="manifest"] .nav-actions{
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
 
 /* -----------------------------
    Hero (manifest-only)
@@ -496,41 +424,9 @@ section{ padding: 92px 0; }
 }
 
 /* -----------------------------
-   Responsive (A: mobile nav collapse)
+   Responsive
    ----------------------------- */
-
-/* A-1: hide the right nav links early (reading page) */
-@media (max-width: 1100px){
-  .nav-links{ display:none; }
-}
-
-/* A-2: mobile header must not be hard-locked to 76px;
-       allow logo to wrap naturally so Chinese never "stands up" */
 @media (max-width: 980px){
-  .nav-content{
-    height: auto;
-    padding: 12px 16px;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .logo{
-    white-space: normal; /* ✅ allow wrap */
-    line-height: 1.15;
-  }
-
-  /* keep logo text readable when it wraps */
-  .logo span{
-    display:inline-block;
-  }
-
-  /* actions stay on the right, but never force text vertical */
-  nav .cta-button,
-  nav .btn-secondary{
-    padding: 10px 12px;
-    font-size: 12px;
-  }
-
   .hero-content{
     grid-template-columns: 1fr;
     gap: 22px;
@@ -538,46 +434,5 @@ section{ padding: 92px 0; }
 
   .toc-grid{
     grid-template-columns: 1fr;
-  }
-}
-
-/* A-3: very small screens: if actions are still tight, let them wrap */
-@media (max-width: 420px){
-  .nav-actions{
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-}
-
-/* ===== mobile logo: force 2-line layout (stable) ===== */
-@media (max-width: 980px){
-  .nav-content{
-    height: auto;
-    padding: 12px 16px;
-    align-items: flex-start;
-  }
-
-  /* 左侧不要被 flex 挤得乱断 */
-  .logo{
-    flex: 0 1 auto;
-    white-space: normal;
-  }
-
-  /* 关键：把 “SynOSX” 和 “· Manifest” 强制上下两行 */
-  .logo > span{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    line-height: 1.05;
-  }
-
-  .logo-sub{
-    margin-left: 0;   /* 防止第二行前面留空 */
-  }
-
-  /* 右侧按钮保持靠右 */
-  .nav-actions{
-    flex: 0 0 auto;
-    margin-left: auto;
   }
 }

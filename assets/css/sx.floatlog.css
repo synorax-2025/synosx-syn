@@ -1,0 +1,199 @@
+/* ======================================================
+   sx.floatlog.css — Floating Runtime Log Panel
+   Frozen v1.0.2 · Constitution-aligned
+   ====================================================== */
+
+/* --------------------------------------------------
+   Root tokens (NO hard z-index here)
+   -------------------------------------------------- */
+:root{
+  /* width */
+  --sx-floatlog-w: 92vw;
+  --sx-floatlog-maxw: 520px;
+
+  /* height */
+  --sx-floatlog-maxh: 56vh;
+
+  /* spacing */
+  --sx-floatlog-right: 14px;
+  --sx-floatlog-bottom: 86px;
+
+  /* visuals */
+  --sx-floatlog-bg: rgba(0,0,0,0.88);
+  --sx-floatlog-border: rgba(88,160,255,0.55);
+  --sx-floatlog-shadow: 0 18px 50px rgba(0,0,0,0.55);
+
+  --sx-floatlog-text: rgba(232,236,245,0.92);
+  --sx-floatlog-muted: rgba(232,236,245,0.65);
+
+  /* handle */
+  --sx-floatlog-handle-w: 46px;
+  --sx-floatlog-handle-h: 92px;
+  --sx-floatlog-handle-bg: rgba(0,0,0,0.70);
+  --sx-floatlog-handle-border: rgba(255,255,255,0.14);
+
+  /* body padding (JS controlled) */
+  --sx-floatlog-pad-bottom: 0px;
+
+  /* safe area */
+  --sx-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* --------------------------------------------------
+   Layout padding when open
+   -------------------------------------------------- */
+body.sx-floatlog-pad{
+  padding-bottom: var(--sx-floatlog-pad-bottom);
+}
+
+/* --------------------------------------------------
+   Handle
+   -------------------------------------------------- */
+.sx-floatlog-handle{
+  position: fixed;
+  right: 8px;
+  bottom: calc(var(--sx-floatlog-bottom) + var(--sx-safe-bottom) + 6px);
+
+  z-index: var(--sx-z-floatlog);
+  pointer-events: auto;
+
+  width: var(--sx-floatlog-handle-w);
+  height: var(--sx-floatlog-handle-h);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 20px;
+  border: 1px solid var(--sx-floatlog-handle-border);
+  background: var(--sx-floatlog-handle-bg);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.38);
+
+  color: rgba(232,236,245,0.92);
+  font-size: 22px;
+  font-weight: 900;
+
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sx-floatlog-handle::before{
+  content: "›";
+  transform: translateX(1px);
+}
+
+/* --------------------------------------------------
+   Panel
+   -------------------------------------------------- */
+.sx-floatlog{
+  position: fixed;
+  right: var(--sx-floatlog-right);
+  bottom: calc(var(--sx-floatlog-bottom) + var(--sx-safe-bottom));
+
+  z-index: calc(var(--sx-z-floatlog) + 1);
+  pointer-events: auto;
+
+  width: min(var(--sx-floatlog-w), var(--sx-floatlog-maxw));
+  max-height: min(
+    var(--sx-floatlog-maxh),
+    calc(100vh - (var(--sx-floatlog-bottom) + 16px))
+  );
+
+  border-radius: 22px;
+  border: 1px solid var(--sx-floatlog-border);
+  background: var(--sx-floatlog-bg);
+  box-shadow: var(--sx-floatlog-shadow);
+
+  overflow: hidden;
+
+  transform: translateX(0);
+  opacity: 1;
+  transition: transform 180ms ease, opacity 180ms ease;
+
+  overscroll-behavior: contain;
+}
+
+.sx-floatlog[hidden]{
+  display: none !important;
+}
+
+.sx-floatlog.is-collapsing{
+  transform: translateX(calc(100% + 26px));
+  opacity: 0.6;
+}
+
+/* --------------------------------------------------
+   Head
+   -------------------------------------------------- */
+.sx-floatlog-head{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+
+  background: linear-gradient(
+    180deg,
+    rgba(59,130,246,0.12),
+    rgba(0,0,0,0)
+  );
+}
+
+.sx-floatlog-title b{
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(90,170,255,0.95);
+}
+
+.sx-floatlog-title span{
+  font-size: 11.5px;
+  color: var(--sx-floatlog-muted);
+}
+
+/* --------------------------------------------------
+   Actions
+   -------------------------------------------------- */
+.sx-floatlog-actions{
+  display: flex;
+  gap: 8px;
+}
+
+.sx-floatlog-btn{
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: rgba(232,236,245,0.90);
+
+  border-radius: 12px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 850;
+
+  cursor: pointer;
+}
+
+.sx-floatlog-btn:hover{
+  background: rgba(255,255,255,0.10);
+}
+
+/* --------------------------------------------------
+   Body
+   -------------------------------------------------- */
+.sx-floatlog-body{
+  padding: 12px;
+  overflow: auto;
+
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+
+  color: var(--sx-floatlog-text);
+}
+
+/* Legacy log compatibility */
+.sx-floatlog-body .log-line.ok{ color: rgba(191,247,214,0.92); }
+.sx-floatlog-body .log-line.warn{ color: rgba(255,233,168,0.92); }
+.sx-floatlog-body .log-line.bad{ color: rgba(255,210,210,0.92); }

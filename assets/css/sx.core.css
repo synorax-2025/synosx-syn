@@ -240,15 +240,16 @@ nav.scrolled{
 
 /* -----------------------------
    Buttons (shared)
+   ✅ Updated: match Manifest compact topbar buttons
    ----------------------------- */
 .cta-button{
-  padding: 11px 18px;
+  padding: 11px 14px;            /* was 11px 18px */
   background: var(--gradient-1);
   border: none;
   border-radius: 12px;
   color: #071022;
-  font-weight: 800;
-  font-size: 13px;
+  font-weight: 900;              /* was 800 */
+  font-size: 12px;               /* was 13px */
   cursor: pointer;
   transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
   display: inline-flex;
@@ -264,13 +265,13 @@ nav.scrolled{
 .cta-button:active{ transform: translateY(-1px); }
 
 .btn-secondary{
-  padding: 11px 18px;
+  padding: 11px 14px;            /* was 11px 18px */
   background: transparent;
   border: 1px solid rgba(59, 130, 246, 0.55);
   border-radius: 12px;
   color: #9fc3ff;
-  font-weight: 800;
-  font-size: 13px;
+  font-weight: 900;              /* was 800 */
+  font-size: 12px;               /* was 13px */
   cursor: pointer;
   transition: transform var(--dur) var(--ease), background var(--dur) var(--ease), border-color var(--dur) var(--ease);
   display: inline-flex;

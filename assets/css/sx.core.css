@@ -239,6 +239,32 @@ nav.scrolled{
 }
 
 /* -----------------------------
+   Desktop nav links spacing (tune)
+   ----------------------------- */
+
+/* 1) tab 之间更松一点 */
+.nav-links{
+  gap: 22px;              /* 原来 14px 太挤 */
+}
+
+/* 2) tab 自身点击热区更舒服 */
+.nav-links a{
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 10px;      /* 让每个 tab 自带“呼吸感” */
+  border-radius: 12px;
+  color: rgba(232,236,245,0.86);
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+/* 3) hover 更清晰（可选，但建议有） */
+.nav-links a:hover{
+  background: rgba(255,255,255,0.06);
+  color: rgba(232,236,245,0.98);
+}
+
+
+/* -----------------------------
    Buttons (shared)
    ✅ Updated: match Manifest compact topbar buttons
    ----------------------------- */

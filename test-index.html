@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>SynOSX Menu Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- 核心样式（宪法级） -->
+    <link rel="stylesheet" href="assets/css/sx.core.css" />
+    <!-- 只管 MENU 的附加样式 -->
+    <link rel="stylesheet" href="assets/css/sx.menu.css" />
+    <link rel="stylesheet" href="assets/css/sx.orb.css" />
+  </head>
+
+<button
+  class="sx-orb"
+  data-sx-menu="trigger"
+  aria-label="Open SynOSX Menu"
+  type="button"
+>
+  <span class="sx-orb-core" aria-hidden="true"></span>
+</button>
+
+  <body>
+    <!-- 全局背景，如果你不想要可以在 page css 里隐藏 .bg-gradient -->
+    <div class="bg-gradient" aria-hidden="true"></div>
+
+    <!-- 顶栏骨架：完全按 sx.core.css 的 nav + nav-content + logo + nav-actions -->
+    <nav>
+      <div class="nav-content">
+        <a href="#" class="logo">
+          <div class="logo-icon">SX</div>
+          <span>
+            <b>SynOSX</b>
+            <span class="logo-sub">Governance OS</span>
+          </span>
+        </a>
+
+        <div class="nav-actions">
+          <!-- Menu 按钮：用 btn-secondary，行为通过 data-sx-menu 绑定 -->
+          <button
+            type="button"
+            class="btn-secondary sx-menu-trigger"
+            data-sx-menu="trigger"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <span class="sx-menu-icon">☰</span>
+            <span class="sx-menu-label">Menu</span>
+          </button>
+
+          <!-- 右侧 CTA 按钮：用 core 里的 cta-button -->
+          <button type="button" class="cta-button">
+            预约技术对话
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 主内容：只是用来占位测试滚动 -->
+    <main>
+      <section class="container">
+        <div style="padding-top: 110px; padding-bottom: 80px;">
+          <h1 style="font-size: 28px; margin-bottom: 12px;">
+            SynOSX · Menu 手感测试页
+          </h1>
+          <p style="color: var(--text-muted); max-width: 560px;">
+            这里先只用于测试：顶栏 Menu 按钮、桌面浮层、手机 Bottom Sheet、Tab 切换、点击关闭等交互手感。
+          </p>
+        </div>
+
+        <div style="height: 1400px;">
+          <p style="color: var(--text-muted);">
+            往下滚动一些，让你感受在滚动页面里打开 / 关闭 MENU 的体验。
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- MENU Overlay -->
+    <div class="sx-menu-overlay" data-sx-menu="overlay" hidden></div>
+
+    <!-- MENU Panel -->
+    <aside
+      class="sx-menu-panel"
+      data-sx-menu="panel"
+      aria-hidden="true"
+      aria-label="SynOSX Menu"
+    >
+      <header class="sx-menu-panel-header">
+        <div class="sx-menu-panel-title">
+          <span class="sx-menu-panel-tag">导航</span>
+          <span class="sx-menu-panel-text">SynOSX Menu</span>
+        </div>
+        <button
+          class="sx-menu-close"
+          type="button"
+          data-sx-menu="close"
+          aria-label="关闭菜单"
+        >
+          ✕
+        </button>
+      </header>
+
+      <!-- Tabs：4 个一级视角 -->
+      <div class="sx-menu-tabs" role="tablist">
+        <button
+          type="button"
+          class="sx-menu-tab is-active"
+          role="tab"
+          data-sx-menu-tab="chapters"
+          aria-selected="true"
+        >
+          目录
+        </button>
+        <button
+          type="button"
+          class="sx-menu-tab"
+          role="tab"
+          data-sx-menu-tab="synosx"
+          aria-selected="false"
+        >
+          SynOSX
+        </button>
+        <button
+          type="button"
+          class="sx-menu-tab"
+          role="tab"
+          data-sx-menu-tab="cases"
+          aria-selected="false"
+        >
+          案例
+        </button>
+        <button
+          type="button"
+          class="sx-menu-tab"
+          role="tab"
+          data-sx-menu-tab="whitepaper"
+          aria-selected="false"
+        >
+          白皮书
+        </button>
+        <!-- 滑块会由 sx.menu.js 动态插入 .sx-menu-tab-slider -->
+      </div>
+
+      <div class="sx-menu-content">
+        <!-- Tab 1: 目录 -->
+        <section
+          class="sx-menu-section is-active"
+          data-sx-menu-panel="chapters"
+          role="tabpanel"
+        >
+          <h2 class="sx-menu-section-title">Chapters</h2>
+          <ul class="sx-menu-list">
+            <li><button class="sx-menu-item" data-sx-chapter="ch.01">Ch.01 · 起点：从 0 到 Governance OS</button></li>
+            <li><button class="sx-menu-item" data-sx-chapter="ch.02">Ch.02 · S0：SynShell · 运行时外壳</button></li>
+            <li><button class="sx-menu-item" data-sx-chapter="ch.03">Ch.03 · S1 Intent Hub · 意图中枢</button></li>
+            <li><button class="sx-menu-item" data-sx-chapter="ch.04">Ch.04 · Error Codes 身份证体系</button></li>
+            <li><button class="sx-menu-item" data-sx-chapter="ch.05">Ch.05 · Contracts-Kit · 契约引擎</button></li>
+            <li><button class="sx-menu-item" data-sx-chapter="ch.06">Ch.06 · SynOSX V1.3 治理闭环</button></li>
+            <li><button class="sx-menu-item" data-sx-chapter="ch.07">Ch.07 · Meta-Contractual Governance</button></li>
+            <li><button class="sx-menu-item" data-sx-chapter="ch.08">Ch.08 · Video Platform · 资产治理</button></li>
+            <li><button class="sx-menu-item" data-sx-chapter="ch.09">Ch.09 · SX-CORE Stack 进化</button></li>
+            <li><button class="sx-menu-item" data-sx-chapter="ch.10">Ch.10 · Roadmap & 白皮书</button></li>
+          </ul>
+        </section>
+
+        <!-- Tab 2: SynOSX S0–S6 -->
+        <section
+          class="sx-menu-section"
+          data-sx-menu-panel="synosx"
+          role="tabpanel"
+        >
+          <h2 class="sx-menu-section-title">SynOSX Layers</h2>
+          <ul class="sx-menu-layer-list">
+            <li class="sx-menu-layer-group">
+              <div class="sx-menu-layer-head">
+                <span class="sx-layer-badge">S0</span>
+                <span class="sx-layer-title">SynShell · Runtime Shell</span>
+              </div>
+              <button class="sx-menu-item" data-sx-layer="S0" data-sx-chapter="ch.03">• ch.03 · S0 & S1 出场</button>
+              <button class="sx-menu-item" data-sx-layer="S0" data-sx-chapter="ch.04">• ch.04 · S0 + Error Kernel</button>
+            </li>
+
+            <li class="sx-menu-layer-group">
+              <div class="sx-menu-layer-head">
+                <span class="sx-layer-badge">S1</span>
+                <span class="sx-layer-title">Intent Hub</span>
+              </div>
+              <button class="sx-menu-item" data-sx-layer="S1" data-sx-chapter="ch.03">• ch.03 · Intent Hub 起源</button>
+              <button class="sx-menu-item" data-sx-layer="S1" data-sx-chapter="ch.05">• ch.05 · Intent ↔ Contracts</button>
+            </li>
+
+            <li class="sx-menu-layer-group">
+              <div class="sx-menu-layer-head">
+                <span class="sx-layer-badge">S2</span>
+                <span class="sx-layer-title">Firewall</span>
+              </div>
+              <button class="sx-menu-item" data-sx-layer="S2" data-sx-chapter="ch.04">• ch.04 · 权限墙与错误码</button>
+            </li>
+
+            <li class="sx-menu-layer-placeholder">
+              <span>… S3 · Audit / S4 · Dictionary / S5 · NLP / S6 · Persona</span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Tab 3: 案例 -->
+        <section
+          class="sx-menu-section"
+          data-sx-menu-panel="cases"
+          role="tabpanel"
+        >
+          <h2 class="sx-menu-section-title">Cases</h2>
+          <ul class="sx-menu-list">
+            <li><button class="sx-menu-item" data-sx-case="demo-governance">Governance OS Demo · 治理总览</button></li>
+            <li><button class="sx-menu-item" data-sx-case="error-registry">Error Codes Registry · 身份证体系</button></li>
+            <li><button class="sx-menu-item" data-sx-case="runtime-replay">Runtime Audit Replay · 运行时回放</button></li>
+            <li><button class="sx-menu-item" data-sx-case="video-platform">Video Platform Governance · 视频资产治理</button></li>
+          </ul>
+        </section>
+
+        <!-- Tab 4: 白皮书 -->
+        <section
+          class="sx-menu-section"
+          data-sx-menu-panel="whitepaper"
+          role="tabpanel"
+        >
+          <h2 class="sx-menu-section-title">Whitepaper</h2>
+          <ul class="sx-menu-list">
+            <li><button class="sx-menu-item" data-sx-doc="manifest">Manifest · SynOSX 系统宣言</button></li>
+            <li><button class="sx-menu-item" data-sx-doc="architecture">Architecture · 架构说明</button></li>
+            <li><button class="sx-menu-item" data-sx-doc="governance-model">Governance Model · 治理模型</button></li>
+            <li><button class="sx-menu-item" data-sx-doc="roadmap">Roadmap · 路线图</button></li>
+          </ul>
+        </section>
+      </div>
+    </aside>
+
+    <script src="assets/js/sx.menu.js" defer></script>
+    <script src="assets/js/sx.orb.js" defer></script>
+  </body>
+</html>

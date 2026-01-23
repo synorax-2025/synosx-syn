@@ -8,7 +8,9 @@ synosx-site/
 │  │  ├─ sx.drawer.css
 │  │  │  # ✅ 顶栏 Menu Drawer 样式（移动端抽屉，制度级）
 │  │  ├─ sx.floatlog.css
-│  │  │  # ✅ 浮动日志/提示框（你说的黑框挡住内容：统一在这里管）
+│  │  │  # ✅ 浮动日志注入逻辑：append / clear / auto-scroll（只管内容进来）
+│  │  ├─ sx.dock.css
+│  │  │  # ✅ Dock 外壳样式：尺寸 / 吸附 / 折叠 / 门把手 / 移动端适配
 │  │  └─ pages/
 │  │     ├─ index.page.css
 │  │     │  # 页面薄壳：只写 index 私有布局，不改全局 token/按钮制度
@@ -26,7 +28,9 @@ synosx-site/
 │     ├─ sx.drawer.js
 │     │  # ✅ 移动端 drawer 行为：开关/锁滚动/iOS 修复/group toggle
 │     ├─ sx.floatlog.js
-│     │  # ✅ 浮动日志/提示框：可关闭(X)/可折叠/不遮挡（统一别塞进 runtime）
+│     │  # 浮动日志内容控制（日志写入 / 清空 / 滚动）
+│     ├─ sx.dock.js
+│     │  # Dock 行为控制（拖动 / 吸附 / 展开折叠）
 │     └─ runtime/
 │        ├─ index.runtime.js
 │        │  # 页面运行时：index 专属逻辑（比如跳转/按钮绑定）

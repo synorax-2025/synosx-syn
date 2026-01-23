@@ -204,7 +204,7 @@
 /* 小屏适配（只影响手机，不影响桌面60vh是外壳高度） */
 @media (max-width: 640px){
   :root{
-    --sx-dock-height-expanded: 30vh;
+    --sx-dock-height-expanded: 40vh;
   }
 
   /* 手机上不要占满宽度，给拖动留空间 */

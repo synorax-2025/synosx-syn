@@ -1,0 +1,406 @@
+/* sx.menu.css — SynOSX Menu Component v2 (OS 控制台版)
+   ✅ 只负责 Menu 相关样式
+   - Menu 按钮内部布局
+   - Overlay / Panel（桌面浮层 + Mobile Bottom Sheet）
+   - 4 个 Tab + 滑块 + 列表
+*/
+
+/* --- Menu 按钮内部的小布局 --- */
+
+.sx-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sx-menu-icon {
+  font-size: 14px;
+}
+
+.sx-menu-label {
+  font-size: 12px;
+}
+
+/* --- Overlay + Panel 基础 --- */
+
+.sx-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at top, rgba(15, 23, 42, 0.6), rgba(3, 7, 18, 0.96));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease);
+  z-index: 120; /* 高于 nav（100） */
+}
+
+.sx-menu-panel {
+  position: fixed;
+  background: linear-gradient(135deg, rgba(10, 14, 26, 0.98), rgba(15, 23, 42, 0.98));
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  box-shadow: var(--shadow-lg);
+  color: var(--text);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+  z-index: 130; /* 高于 overlay + nav */
+  display: flex;
+  flex-direction: column;
+  max-height: 40vh; /* 控制台高度 */
+}
+
+/* Desktop：紧贴 nav 底部右侧 */
+@media (min-width: 768px) {
+  .sx-menu-panel {
+    top: calc(56px + var(--sx-safe-top));
+    right: 20px;
+    width: min(280px, calc(100% - 40px));
+  }
+}
+
+/* Mobile：Bottom Console（带边界的系统面板） */
+@media (max-width: 767.98px) {
+  .sx-menu-panel {
+    left: 50px;
+    right: 50px;
+    bottom: 12px;
+    top: auto;
+
+    width: auto;
+    max-height: 38vh;
+
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+
+    box-shadow: 0 20px 48px rgba(3, 7, 18, 0.85);
+
+    transform: translateY(100%);
+  }
+}
+
+
+/* 打开状态（通过 html.sx-menu-open 控制） */
+
+html.sx-menu-open .sx-menu-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+html.sx-menu-open .sx-menu-overlay[hidden] {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  html.sx-menu-open .sx-menu-panel {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 767.98px) {
+  html.sx-menu-open .sx-menu-panel {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Panel Header（固定高度，不参与挤压） --- */
+
+.sx-menu-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px 6px;
+  border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+  min-height: 40px;
+}
+
+.sx-menu-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sx-menu-panel-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(59, 130, 246, 0.16);
+  color: #bfdbfe;
+}
+
+.sx-menu-panel-text {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.sx-menu-close {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 999px;
+  transition:
+    background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.sx-menu-close:hover {
+  background: rgba(37, 99, 235, 0.18);
+  color: var(--text);
+}
+
+/* --- Tabs（4 个视角 + 滑块） --- */
+
+/* 从 grid 改成 flex，让 Tab 按内容宽度排队，不再平均分 4 列 */
+.sx-menu-tabs {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;              /* 四个标签之间的实际间距 */
+  padding: 2px 8px 0;    /* 顶部 2px，底部 0 */
+}
+
+/* 滑块：由 js 动态插入 */
+.sx-menu-tab-slider {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.16);
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.35);
+  pointer-events: none;
+  z-index: 0;
+  transition:
+    left var(--dur-fast) var(--ease),
+    width var(--dur-fast) var(--ease),
+    opacity var(--dur-fast) var(--ease);
+  opacity: 0; /* 初始隐藏，首次计算后再显示 */
+}
+
+.sx-menu-tab {
+  position: relative;
+  z-index: 1;
+  padding: 4px 10px;     /* 胶囊大小：刚好比文字大一圈 */
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+  transition:
+    color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+
+.sx-menu-tab.is-active {
+  color: #e5edff;
+  transform: translateY(-1px);
+}
+
+/* 覆盖全局 focus：蓝框只包住胶囊，略大于文字 */
+.sx-menu-tab:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 1px var(--focus);
+  border-radius: 999px;
+}
+
+/* --- 内容区域 --- */
+
+.sx-menu-content {
+  padding: 0 8px 8px;
+  flex: 1 1 auto;
+  overflow-y: auto;   /* ✅ 这里才是真正滚动区 */
+  -webkit-overflow-scrolling: touch; /* iOS 必须 */
+}
+
+/* 覆盖 sx.core.css 中 section{padding:100px 0;} 的全局规则 */
+.sx-menu-section {
+  display: none;
+  height: 100%;
+  padding: 8px 0 0;      /* 顶部只留 8px，底部 0 */
+  box-sizing: border-box;
+}
+
+.sx-menu-section.is-active {
+  display: block;
+}
+
+.sx-menu-section-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  margin: 0 2px 4px;     /* 上 0，下 4px：几乎贴 Tabs */
+}
+
+/* 列表滚动区域（主：可滚动） */
+
+.sx-menu-list,
+.sx-menu-layer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  overflow: visible; /* ✅ 或者直接不写 overflow */
+}
+
+
+/* 滚动条（可选） */
+.sx-menu-list::-webkit-scrollbar,
+.sx-menu-layer-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sx-menu-list::-webkit-scrollbar-thumb,
+.sx-menu-layer-list::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.9);
+  border-radius: 999px;
+}
+
+/* 🔽 渐隐遮罩：提示下面还有内容 */
+.sx-menu-list::after,
+.sx-menu-layer-list::after {
+  content: "";
+  position: sticky;
+  bottom: 0;
+  height: 24px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 14, 26, 0),
+    rgba(10, 14, 26, 0.96)
+  );
+}
+
+/* 列表按钮 */
+
+.sx-menu-item {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  padding: 7px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: block;
+  transition:
+    background var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.sx-menu-item:hover {
+  background: rgba(37, 99, 235, 0.18);
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.45);
+  transform: translateY(-0.5px);
+}
+
+/* Layer 分组 */
+
+.sx-menu-layer-group {
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(55, 65, 81, 0.9);
+}
+
+.sx-menu-layer-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 2px 2px;
+}
+
+.sx-layer-badge {
+  min-width: 28px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  text-align: center;
+  background: rgba(37, 99, 235, 0.9);
+  color: #dbeafe;
+}
+
+.sx-layer-title {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.sx-menu-layer-placeholder {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 4px 8px 0;
+}
+
+/* 小屏微调 */
+
+@media (max-width: 480px) {
+  .sx-menu-section-title {
+    margin-top: 2px;
+  }
+
+  .sx-menu-tabs {
+    padding-inline: 6px;
+    gap: 6px;           /* 小屏稍微放松一点 */
+  }
+
+  .sx-menu-tab {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+}
+
+/* --- Mobile Menu FAB（单手 SynOSX 入口） --- */
+
+.sx-mobile-menu-fab {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  .sx-mobile-menu-fab {
+    position: fixed;
+    right: 16px;
+    bottom: calc(20px + var(--sx-safe-bottom));
+    z-index: 110; /* 低于 overlay，避免打开后继续点 */
+
+    padding: 0 18px;
+    height: 48px;
+    border-radius: 999px;
+
+    background: var(--gradient-1);
+    color: #071022;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+
+    border: none;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .sx-mobile-menu-fab:active {
+    transform: scale(0.94);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.55);
+  }
+}

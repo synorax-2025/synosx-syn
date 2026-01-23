@@ -28,9 +28,11 @@
   <!-- ✅ Shared CSS (Frozen order) -->
   <link rel="stylesheet" href="assets/css/sx.core.css" />
   <link rel="stylesheet" href="assets/css/sx.layers.css" /> <!-- 新增 -->
-  <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
   <link rel="stylesheet" href="assets/css/sx.drawer.css" />
   <link rel="stylesheet" href="assets/css/sx.floatlog.css" />
+  <link rel="stylesheet" href="assets/css/sx.dock.css">
+  <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
+  
 
   <!-- ✅ Page CSS -->
   <link rel="stylesheet" href="assets/css/pages/replay.page.css" />
@@ -41,20 +43,53 @@
 
   <!--@include nav-->
 
- <!-- ✅ FloatLog Panel (Scheme B / single protocol) -->
-<div class="sx-floatlog" aria-label="audit console">
+<!-- ✅ SynOSX Audit Dock -->
+<div
+  class="sx-dock sx-dock--floating sx-dock--expanded sx-dock--right"
+  id="sxDockAudit"
+  aria-label="audit console"
+>
+  <!-- ⭐ 门把手：只有 docked-left/right 时才出现 -->
+  <button class="sx-dock__edgeHandle" type="button">
+    <span class="sx-dock__chevron"></span>
+  </button>
+
+  <!-- ⭐ 内容区域：继续用 floatlog 的语义命名 -->
   <div class="sx-floatlog__panel">
-    <div class="sx-floatlog__handle">
+
+    <!-- 顶部 header：既是 dock header，也是 floatlog header -->
+    <div class="sx-dock__header sx-floatlog__handle" data-sx-dock-drag>
       <span class="sx-floatlog__title">
         <i class="sx-floatlog__dot" aria-hidden="true"></i>
         <span class="sx-floatlog__titleText">AUDIT ENGINE</span>
+        <span class="sx-floatlog__status" data-sx-dock-status>FLOATING · CENTER</span>
       </span>
+
       <div class="sx-floatlog__actions">
-        <button class="sx-floatlog__btn" type="button" data-action="collapse">—</button>
-        <button class="sx-floatlog__btn" type="button" data-action="close">×</button>
+        <button
+          class="sx-floatlog__btn"
+          type="button"
+          data-sx-dock-action="collapse"
+          title="Collapse"
+        >
+          —
+        </button>
+        <button
+          class="sx-floatlog__btn"
+          type="button"
+          data-sx-dock-action="close"
+          title="Close"
+        >
+          ×
+        </button>
       </div>
     </div>
-    <div class="sx-floatlog__body"></div>
+
+    <!-- 日志主体：sx.floatlog.js 仍然可以往这里 append -->
+    <div class="sx-dock__body sx-floatlog__body" aria-live="polite" id="sxFloatlogBody">
+      <!-- 这里是 audit log line 容器 -->
+    </div>
+
   </div>
 </div>
 
@@ -169,6 +204,7 @@
   <script src="assets/js/sx.core.js"></script>
   <script src="assets/js/sx.drawer.js"></script>
   <script src="assets/js/sx.floatlog.js"></script>
+  <script src="assets/js/sx.dock.js"></script>
   <script src="assets/js/sx.statusbar.js"></script>
 
   <!-- ✅ Page runtime -->

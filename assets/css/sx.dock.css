@@ -1,0 +1,204 @@
+/* sx.dock.css — SynOSX Dock Protocol (S0 Window Carrier)
+   - 负责：位置 / 拖动 / 吸附 / 门把手 / 展开折叠
+   - 不负责：日志内容的具体样式（交给 sx.floatlog.css）
+*/
+
+:root{
+  --sx-dock-width-expanded: 340px;
+  --sx-dock-width-collapsed: 42px;
+  --sx-dock-height-expanded: 220px;
+
+  --sx-dock-radius: 22px;
+  --sx-dock-shadow: 0 25px 60px -18px rgba(0, 0, 0, 0.55);
+
+  --sx-safe-top: env(safe-area-inset-top, 0px);
+  --sx-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* 根容器：承载任何面板（这里装的是 Audit Engine） */
+.sx-dock{
+  position: fixed;
+  z-index: 9999;
+
+  /* 初始大致居中（避开 safe-area 顶部） */
+  top: calc(50% - var(--sx-dock-height-expanded) / 2 + var(--sx-safe-top) / 2);
+  left: calc(50% - var(--sx-dock-width-expanded) / 2);
+  transform: none;
+
+  display: flex;
+  align-items: stretch;
+
+  width: var(--sx-dock-width-expanded);
+  height: var(--sx-dock-height-expanded);
+
+  /* 外壳视觉：可按需改成你喜欢的风格 */
+  background: radial-gradient(circle at top left, #252b3d, #10121a);
+  border-radius: var(--sx-dock-radius);
+  box-shadow: var(--sx-dock-shadow);
+  border: 1px solid rgba(255,255,255,0.08);
+  overflow: hidden;
+  color: var(--text);
+
+  transition:
+    width var(--dur) var(--ease),
+    height var(--dur) var(--ease),
+    left var(--dur) var(--ease),
+    right var(--dur) var(--ease),
+    top var(--dur) var(--ease),
+    transform 160ms var(--ease),
+    opacity 160ms var(--ease);
+}
+
+/* 浮动模式 */
+.sx-dock--floating{
+  border-radius: var(--sx-dock-radius);
+}
+
+/* 拖拽中：关闭过渡，保证跟手 */
+.sx-dock.is-dragging{
+  opacity: .96;
+  transform: none;
+  transition: none !important;
+}
+
+/* 展开 / 折叠 */
+.sx-dock--expanded{
+  width: var(--sx-dock-width-expanded);
+  height: var(--sx-dock-height-expanded);
+}
+
+.sx-dock--collapsed{
+  width: var(--sx-dock-width-collapsed);
+  height: 110px;
+  border-radius: 999px;
+}
+
+/* 左 / 右 dock 状态 */
+.sx-dock--docked-left{
+  left: 0;
+  right: auto;
+  border-radius: 0 var(--sx-dock-radius) var(--sx-dock-radius) 0;
+}
+
+.sx-dock--docked-right{
+  right: -4px;
+  left: auto;
+  border-radius: var(--sx-dock-radius) 0 0 var(--sx-dock-radius);
+}
+
+/* 完全隐藏 */
+.sx-dock--hidden{
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ===========================
+   Edge Handle（门把手）
+   =========================== */
+
+/* 默认不占宽（floating 时看不到） */
+.sx-dock__edgeHandle{
+  flex: 0 0 0;
+  width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+/* docked 时才出现，并占据 collapsed 宽度 */
+.sx-dock--docked-left .sx-dock__edgeHandle,
+.sx-dock--docked-right .sx-dock__edgeHandle{
+  flex: 0 0 var(--sx-dock-width-collapsed);
+  width: var(--sx-dock-width-collapsed);
+
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* 箭头 */
+.sx-dock__chevron{
+  display:block;
+  width:10px;
+  height:18px;
+  border-style:solid;
+  border-width:0 3px 3px 0;
+  border-color:#e2e6f1;
+  border-radius:8px;
+  transform-origin:center;
+  transition:transform var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
+}
+
+/* 右 dock：箭头向左 “<” */
+.sx-dock--docked-right .sx-dock__chevron{
+  transform: rotate(135deg);
+}
+
+/* 左 dock：箭头向右 “>” */
+.sx-dock--docked-left .sx-dock__chevron{
+  transform: rotate(-45deg);
+}
+
+/* 展开时可轻微还原（可按需调整） */
+.sx-dock--expanded .sx-dock__chevron{
+  transform: translateX(0) rotate(0deg);
+}
+
+/* ===========================
+   内部 Layout（给 header/body 用）
+   =========================== */
+
+.sx-dock__header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:11px;
+  color:var(--text-muted);
+
+  padding:6px 10px 4px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.sx-dock.is-dragging .sx-dock__header{
+  cursor: grabbing;
+}
+
+.sx-dock__body{
+  padding: 8px 10px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  opacity:1;
+  transition:opacity 160ms var(--ease);
+}
+
+/* 折叠时隐藏内容，只留下门把手 */
+.sx-dock--collapsed .sx-dock__body{
+  opacity:0;
+  pointer-events:none;
+}
+
+/* 小屏适配 */
+@media (max-width: 640px){
+  :root{
+    --sx-dock-height-expanded: 220px;
+  }
+
+  .sx-dock{
+    width: min(92vw, var(--sx-dock-width-expanded));
+  }
+}

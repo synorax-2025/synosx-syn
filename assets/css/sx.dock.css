@@ -201,3 +201,41 @@
   }
 }
 
+/* 小屏适配（只影响手机，不影响桌面60vh是外壳高度） */
+@media (max-width: 640px){
+  :root{
+    --sx-dock-height-expanded: 30vh;
+  }
+
+  /* 手机上不要占满宽度，给拖动留空间 */
+  .sx-dock{
+    width: min(82vw, var(--sx-dock-width-expanded));
+    left: 9vw;
+    right: auto;
+    top: 18vh;
+  }
+
+  /* 折叠态：门把手 */
+  .sx-dock--collapsed{
+    width: var(--sx-dock-width-collapsed);
+    height: 80px;
+    border-radius: 999px;
+  }
+
+  /* 折叠时隐藏 header，防止字露出来 */
+  .sx-dock--collapsed .sx-dock__header{
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* 吸附后稍微咬出屏幕 */
+  .sx-dock--docked-left.sx-dock--collapsed{
+    left: -4px;
+    right: auto;
+  }
+
+  .sx-dock--docked-right.sx-dock--collapsed{
+    right: -4px;
+    left: auto;
+  }
+}

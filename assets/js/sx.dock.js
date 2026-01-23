@@ -11,8 +11,14 @@
 (function () {
   "use strict";
 
-  const EDGE_THRESHOLD = 36; // 离边缘多少像素内算“贴边”
-  const EDGE_PAD = 8;        // 浮动模式最小边距
+  const IS_MOBILE = window.innerWidth <= 640;
+
+// ⭐ 手机端吸附更“克制”，避免一碰就吸
+const EDGE_THRESHOLD = IS_MOBILE ? 12 : 36;
+
+// ⭐ 手机端允许更靠近边缘自由拖动
+const EDGE_PAD = IS_MOBILE ? 4 : 8;
+
 
   const root = document.getElementById("sxDockAudit");
   if (!root) return;

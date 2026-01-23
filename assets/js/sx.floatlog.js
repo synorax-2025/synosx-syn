@@ -92,6 +92,7 @@
     append(entry) {
       // 任何输出都会让窗口重新可见
       root.classList.remove("is-hidden");
+      root.classList.remove("sx-dock--hidden"); // ⭐ 同时去掉 dock 的隐藏态
 
       if (typeof entry === "string") {
         bodyEl.appendChild(
@@ -137,6 +138,4 @@
   window.SXFloatLog = api;
   window.SXFloatlog = api;
 
-  // 给你一条“ready”提示
-  api.append({ mark: "·", text: "SynOSX Audit Engine ready.", muted: true });
 })();

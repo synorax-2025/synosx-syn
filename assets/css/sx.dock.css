@@ -6,7 +6,7 @@
 :root{
   --sx-dock-width-expanded: 340px;
   --sx-dock-width-collapsed: 42px;
-  --sx-dock-height-expanded: 220px;
+  --sx-dock-height-expanded: 280px;
 
   --sx-dock-radius: 22px;
   --sx-dock-shadow: 0 25px 60px -18px rgba(0, 0, 0, 0.55);
@@ -126,31 +126,31 @@
 
 /* 箭头 */
 .sx-dock__chevron{
-  display:block;
-  width:10px;
-  height:18px;
-  border-style:solid;
-  border-width:0 3px 3px 0;
-  border-color:#e2e6f1;
-  border-radius:8px;
-  transform-origin:center;
-  transition:transform var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
+  display: block;
+  width: 10px;
+  height: 18px;
+
+  border-style: solid;
+  border-width: 0 3px 3px 0;
+  border-color: rgba(232,236,245,0.9);
+
+  border-radius: 6px;
+
+  /* 默认不给方向，方向只由 dock 状态决定 */
+  transform-origin: center;
+  transition: transform 160ms var(--ease);
 }
 
-/* 右 dock：箭头向左 “<” */
-.sx-dock--docked-right .sx-dock__chevron{
-  transform: rotate(135deg);
-}
-
-/* 左 dock：箭头向右 “>” */
+/* 吸在左边 → 门把手向右（›） */
 .sx-dock--docked-left .sx-dock__chevron{
   transform: rotate(-45deg);
 }
 
-/* 展开时可轻微还原（可按需调整） */
-.sx-dock--expanded .sx-dock__chevron{
-  transform: translateX(0) rotate(0deg);
+/* 吸在右边 → 门把手向左（‹） */
+.sx-dock--docked-right .sx-dock__chevron{
+  transform: rotate(135deg);
 }
+
 
 /* ===========================
    内部 Layout（给 header/body 用）
@@ -179,12 +179,10 @@
 
 .sx-dock__body{
   padding: 8px 10px 10px;
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  opacity:1;
-  transition:opacity 160ms var(--ease);
+  opacity: 1;
+  transition: opacity 160ms var(--ease);
 }
+
 
 /* 折叠时隐藏内容，只留下门把手 */
 .sx-dock--collapsed .sx-dock__body{
@@ -202,3 +200,4 @@
     width: min(92vw, var(--sx-dock-width-expanded));
   }
 }
+

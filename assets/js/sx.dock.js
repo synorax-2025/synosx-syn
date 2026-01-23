@@ -1,273 +1,265 @@
-// sx.dock.js — SynOSX Dock Behavior (Audit Dock v1)
-// 负责：拖动 / 吸附 / 门把手 / 展开折叠 / 关闭
+// sx.dock.js — SynOSX Audit Dock for current HTML
+// 结构约定：
+// #sxDockAudit.sx-dock
+//   .sx-dock__edgeHandle         ← 门把手
+//   .sx-floatlog__panel
+//     .sx-dock__header[data-sx-dock-drag]  ← 顶栏（可拖拽）
+//       [data-sx-dock-action="collapse"]   ← “—” 按钮
+//       [data-sx-dock-action="close"]      ← “×” 按钮
+//     .sx-dock__body.sx-floatlog__body     ← 日志内容区域
+
 (function () {
-  const dock = document.getElementById("sxDockAudit");
-  if (!dock) return;
+  "use strict";
 
-  const edgeHandle = dock.querySelector(".sx-dock__edgeHandle");
-  const dragHandle = dock.querySelector("[data-sx-dock-drag]") || dock;
-  const btnCollapse = dock.querySelector('[data-sx-dock-action="collapse"]');
-  const btnClose = dock.querySelector('[data-sx-dock-action="close"]');
-  const statusEl = dock.querySelector("[data-sx-dock-status]");
+  const EDGE_THRESHOLD = 36; // 离边缘多少像素内算“贴边”
+  const EDGE_PAD = 8;        // 浮动模式最小边距
 
-  const SNAP_THRESHOLD = 80;
+  const root = document.getElementById("sxDockAudit");
+  if (!root) return;
 
-  const state = {
-    dragging: false,
-    startX: 0,
-    startY: 0,
-    offsetX: 0,
-    offsetY: 0,
-    centerY: window.innerHeight / 2,
-    side: "right",      // "left" | "right"
-    mode: "floating",   // "floating" | "docked"
-    expanded: true
-  };
+  const header = root.querySelector(".sx-dock__header");
+  const edgeHandle = root.querySelector(".sx-dock__edgeHandle");
+  const statusEl = root.querySelector("[data-sx-dock-status]");
+  const btnCollapse = root.querySelector('[data-sx-dock-action="collapse"]');
+  const btnClose = root.querySelector('[data-sx-dock-action="close"]');
+
+  if (!header) return;
+
+  let dragging = false;
+  let pointerId = null;
+  let startX = 0;
+  let startY = 0;
+  let startLeft = 0;
+  let startTop = 0;
+
+  function clamp(n, min, max) {
+    return Math.max(min, Math.min(max, n));
+  }
+
+  function isDockedLeft() {
+    return root.classList.contains("sx-dock--docked-left");
+  }
+  function isDockedRight() {
+    return root.classList.contains("sx-dock--docked-right");
+  }
+  function isDocked() {
+    return isDockedLeft() || isDockedRight();
+  }
+
+  function setStatus(text) {
+    if (statusEl) statusEl.textContent = text;
+  }
 
   function updateStatus() {
-    if (!statusEl) return;
-
-    if (dock.classList.contains("sx-dock--hidden")) {
-      statusEl.textContent = "HIDDEN";
+    if (root.classList.contains("sx-dock--hidden")) {
+      setStatus("HIDDEN");
       return;
     }
-
-    if (state.mode === "floating") {
-      statusEl.textContent = "FLOATING · CENTER";
+    if (!isDocked()) {
+      setStatus("FLOATING · CENTER");
       return;
     }
-
-    const sideText = (state.side || "EDGE").toUpperCase();
-    const modeText = state.expanded ? "OPEN" : "DOCKED";
-    statusEl.textContent = `${modeText} · ${sideText}`;
+    const side = isDockedLeft() ? "LEFT" : "RIGHT";
+    const mode = root.classList.contains("sx-dock--collapsed")
+      ? "DOCKED"
+      : "OPEN";
+    setStatus(`${mode} · ${side}`);
   }
 
-  function clampFloatingPosition() {
-    const rect = dock.getBoundingClientRect();
-    const margin = 12;
+  // 退出 dock + 折叠
+  function undock() {
+    root.classList.remove("sx-dock--docked-left");
+    root.classList.remove("sx-dock--docked-right");
+    root.classList.remove("sx-dock--collapsed");
+    updateStatus();
+  }
 
-    let left = rect.left;
+  // 从当前位置 dock 到指定边（不判断阈值）
+  function dockToSide(side) {
+    const rect = root.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const h = rect.height;
+
+    // 垂直方向 clamp 一下，避免超出屏幕
     let top = rect.top;
+    const minTop = EDGE_PAD;
+    const maxTop = vh - h - EDGE_PAD;
+    top = clamp(top, minTop, maxTop);
 
-    const maxLeft = window.innerWidth - rect.width - margin;
-    const maxTop = window.innerHeight - rect.height - margin;
+    undock(); // 清旧状态
 
-    if (left < margin) left = margin;
-    if (left > maxLeft) left = maxLeft;
-    if (top < margin + parseInt(getComputedStyle(document.documentElement).getPropertyValue("--sx-safe-top") || "0", 10)) {
-      top = margin + parseInt(getComputedStyle(document.documentElement).getPropertyValue("--sx-safe-top") || "0", 10);
-    }
-    if (top > maxTop - parseInt(getComputedStyle(document.documentElement).getPropertyValue("--sx-safe-bottom") || "0", 10)) {
-      top = maxTop - parseInt(getComputedStyle(document.documentElement).getPropertyValue("--sx-safe-bottom") || "0", 10);
-    }
-
-    dock.style.left = left + "px";
-    dock.style.top = top + "px";
-    dock.style.right = "auto";
-
-    state.centerY = top + rect.height / 2;
-  }
-
-  function applyDock(side, options = {}) {
-    const { collapse = false, keepY = false } = options;
-
-    state.mode = "docked";
-    state.side = side;
-
-    const rect = dock.getBoundingClientRect();
-    const margin = 32;
-    const halfHeight = rect.height / 2 || 80;
-
-    let centerY = keepY ? state.centerY : rect.top + halfHeight;
-    const minCenter = margin + halfHeight;
-    const maxCenter = window.innerHeight - margin - halfHeight;
-
-    if (centerY < minCenter) centerY = minCenter;
-    if (centerY > maxCenter) centerY = maxCenter;
-    state.centerY = centerY;
-
-    const top = centerY - halfHeight;
-    dock.style.top = top + "px";
-
-    dock.classList.remove(
-      "sx-dock--floating",
-      "sx-dock--docked-left",
-      "sx-dock--docked-right"
-    );
+    root.style.top = top + "px";
 
     if (side === "left") {
-      dock.classList.add("sx-dock--docked-left");
-      dock.style.left = "0px";
-      dock.style.right = "auto";
+      root.classList.add("sx-dock--docked-left");
+      root.style.left = "0px";
+      root.style.right = "auto";
     } else {
-      dock.classList.add("sx-dock--docked-right");
-      dock.style.right = "-4px";
-      dock.style.left = "auto";
-    }
-
-    if (collapse) {
-      dock.classList.add("sx-dock--collapsed");
-      dock.classList.remove("sx-dock--expanded");
-      state.expanded = false;
-    } else {
-      dock.classList.add("sx-dock--expanded");
-      dock.classList.remove("sx-dock--collapsed");
-      state.expanded = true;
+      root.classList.add("sx-dock--docked-right");
+      root.style.right = "0px";
+      root.style.left = "auto";
     }
 
     updateStatus();
   }
 
-  function dockToNearestEdgeAndToggle() {
-    const rect = dock.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
+  // 拖拽结束后：如接近边缘，自动 dock + 折叠
+  function snapDockIfNeeded() {
+    const rect = root.getBoundingClientRect();
     const vw = window.innerWidth;
-    const side = centerX < vw / 2 ? "left" : "right";
 
-    applyDock(side, { collapse: !state.expanded });
-  }
+    const dLeft = rect.left;
+    const dRight = vw - (rect.left + rect.width);
+    const min = Math.min(dLeft, dRight);
 
-  function toggleExpand() {
-    if (state.mode !== "docked") {
-      dockToNearestEdgeAndToggle();
+    if (min > EDGE_THRESHOLD) {
+      // 离两侧远：继续浮动
+      updateStatus();
       return;
     }
 
-    if (state.expanded) {
-      dock.classList.add("sx-dock--collapsed");
-      dock.classList.remove("sx-dock--expanded");
-      state.expanded = false;
-    } else {
-      dock.classList.add("sx-dock--expanded");
-      dock.classList.remove("sx-dock--collapsed");
-      state.expanded = true;
-    }
+    const side = dLeft <= dRight ? "left" : "right";
+    dockToSide(side);
+
+    // 贴边后默认折叠成门把手
+    root.classList.add("sx-dock--collapsed");
     updateStatus();
   }
 
+  // ---------------- 拖拽逻辑 ----------------
   function onPointerDown(e) {
-    if (e.button !== 0 && e.pointerType === "mouse") return;
+    // 点到按钮就别开始拖
+    if (e.target.closest("[data-sx-dock-action]")) return;
+    if (e.target.closest(".sx-dock__edgeHandle")) return;
 
-    state.dragging = true;
-    dock.classList.add("is-dragging");
+    // 只接受左键 / 单指
+    if (e.button != null && e.button !== 0) return;
 
-    const rect = dock.getBoundingClientRect();
-    state.startX = e.clientX;
-    state.startY = e.clientY;
-    state.offsetX = e.clientX - rect.left;
-    state.offsetY = e.clientY - rect.top;
+    dragging = true;
+    pointerId = e.pointerId;
 
-    dock.classList.remove("sx-dock--docked-left", "sx-dock--docked-right");
-    dock.classList.add("sx-dock--floating", "sx-dock--expanded");
-    dock.classList.remove("sx-dock--collapsed");
+    const rect = root.getBoundingClientRect();
+    startLeft = rect.left;
+    startTop = rect.top;
+    startX = e.clientX;
+    startY = e.clientY;
 
-    state.mode = "floating";
-    state.side = null;
-    state.expanded = true;
-    updateStatus();
+    undock();
+    root.classList.add("is-dragging");
 
-    // 移动端：避免拖 dock 时整个页面跟着滚
-    document.body.style.overscrollBehavior = "none";
+    try {
+      header.setPointerCapture(pointerId);
+    } catch {}
+
+    e.preventDefault();
   }
 
   function onPointerMove(e) {
-    if (!state.dragging) return;
+    if (!dragging || e.pointerId !== pointerId) return;
 
-    const newLeft = e.clientX - state.offsetX;
-    const newTop = e.clientY - state.offsetY;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
 
-    state.centerY = newTop + dock.offsetHeight / 2;
+    const rect = root.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
 
-    dock.style.left = newLeft + "px";
-    dock.style.right = "auto";
-    dock.style.top = newTop + "px";
+    const newLeft = clamp(
+      startLeft + dx,
+      EDGE_PAD,
+      vw - rect.width - EDGE_PAD
+    );
+    const newTop = clamp(
+      startTop + dy,
+      EDGE_PAD,
+      vh - rect.height - EDGE_PAD
+    );
+
+    root.style.left = newLeft + "px";
+    root.style.top = newTop + "px";
+    root.style.right = "auto";
   }
 
   function onPointerUp(e) {
-    if (!state.dragging) return;
-    state.dragging = false;
-    dock.classList.remove("is-dragging");
-    document.body.style.overscrollBehavior = "";
+    if (!dragging || e.pointerId !== pointerId) return;
 
-    const x = e.clientX;
-    const vw = window.innerWidth;
+    dragging = false;
+    root.classList.remove("is-dragging");
 
-    const distLeft = x;
-    const distRight = vw - x;
+    try {
+      header.releasePointerCapture(pointerId);
+    } catch {}
+    pointerId = null;
 
-    if (distLeft <= SNAP_THRESHOLD || distRight <= SNAP_THRESHOLD) {
-      const side = distLeft < distRight ? "left" : "right";
-      applyDock(side, { collapse: true });
-    } else {
-      clampFloatingPosition();
-      state.mode = "floating";
-      state.side = null;
-      state.expanded = true;
+    snapDockIfNeeded();
+  }
 
-      dock.classList.add("sx-dock--floating", "sx-dock--expanded");
-      dock.classList.remove(
-        "sx-dock--collapsed",
-        "sx-dock--docked-left",
-        "sx-dock--docked-right"
-      );
+  header.addEventListener("pointerdown", onPointerDown);
+  window.addEventListener("pointermove", onPointerMove);
+  window.addEventListener("pointerup", onPointerUp);
 
+  // ---------------- 门把手逻辑 ----------------
+  if (edgeHandle) {
+    edgeHandle.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (!isDocked()) return;
+      root.classList.toggle("sx-dock--collapsed");
       updateStatus();
-    }
-  }
+    });
 
-  function onMinimizeClick(e) {
-    e.stopPropagation();
-    if (state.mode === "floating") {
-      const rect = dock.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const vw = window.innerWidth;
-      const side = centerX < vw / 2 ? "left" : "right";
-      applyDock(side, { collapse: true });
-    } else {
-      toggleExpand();
-    }
-  }
-
-  function onCloseClick(e) {
-    e.stopPropagation();
-    dock.classList.add("sx-dock--hidden");
-    updateStatus();
-  }
-
-  function init() {
-    // 初始：浮动在右侧偏中
-    dock.classList.add("sx-dock--floating", "sx-dock--expanded", "sx-dock--docked-right");
-    updateStatus();
-
-    dragHandle.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("pointermove", onPointerMove);
-    window.addEventListener("pointerup", onPointerUp);
-
-    if (edgeHandle) {
-      edgeHandle.addEventListener("click", function (e) {
-        e.stopPropagation();
-        toggleExpand();
-      });
-      edgeHandle.addEventListener("pointerdown", function (e) {
-        e.stopPropagation();
-      });
-    }
-
-    if (btnCollapse) {
-      btnCollapse.addEventListener("click", onMinimizeClick);
-    }
-    if (btnClose) {
-      btnClose.addEventListener("click", onCloseClick);
-    }
-
-    window.addEventListener("resize", function () {
-      if (state.mode === "docked" && state.side) {
-        applyDock(state.side, { keepY: true });
-      } else {
-        clampFloatingPosition();
-      }
+    edgeHandle.addEventListener("pointerdown", function (e) {
+      // 避免门把手触发拖拽
+      e.stopPropagation();
     });
   }
 
-  init();
+  // ---------------- 按钮：- / x ----------------
+  if (btnCollapse) {
+    btnCollapse.addEventListener("click", function (e) {
+      e.stopPropagation();
+
+      if (!isDocked()) {
+        // 还在中间：dock 到最近边，再折叠
+        const rect = root.getBoundingClientRect();
+        const vw = window.innerWidth;
+        const dLeft = rect.left;
+        const dRight = vw - (rect.left + rect.width);
+        const side = dLeft <= dRight ? "left" : "right";
+        dockToSide(side);
+        root.classList.add("sx-dock--collapsed");
+      } else {
+        // 已贴边：切换折叠 / 展开
+        root.classList.toggle("sx-dock--collapsed");
+      }
+
+      updateStatus();
+    });
+  }
+
+  if (btnClose) {
+    btnClose.addEventListener("click", function (e) {
+      e.stopPropagation();
+      root.classList.add("sx-dock--hidden");
+      // 兼容旧逻辑：有些地方可能会看 is-hidden
+      root.classList.add("is-hidden");
+      updateStatus();
+    });
+  }
+
+  // ---------------- 窗口尺寸变化：clamp 一下 ----------------
+  window.addEventListener("resize", function () {
+    const rect = root.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    const newLeft = clamp(rect.left, EDGE_PAD, vw - rect.width - EDGE_PAD);
+    const newTop = clamp(rect.top, EDGE_PAD, vh - rect.height - EDGE_PAD);
+
+    root.style.left = newLeft + "px";
+    root.style.top = newTop + "px";
+    root.style.right = "auto";
+  });
+
+  // 初始化一次状态文本
+  updateStatus();
 })();

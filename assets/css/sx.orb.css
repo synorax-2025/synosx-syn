@@ -31,7 +31,7 @@
   .sx-orb{
     position: fixed;
     right: 16px;
-    bottom: calc(18px + var(--sx-safe-bottom));
+    bottom: calc(60px + var(--sx-safe-bottom));
 
     /* ✅ Must be above overlay(120) and panel(130) to remain visible */
     z-index: 140;

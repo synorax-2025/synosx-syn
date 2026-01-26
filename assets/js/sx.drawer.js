@@ -1,276 +1,243 @@
-/* sx.drawer.js — Frozen v1.4.1 (DOM-ready + iOS scroll fix + stable group toggle)
-   ✅ Works even if script is not deferred (wait DOM)
-   ✅ iOS stable: background locked + allow panel scroll
-   ✅ Drawer supports:
-      - Use Cases fold (.sx-drawer-usecases -> #sx-usecases-panel)
-      - Generic group folds (.sx-drawer-group[aria-controls] -> #sx-group-*)
-   ✅ Group panel lookup is SCOPED to drawer (no global getElementById bugs)
+/* sx.drawer.js — v2.2.2 iOS Scroll Fix
+   2026-01-25
+
+   修复：iOS 滚动问题 - 完全移除 body lock 的 position 修改
 */
 
-(function(){
-  "use strict";
+(() => {
+  const html   = document.documentElement;
+  const body   = document.body;
 
-  function boot(){
-    const btn = document.getElementById("sxMenuBtn");
-    const drawer = document.getElementById("sx-mobile-menu");
-    if (!btn || !drawer) return false;
+  const trigger = document.getElementById("sxMenuBtn");
+  const drawer  = document.getElementById("sx-mobile-menu");
+  if (!trigger || !drawer) return;
 
-    const panel = drawer.querySelector(".sx-drawer-panel");
-    const backdrop = drawer.querySelector(".sx-drawer-backdrop");
-    const nav = document.querySelector("#navbar") || document.querySelector("nav");
+  const backdrop = drawer.querySelector(".sx-drawer-backdrop");
+  const panel    = drawer.querySelector(".sx-drawer-panel");
 
-    // Use Cases (special)
-    const ucBtn = drawer.querySelector(".sx-drawer-usecases");
-    const ucPanel = drawer.querySelector("#sx-usecases-panel");
+  // Use Cases (special)
+  const ucBtn   = drawer.querySelector(".sx-drawer-usecases");
+  const ucPanel = drawer.querySelector("#sx-usecases-panel");
 
-    // Generic groups (目录等) — cache once
-    const groupBtns = Array.from(drawer.querySelectorAll(".sx-drawer-group[aria-controls]"));
+  // Generic groups (目录等)
+  const groupBtns = Array.from(
+    drawer.querySelectorAll(".sx-drawer-group[aria-controls]")
+  );
 
-    let locked = false;
-    let scrollY = 0;
+  const state = {
+    open: false,
+    scrollY: 0,
+  };
 
-    // iOS: touch control
-    let touchStartY = 0;
-
-    function syncNavHeight(){
-      if (!nav) return;
-      const h = Math.ceil(nav.getBoundingClientRect().height);
-      if (h > 0) document.documentElement.style.setProperty("--sx-nav-h", h + "px");
+  function syncViewportPx() {
+    const h = Math.ceil(window.innerHeight || 0);
+    if (h > 0) {
+      document.documentElement.style.setProperty("--sx-vh-px", h + "px");
     }
-
-    function syncViewportPx(){
-      const h = Math.ceil(window.innerHeight || 0);
-      if (h > 0) document.documentElement.style.setProperty("--sx-vh-px", h + "px");
-    }
-
-    function applyHardFloor(){
-      // 兜底：避免变量未写入时“2行高”错觉
-      if (!panel) return;
-      panel.style.minHeight = "360px"; // 你要“至少 6 个按钮高度”，360 更稳
-    }
-
-    function lockBodyFixed(on){
-      if (on){
-        if (locked) return;
-        locked = true;
-
-        scrollY = window.scrollY || window.pageYOffset || 0;
-
-        document.body.style.position = "fixed";
-        document.body.style.top = (-scrollY) + "px";
-        document.body.style.left = "0";
-        document.body.style.right = "0";
-        document.body.style.width = "100%";
-      }else{
-        if (!locked) return;
-        locked = false;
-
-        document.body.style.position = "";
-        document.body.style.top = "";
-        document.body.style.left = "";
-        document.body.style.right = "";
-        document.body.style.width = "";
-
-        window.scrollTo(0, scrollY);
-      }
-    }
-
-    // ----------------------
-    // Use Cases fold
-    // ----------------------
-    function closeUseCases(){
-      if (!ucBtn || !ucPanel) return;
-      ucBtn.setAttribute("aria-expanded", "false");
-      ucPanel.hidden = true;
-    }
-
-    function toggleUseCases(){
-      if (!ucBtn || !ucPanel) return;
-      const isOpen = ucBtn.getAttribute("aria-expanded") === "true";
-      ucBtn.setAttribute("aria-expanded", isOpen ? "false" : "true");
-      ucPanel.hidden = isOpen;
-    }
-
-    // ----------------------
-    // Generic group folds (目录等)
-    // ----------------------
-    function getGroupPanel(btnEl){
-      const id = btnEl && btnEl.getAttribute("aria-controls");
-      if (!id) return null;
-      // ✅ scope to drawer only — critical fix
-      return drawer.querySelector("#" + CSS.escape(id));
-    }
-
-    function closeAllGroups(){
-      groupBtns.forEach((b) => {
-        const p = getGroupPanel(b);
-        b.setAttribute("aria-expanded", "false");
-        if (p) p.hidden = true;
-      });
-    }
-
-    function openOnlyThisGroup(btnEl){
-      // policy: only one group open at a time (prevents “一坨”)
-      groupBtns.forEach((b) => {
-        const p = getGroupPanel(b);
-        const isSelf = b === btnEl;
-
-        b.setAttribute("aria-expanded", isSelf ? "true" : "false");
-        if (p) p.hidden = !isSelf;
-      });
-    }
-
-    function toggleGroup(btnEl){
-      const p = getGroupPanel(btnEl);
-      if (!p) return;
-
-      const isOpen = btnEl.getAttribute("aria-expanded") === "true";
-      if (isOpen){
-        btnEl.setAttribute("aria-expanded", "false");
-        p.hidden = true;
-      }else{
-        openOnlyThisGroup(btnEl);
-      }
-    }
-
-    // ----------------------
-    // iOS scroll fix
-    // ----------------------
-    function onDrawerTouchMove(e){ e.preventDefault(); }
-
-    function onPanelTouchStart(e){
-      touchStartY = e.touches ? e.touches[0].clientY : 0;
-    }
-
-    function onPanelTouchMove(e){
-      if (!panel) return;
-
-      const curY = e.touches ? e.touches[0].clientY : 0;
-      const deltaY = curY - touchStartY;
-
-      const atTop = panel.scrollTop <= 0;
-      const atBottom = panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 1;
-
-      if ((atTop && deltaY > 0) || (atBottom && deltaY < 0)){
-        e.preventDefault();
-        return;
-      }
-      e.stopPropagation();
-    }
-
-    function enableIosScrollFix(){
-      drawer.addEventListener("touchmove", onDrawerTouchMove, { passive: false });
-      if (panel){
-        panel.addEventListener("touchstart", onPanelTouchStart, { passive: true });
-        panel.addEventListener("touchmove", onPanelTouchMove, { passive: false });
-      }
-    }
-
-    function disableIosScrollFix(){
-      drawer.removeEventListener("touchmove", onDrawerTouchMove);
-      if (panel){
-        panel.removeEventListener("touchstart", onPanelTouchStart);
-        panel.removeEventListener("touchmove", onPanelTouchMove);
-      }
-    }
-
-    // ----------------------
-    // Open / Close
-    // ----------------------
-    function open(){
-      syncNavHeight();
-      syncViewportPx();
-      applyHardFloor();
-
-      drawer.classList.add("is-open");
-      drawer.setAttribute("aria-hidden", "false");
-      btn.setAttribute("aria-expanded", "true");
-
-      closeUseCases();
-      closeAllGroups();
-
-      lockBodyFixed(true);
-      enableIosScrollFix();
-
-      setTimeout(() => { try{ panel && panel.focus(); }catch(_){} }, 0);
-    }
-
-    function close(){
-      drawer.classList.remove("is-open");
-      drawer.setAttribute("aria-hidden", "true");
-      btn.setAttribute("aria-expanded", "false");
-
-      disableIosScrollFix();
-      lockBodyFixed(false);
-
-      closeUseCases();
-      closeAllGroups();
-
-      try{ btn.focus(); }catch(_){}
-    }
-
-    // ----------------------
-    // Events
-    // ----------------------
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      drawer.classList.contains("is-open") ? close() : open();
-    });
-
-    if (backdrop) backdrop.addEventListener("click", close);
-
-    // close-on-click (links + any [data-close])
-    drawer.addEventListener("click", (e) => {
-      const el = e.target && e.target.closest && e.target.closest('[data-close="sx-drawer"]');
-      if (el) close();
-    });
-
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && drawer.classList.contains("is-open")) close();
-    });
-
-    // Use Cases fold
-    if (ucBtn && ucPanel){
-      closeUseCases();
-      ucBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleUseCases();
-      });
-    }
-
-    // Group fold (event delegation)
-    drawer.addEventListener("click", (e) => {
-      const gbtn = e.target && e.target.closest && e.target.closest(".sx-drawer-group[aria-controls]");
-      if (!gbtn) return;
-      e.preventDefault();
-      e.stopPropagation();
-      toggleGroup(gbtn);
-    });
-
-    function onViewportChange(){
-      if (!drawer.classList.contains("is-open")) return;
-      syncViewportPx();
-      syncNavHeight();
-      applyHardFloor();
-    }
-
-    window.addEventListener("resize", onViewportChange);
-    if (window.visualViewport){
-      window.visualViewport.addEventListener("resize", onViewportChange);
-    }
-
-    // init vars even before open
-    syncNavHeight();
-    syncViewportPx();
-    applyHardFloor();
-
-    return true;
   }
 
-  // ✅ if script runs too early, wait DOM ready
-  if (!boot()){
-    document.addEventListener("DOMContentLoaded", boot, { once: true });
+  // ----------------------
+  // Body Lock（iOS 修复：只用 overflow，不动 position）
+  // ----------------------
+  function lockBody() {
+    if (html.classList.contains("sx-drawer-open")) return;
+
+    state.scrollY = window.scrollY || window.pageYOffset || 0;
+
+    // 🔧 iOS 修复：只锁 overflow，完全不碰 position
+    html.classList.add("sx-drawer-open");
+    html.style.overflow = "hidden";
+  }
+
+  function unlockBody() {
+    if (!html.classList.contains("sx-drawer-open")) return;
+
+    html.style.overflow = "";
+    html.classList.remove("sx-drawer-open");
+    
+    // 恢复滚动位置
+    window.scrollTo(0, state.scrollY || 0);
+  }
+
+  // ----------------------
+  // Use Cases fold
+  // ----------------------
+  function closeUseCases() {
+    if (!ucBtn || !ucPanel) return;
+    ucBtn.setAttribute("aria-expanded", "false");
+    ucPanel.hidden = true;
+  }
+
+  function toggleUseCases() {
+    if (!ucBtn || !ucPanel) return;
+    const isOpen = ucBtn.getAttribute("aria-expanded") === "true";
+    ucBtn.setAttribute("aria-expanded", isOpen ? "false" : "true");
+    ucPanel.hidden = isOpen;
+  }
+
+  // ----------------------
+  // Generic group folds (目录等)
+  // ----------------------
+  function getGroupPanel(btnEl) {
+    const id = btnEl && btnEl.getAttribute("aria-controls");
+    if (!id) return null;
+    return drawer.querySelector("#" + CSS.escape(id));
+  }
+
+  function closeAllGroups() {
+    groupBtns.forEach((b) => {
+      const p = getGroupPanel(b);
+      b.setAttribute("aria-expanded", "false");
+      if (p) p.hidden = true;
+    });
+  }
+
+  function openOnlyThisGroup(btnEl) {
+    groupBtns.forEach((b) => {
+      const p = getGroupPanel(b);
+      const isSelf = b === btnEl;
+
+      b.setAttribute("aria-expanded", isSelf ? "true" : "false");
+      if (p) p.hidden = !isSelf;
+    });
+  }
+
+  function toggleGroup(btnEl) {
+    const p = getGroupPanel(btnEl);
+    if (!p) return;
+
+    const isOpen = btnEl.getAttribute("aria-expanded") === "true";
+    if (isOpen) {
+      btnEl.setAttribute("aria-expanded", "false");
+      p.hidden = true;
+    } else {
+      openOnlyThisGroup(btnEl);
+    }
+  }
+
+  // ----------------------
+  // Open / Close
+  // ----------------------
+  function openDrawer() {
+    if (state.open) return;
+    state.open = true;
+
+    syncViewportPx();
+    lockBody();
+
+    drawer.classList.add("is-open");
+    drawer.setAttribute("aria-hidden", "false");
+    trigger.setAttribute("aria-expanded", "true");
+
+    closeUseCases();
+    closeAllGroups();
+
+    requestAnimationFrame(() => {
+      try {
+        panel && panel.focus();
+      } catch {}
+    });
+  }
+
+  function closeDrawer() {
+    if (!state.open) return;
+    state.open = false;
+
+    drawer.classList.remove("is-open");
+    drawer.setAttribute("aria-hidden", "true");
+    trigger.setAttribute("aria-expanded", "false");
+
+    closeUseCases();
+    closeAllGroups();
+    unlockBody();
+
+    try {
+      trigger.focus();
+    } catch {}
+  }
+
+  function toggleDrawer() {
+    state.open ? closeDrawer() : openDrawer();
+  }
+
+  // ----------------------
+  // Events
+  // ----------------------
+
+  // 触发按钮
+  trigger.addEventListener("click", (ev) => {
+    ev.preventDefault();
+    toggleDrawer();
+  });
+
+  // 点击幕布关闭（只在点到幕布本身时关闭）
+  if (backdrop) {
+    backdrop.addEventListener("click", (ev) => {
+      if (ev.target === backdrop) {
+        closeDrawer();
+      }
+    });
+  }
+
+  // Esc 关闭
+  window.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape" && state.open) {
+      closeDrawer();
+    }
+  });
+
+  // close-on-click（任意带 data-close="sx-drawer" 的元素）
+  drawer.addEventListener("click", (ev) => {
+    const el =
+      ev.target &&
+      ev.target.closest &&
+      ev.target.closest('[data-close="sx-drawer"]');
+    if (el) {
+      closeDrawer();
+    }
+  });
+
+  // Use Cases 按钮
+  if (ucBtn && ucPanel) {
+    closeUseCases();
+    ucBtn.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      toggleUseCases();
+    });
+  }
+
+  // Group 折叠（事件代理）
+  drawer.addEventListener("click", (ev) => {
+    const gbtn =
+      ev.target &&
+      ev.target.closest &&
+      ev.target.closest(".sx-drawer-group[aria-controls]");
+    if (!gbtn) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    toggleGroup(gbtn);
+  });
+
+  // 视口变化时，更新 vh 变量
+  function onViewportChange() {
+    if (!state.open) return;
+    syncViewportPx();
+  }
+
+  window.addEventListener("resize", onViewportChange);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", onViewportChange);
+  }
+
+  // 调试时如果一开始就带 is-open，同步状态
+  if (drawer.classList.contains("is-open")) {
+    state.open = true;
+    drawer.setAttribute("aria-hidden", "false");
+    trigger.setAttribute("aria-expanded", "true");
+    lockBody();
+    requestAnimationFrame(syncViewportPx);
+  } else {
+    syncViewportPx();
   }
 })();

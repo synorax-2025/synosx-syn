@@ -1,0 +1,291 @@
+/* sx.drawer.system.css — SynOSX System Drawer v2.0
+   Model: same as sx.menu (panel max-height + inner flex scroll)
+*/
+
+/* =========================
+   Overlay
+   ========================= */
+
+.sx-system-overlay {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at top, rgba(15, 23, 42, 0.6), rgba(3, 7, 18, 0.96));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur, 220ms) var(--ease, ease-out);
+  z-index: 120;
+}
+
+.sx-system-overlay[hidden] {
+  display: none;
+}
+
+html.sx-system-open .sx-system-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* =========================
+   Panel（外框，仅 max-height）
+   ========================= */
+
+.sx-system-panel {
+  position: fixed;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 14, 26, 0.98),
+    rgba(15, 23, 42, 0.98)
+  );
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  box-shadow: var(--shadow-lg, 0 20px 60px rgba(0, 0, 0, 0.7));
+  color: var(--text, #e5e7eb);
+  z-index: 130;
+
+  display: flex;
+  flex-direction: column;
+
+  /* ⭐ 核心：只限制最大高度，不写 height / overflow */
+  max-height: 40vh;
+
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity var(--dur, 220ms) var(--ease, ease-out),
+    transform var(--dur, 220ms) var(--ease, ease-out);
+}
+
+/* Desktop：紧贴 nav 右侧 */
+@media (min-width: 768px) {
+  .sx-system-panel {
+    top: calc(56px + var(--sx-safe-top, 0px));
+    right: 20px;
+    width: min(280px, calc(100% - 40px));
+  }
+}
+
+/* Mobile：Bottom Console */
+@media (max-width: 767.98px) {
+  .sx-system-panel {
+    left: 50px;
+    right: 50px;
+    bottom: 60px;
+    top: auto;
+
+    width: auto;
+    max-height: 38vh; /* 小屏略低一点 */
+
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    box-shadow: 0 20px 48px rgba(3, 7, 18, 0.85);
+
+    transform: translateY(100%);
+  }
+}
+
+/* 打开状态 */
+
+html.sx-system-open .sx-system-panel {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =========================
+   Header（不参与滚动）
+   ========================= */
+
+.sx-system-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px 6px;
+  border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+  min-height: 40px;
+  flex-shrink: 0; /* 固定在顶部，不被压缩 */
+}
+
+.sx-system-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sx-system-panel-tag {
+  font-family: var(--mono, ui-monospace, SFMono-Regular, Menlo, Monaco),
+    monospace;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(59, 130, 246, 0.16);
+  color: #bfdbfe;
+}
+
+.sx-system-panel-text {
+  font-size: 12px;
+  color: var(--text-muted, #9ca3af);
+}
+
+.sx-system-close {
+  border: none;
+  background: transparent;
+  color: var(--text-muted, #9ca3af);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 999px;
+  transition:
+    background var(--dur-fast, 140ms) var(--ease, ease-out),
+    color var(--dur-fast, 140ms) var(--ease, ease-out);
+}
+
+.sx-system-close:hover {
+  background: rgba(37, 99, 235, 0.18);
+  color: var(--text, #e5e7eb);
+}
+
+/* =========================
+   内容区域（内部滚动）
+   ========================= */
+
+.sx-system-content {
+  padding: 4px 8px 10px;
+
+  /* ⭐ 一模一样的模式：占用剩余空间 + 内部滚动 */
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sx-system-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sx-system-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+/* 渐隐遮罩（可选） */
+
+.sx-system-list::after {
+  content: "";
+  position: sticky;
+  bottom: 0;
+  height: 24px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 14, 26, 0),
+    rgba(10, 14, 26, 0.96)
+  );
+}
+
+/* 滚动条 */
+
+.sx-system-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sx-system-content::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.9);
+  border-radius: 999px;
+}
+
+/* =========================
+   主按钮
+   ========================= */
+
+.sx-system-item {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--text, #e5e7eb);
+  font-size: 13px;
+  padding: 7px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: block;
+  transition:
+    background var(--dur-fast, 140ms) var(--ease, ease-out),
+    transform var(--dur-fast, 140ms) var(--ease, ease-out),
+    box-shadow var(--dur-fast, 140ms) var(--ease, ease-out),
+    color var(--dur-fast, 140ms) var(--ease, ease-out);
+}
+
+.sx-system-item:hover {
+  background: rgba(37, 99, 235, 0.18);
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.45);
+  transform: translateY(-0.5px);
+}
+
+.sx-system-list > li + li {
+  margin-top: 2px;
+}
+
+/* =========================
+   Use Cases 折叠组
+   ========================= */
+
+.sx-system-group {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(30, 64, 175, 0.7);
+}
+
+.sx-system-item-group {
+  display: flex;
+  align-items: center;
+}
+
+.sx-system-chevron {
+  margin-left: auto;
+  font-size: 11px;
+  opacity: 0.8;
+  transition:
+    transform 160ms var(--ease, ease-out),
+    opacity 160ms var(--ease, ease-out);
+}
+
+.sx-system-sublist {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0 0 0 10px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-height 160ms var(--ease, ease-out),
+    opacity 160ms var(--ease, ease-out);
+}
+
+.sx-system-group.is-open .sx-system-sublist {
+  max-height: 320px;
+  opacity: 1;
+}
+
+.sx-system-group.is-open .sx-system-chevron {
+  transform: rotate(90deg);
+  opacity: 1;
+}
+
+/* =========================
+   小屏微调
+   ========================= */
+
+@media (max-width: 480px) {
+  .sx-system-content {
+    padding-inline: 6px;
+  }
+
+  .sx-system-item {
+    font-size: 12px;
+    padding-inline: 7px;
+  }
+}

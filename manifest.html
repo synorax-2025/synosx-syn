@@ -25,18 +25,29 @@
 
   <!-- ✅ Shared CSS -->
   <link rel="stylesheet" href="assets/css/sx.core.css" />
+  <link rel="stylesheet" href="assets/css/sx.nav.css" />
   <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
-  <link rel="stylesheet" href="assets/css/sx.drawer.css" />
+  <link rel="stylesheet" href="assets/css/sx.menu.css" />
+  <link rel="stylesheet" href="assets/css/sx.orb.css" />
 
   <!-- ✅ Page CSS -->
   <link rel="stylesheet" href="assets/css/pages/manifest.page.css" />
 </head>
 
+<button
+  class="sx-orb"
+  data-sx-menu="trigger"
+  aria-label="Open SynOSX Menu"
+  type="button"
+>
+  <span class="sx-orb-core" aria-hidden="true"></span>
+</button>
+
 <body class="has-statusbar">
   <div class="bg-gradient" aria-hidden="true"></div>
 
-  <!-- ✅ Unified Nav + Mobile Drawer (from partials/nav.partial.html) -->
-  <!--@include nav-->
+  <!-- ✅ Manifest 专用：挂一份横排 sx.menu（用 menu.partial.html 注入） -->
+  <!--@include menu-->
 
   <!-- Hero -->
   <section class="hero" id="top">
@@ -607,7 +618,8 @@
   <!-- ✅ Shared JS -->
   <script src="assets/js/sx.core.js"></script>
   <script src="assets/js/sx.statusbar.js"></script>
-  <script src="assets/js/sx.drawer.js"></script>
+  <script src="assets/js/sx.menu.js"></script>
+  <script src="assets/js/sx.orb.js" defer></script>
 
   <!-- ✅ Page runtime -->
   <script src="assets/js/runtime/manifest.runtime.js"></script>

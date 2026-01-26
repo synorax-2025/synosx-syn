@@ -1,0 +1,140 @@
+<!-- menu.partial.html — Manifest 专用 Menu（返回首页 + 目录）
+     ✅ 复用 sx.menu.css / sx.menu.js 交互
+     ✅ iOS 面板滚动：唯一滚动容器 .sx-menu-content
+-->
+
+<!-- 顶部横排导航：复用全站 nav#navbar 样式 -->
+<nav
+  id="navbar"
+  class="manifest-header"
+  aria-label="Manifest Navigation"
+>
+  <div class="nav-content">
+    <!-- 左侧 Logo / 标题：用和全站一样的结构 -->
+    <a href="index.html" class="logo">
+      <div class="logo-icon">SX</div>
+      <span>
+        <b>SynOSX</b>
+        <span class="logo-sub">· Manifest</span>
+      </span>
+    </a>
+
+    <!-- 右侧按钮：统一使用 btn-secondary / cta-button -->
+    <div class="nav-actions">
+      <a href="index.html" class="btn-secondary">返回首页</a>
+
+      <!-- 顶栏 Menu 按钮：交给 sx.menu.js 处理 -->
+      <button
+        type="button"
+        class="btn-secondary sx-menu-trigger"
+        data-sx-menu="trigger"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <span class="sx-menu-icon">☰</span>
+        <span class="sx-menu-label">目录</span>
+      </button>
+
+      <a href="#toc" class="cta-button">开始阅读</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ORB 触发器（右下角小球） -->
+<button
+  class="sx-orb"
+  data-sx-menu="trigger"
+  aria-label="Open SynOSX Menu"
+  type="button"
+>
+  <span class="sx-orb-core" aria-hidden="true"></span>
+</button>
+
+<!-- MENU Overlay -->
+<div class="sx-menu-overlay" data-sx-menu="overlay" hidden></div>
+
+<!-- MENU Panel -->
+<aside
+  class="sx-menu-panel"
+  data-sx-menu="panel"
+  aria-hidden="true"
+  aria-label="SynOSX Manifest Menu"
+>
+  <header class="sx-menu-panel-header">
+    <div class="sx-menu-panel-title">
+      <span class="sx-menu-panel-tag">导航</span>
+      <span class="sx-menu-panel-text">Manifest / Whitepaper</span>
+    </div>
+    <button
+      class="sx-menu-close"
+      type="button"
+      data-sx-menu="close"
+      aria-label="关闭菜单"
+    >
+      ✕
+    </button>
+  </header>
+
+  <!-- Tabs：左“目录”，右“快速入口” -->
+  <div class="sx-menu-tabs" role="tablist">
+    <button
+      type="button"
+      class="sx-menu-tab is-active"
+      role="tab"
+      data-sx-menu-tab="chapters"
+      aria-selected="true"
+    >
+      目录
+    </button>
+    <button
+      type="button"
+      class="sx-menu-tab"
+      role="tab"
+      data-sx-menu-tab="quick"
+      aria-selected="false"
+    >
+      快速入口
+    </button>
+    <!-- 滑块由 sx.menu.js 动态插入 -->
+  </div>
+
+  <!-- ⭐ 唯一滚动容器 -->
+  <div class="sx-menu-content">
+    <!-- Tab 1: 目录（锚点跳到 #toc / #c1~#c10） -->
+    <section
+      class="sx-menu-section is-active"
+      data-sx-menu-panel="chapters"
+      role="tabpanel"
+    >
+      <h2 class="sx-menu-section-title">Manifest 目录</h2>
+      <ul class="sx-menu-list">
+        <li><a class="sx-menu-item" href="#top">顶部 · Manifest Lens</a></li>
+        <li><a class="sx-menu-item" href="#toc">目录 · Table of Contents</a></li>
+        <li><a class="sx-menu-item" href="#c1">Ch.1 · The Constitutional Problem</a></li>
+        <li><a class="sx-menu-item" href="#c2">Ch.2 · Core Principles（三铁律）</a></li>
+        <li><a class="sx-menu-item" href="#c3">Ch.3 · Governance Architecture（角色分离）</a></li>
+        <li><a class="sx-menu-item" href="#c4">Ch.4 · Governance Runtime (S0–S6)</a></li>
+        <li><a class="sx-menu-item" href="#c5">Ch.5 · Voice &amp; Authority</a></li>
+        <li><a class="sx-menu-item" href="#c6">Ch.6 · Contracts-first World</a></li>
+        <li><a class="sx-menu-item" href="#c7">Ch.7 · Operational Evidence</a></li>
+        <li><a class="sx-menu-item" href="#c8">Ch.8 · Case Study</a></li>
+        <li><a class="sx-menu-item" href="#c9">Ch.9 · Scope &amp; Non-Goals</a></li>
+        <li><a class="sx-menu-item" href="#c10">Ch.10 · Conclusion（文明选择）</a></li>
+      </ul>
+    </section>
+
+    <!-- Tab 2: 快速入口（返回首页 + 顶部） -->
+    <section
+      class="sx-menu-section"
+      data-sx-menu-panel="quick"
+      role="tabpanel"
+    >
+      <h2 class="sx-menu-section-title">快速入口</h2>
+      <ul class="sx-menu-list">
+        <li><a class="sx-menu-item" href="index.html">返回首页 · SynOSX Overview</a></li>
+        <li><a class="sx-menu-item" href="#top">回到本文顶部 · Manifest Lens</a></li>
+        <li><a class="sx-menu-item" href="#toc">直接跳到目录 · TOC</a></li>
+      </ul>
+    </section>
+  </div>
+</aside>

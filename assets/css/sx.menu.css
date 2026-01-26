@@ -5,6 +5,30 @@
    - 4 个 Tab + 滑块 + 列表
 */
 
+/* =========================
+   Manifest / Menu Header 布局（不改按钮样式）
+   ========================= */
+
+.sx-menu-header {
+  padding: 10px 16px 0;
+}
+
+.sx-menu-header .nav-content {
+  max-width: 1120px;              /* 和其它页面 nav 一样的宽度（可按你实际值调） */
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sx-menu-header .nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
 /* --- Menu 按钮内部的小布局 --- */
 
 .sx-menu-trigger {
@@ -66,7 +90,7 @@
   .sx-menu-panel {
     left: 50px;
     right: 50px;
-    bottom: 12px;
+    bottom: 60px;
     top: auto;
 
     width: auto;

@@ -1,15 +1,8 @@
 /* tools/build-includes.mjs — static include builder (no deps, ESM)
    ✅ Reads registry/site.nav.json (Single Source of Truth)
    ✅ Builds per-page nav+drawer HTML and injects into html via <!--@include nav-->
-   ✅ Recreates dist/: copies non-html assets, rebuilds html with injected nav
-   ✅ Supports nested pages (pages/** etc) with auto href prefixing
-   ✅ Supports desktop+drawer: link / divider / group (dropdown & collapsible)
-   ✅ Supports desktop actions: primary + secondary (2 CTAs on desktop)
-   ✅ Responsive policy:
-      - Topbar secondary auto gets class "sx-cta-secondary" (CSS hides on mobile)
-      - actions.secondary auto-degrades into Drawer as mobile-only link (class "sx-only-mobile")
-      - Drawer dedup is by href (not by label)
-      - Drawer never repeats Topbar primary (when primary is a link)
+   ✅ Injects menu.partial.html via <!--@include menu-->
+   ✅ Recreates dist/: copies non-html assets, rebuilds html with injected nav/menu
 */
 
 import fs from "node:fs";
@@ -19,7 +12,12 @@ const ROOT = process.cwd();
 const DIST_DIR = path.join(ROOT, "dist");
 
 const NAV_CONFIG_PATH = path.join(ROOT, "registry", "site.nav.json");
-const INCLUDE_TOKEN = "<!--@include nav-->";
+
+// include tokens
+const NAV_INCLUDE = "<!--@include nav-->";
+const MENU_INCLUDE = "<!--@include menu-->";
+
+const MENU_PARTIAL_PATH = path.join(ROOT, "partials", "menu.partial.html");
 
 // Exclude folders from dist copy (source-only / tooling / repo internals)
 const EXCLUDE_DIR_NAMES = new Set([
@@ -413,11 +411,22 @@ function renderTopbarActions(actions = {}, prefix) {
   // Desktop may show 2 CTAs; mobile will hide secondary via CSS (.sx-cta-secondary)
   if (secondary) {
     if (secondary.type !== "link") {
-      throw new Error(`actions.secondary must be {type:"link", ...}. Got type="${secondary.type}".`);
+      throw new Error(
+        `actions.secondary must be {type:"link", ...}. Got type="${secondary.type}".`
+      );
     }
-    const cls = joinClasses("btn-secondary", "cta-secondary", "sx-cta-secondary", secondary.class);
+    const cls = joinClasses(
+      "btn-secondary",
+      "cta-secondary",
+      "sx-cta-secondary",
+      secondary.class
+    );
     parts.push(
-      `<a class="${escapeHtml(cls)}"${attr("href", withPrefix(secondary.href, prefix))}>${escapeHtml(secondary.label)}</a>`
+      `<a class="${escapeHtml(
+        cls
+      )}"${attr("href", withPrefix(secondary.href, prefix))}>${escapeHtml(
+        secondary.label
+      )}</a>`
     );
   }
 
@@ -425,15 +434,24 @@ function renderTopbarActions(actions = {}, prefix) {
     if (primary.type === "button") {
       const cls = joinClasses("cta-button", primary.class);
       parts.push(
-        `<button class="${escapeHtml(cls)}"${attr("id", primary.id)} type="button">${escapeHtml(primary.label)}</button>`
+        `<button class="${escapeHtml(cls)}"${attr(
+          "id",
+          primary.id
+        )} type="button">${escapeHtml(primary.label)}</button>`
       );
     } else if (primary.type === "link") {
       const cls = joinClasses("cta-button", primary.class);
       parts.push(
-        `<a class="${escapeHtml(cls)}"${attr("href", withPrefix(primary.href, prefix))}>${escapeHtml(primary.label)}</a>`
+        `<a class="${escapeHtml(
+          cls
+        )}"${attr("href", withPrefix(primary.href, prefix))}>${escapeHtml(
+          primary.label
+        )}</a>`
       );
     } else {
-      throw new Error(`actions.primary must be type "link" or "button". Got "${primary.type}".`);
+      throw new Error(
+        `actions.primary must be type "link" or "button". Got "${primary.type}".`
+      );
     }
   }
 
@@ -446,7 +464,7 @@ function renderDrawerLinks(links = [], prefix) {
   return (links ?? [])
     .map((it) => renderDrawerItem(it, prefix))
     .filter(Boolean)
-    .join("\n"); // ✅ 强制换行，降低浏览器重排概率
+    .join("\n"); // strong line breaks
 }
 
 function isMobileOnly(it) {
@@ -471,7 +489,6 @@ function renderDrawerItem(it, prefix) {
       .filter(Boolean)
       .join("\n");
 
-    // ✅ 硬规则：空 group 不允许输出
     if (!children.trim()) return "";
 
     return `
@@ -489,14 +506,17 @@ ${children}
   }
 
   const cls = joinClasses(isMobileOnly(it) ? "sx-only-mobile" : null, it.class);
-  return `<a${attr("class", cls)} href="${escapeHtml(withPrefix(it.href, prefix))}" data-close="sx-drawer">${escapeHtml(it.label)}</a>`;
+  return `<a${attr("class", cls)} href="${escapeHtml(
+    withPrefix(it.href, prefix)
+  )}" data-close="sx-drawer">${escapeHtml(it.label)}</a>`;
 }
 
 function renderDrawerTail(tail = [], prefix) {
   return (tail ?? [])
     .map((l) => {
       if (!l) return "";
-      if (l.type === "divider") return `<div class="sx-drawer-divider" aria-hidden="true"></div>`;
+      if (l.type === "divider")
+        return `<div class="sx-drawer-divider" aria-hidden="true"></div>`;
       return renderDrawerItem(l, prefix);
     })
     .filter(Boolean)
@@ -515,24 +535,36 @@ function renderDrawerUsecases(usecases, prefix) {
 
       if (it?.subtitle) {
         return `
-          <a class="sx-drawer-narratives" href="${escapeHtml(withPrefix(it.href, prefix))}" data-close="sx-drawer">
-            <span class="sx-drawer-narratives-title">${escapeHtml(it.label)}</span>
-            <span class="sx-drawer-narratives-sub">${escapeHtml(it.subtitle)}</span>
+          <a class="sx-drawer-narratives" href="${escapeHtml(
+            withPrefix(it.href, prefix)
+          )}" data-close="sx-drawer">
+            <span class="sx-drawer-narratives-title">${escapeHtml(
+              it.label
+            )}</span>
+            <span class="sx-drawer-narratives-sub">${escapeHtml(
+              it.subtitle
+            )}</span>
           </a>
         `.trim();
       }
 
-      return `<a href="${escapeHtml(withPrefix(it.href, prefix))}" data-close="sx-drawer">${escapeHtml(it.label)}${ext}</a>`;
+      return `<a href="${escapeHtml(
+        withPrefix(it.href, prefix)
+      )}" data-close="sx-drawer">${escapeHtml(it.label)}${ext}</a>`;
     })
     .join("\n");
 
   const panelId = "sx-usecases-panel";
 
   return `
-    <button class="sx-drawer-usecases" type="button" aria-expanded="false" aria-controls="${escapeHtml(panelId)}">
+    <button class="sx-drawer-usecases" type="button" aria-expanded="false" aria-controls="${escapeHtml(
+      panelId
+    )}">
       ${escapeHtml(label)} <span class="sx-usecases-caret" aria-hidden="true">▸</span>
     </button>
-    <div id="${escapeHtml(panelId)}" class="sx-drawer-group-panel" hidden>
+    <div id="${escapeHtml(
+      panelId
+    )}" class="sx-drawer-group-panel" hidden>
 ${items}
     </div>
   `.trim();
@@ -549,14 +581,24 @@ function renderDrawerActions(actions = [], prefix) {
       const cls = joinClasses(baseCls, a.class);
 
       if (a.type === "button") {
-        return `<button class="${escapeHtml(cls)}"${attr("id", a.id)} type="button">${escapeHtml(a.label)}</button>`;
+        return `<button class="${escapeHtml(cls)}"${attr(
+          "id",
+          a.id
+        )} type="button">${escapeHtml(a.label)}</button>`;
       }
 
       if (a.type === "link") {
-        return `<a class="${escapeHtml(cls)}"${attr("href", withPrefix(a.href, prefix))} data-close="sx-drawer">${escapeHtml(a.label)}</a>`;
+        return `<a class="${escapeHtml(
+          cls
+        )}"${attr(
+          "href",
+          withPrefix(a.href, prefix)
+        )} data-close="sx-drawer">${escapeHtml(a.label)}</a>`;
       }
 
-      throw new Error(`drawer.actions[] must be type "link" or "button". Got "${a.type}".`);
+      throw new Error(
+        `drawer.actions[] must be type "link" or "button". Got "${a.type}".`
+      );
     })
     .filter(Boolean)
     .join("\n");
@@ -578,11 +620,15 @@ function renderNavShell(resolvedRaw, prefix) {
   const brandHref = brand.href || "index.html";
 
   const brandHtml = `
-    <a class="logo" href="${escapeHtml(withPrefix(brandHref, prefix))}" aria-label="${escapeHtml(brandName)} Home">
+    <a class="logo" href="${escapeHtml(
+      withPrefix(brandHref, prefix)
+    )}" aria-label="${escapeHtml(brandName)} Home">
       <div class="logo-icon">SX</div>
       <span>
         <b>${escapeHtml(brandName)}</b>
-        <span class="logo-sub" data-sx="nav-sub">${escapeHtml(brandSubtitle)}</span>
+        <span class="logo-sub" data-sx="nav-sub">${escapeHtml(
+          brandSubtitle
+        )}</span>
       </span>
     </a>
   `.trim();
@@ -605,7 +651,9 @@ function renderNavShell(resolvedRaw, prefix) {
       <div class="logo-icon">SX</div>
       <div class="sx-drawer-title">
         <div class="sx-drawer-name">${escapeHtml(brandName)}</div>
-        <div class="sx-drawer-sub" data-sx="drawer-sub">${escapeHtml(brandSubtitle)}</div>
+        <div class="sx-drawer-sub" data-sx="drawer-sub">${escapeHtml(
+          brandSubtitle
+        )}</div>
       </div>
     </div>
   `.trim();
@@ -657,6 +705,9 @@ function pageKeyFromFilename(relPath) {
 function buildHtmlFiles(config) {
   const relFiles = listHtmlFilesRec(ROOT);
 
+  const hasMenuPartial = fs.existsSync(MENU_PARTIAL_PATH);
+  const menuPartialRaw = hasMenuPartial ? readText(MENU_PARTIAL_PATH) : "";
+
   for (const rel of relFiles) {
     const inPath = path.join(ROOT, rel);
     const outPath = path.join(DIST_DIR, rel);
@@ -664,17 +715,28 @@ function buildHtmlFiles(config) {
 
     ensureDir(path.dirname(outPath));
 
-    if (!src.includes(INCLUDE_TOKEN)) {
-      fs.writeFileSync(outPath, src, "utf8");
-      continue;
-    }
+    let out = src;
 
     const prefix = calcPrefixForRelHtml(rel);
     const key = pageKeyFromFilename(rel);
-    const resolved = resolvePageNav(config, key);
-    const navHtml = renderNavShell(resolved, prefix);
 
-    const out = src.replace(INCLUDE_TOKEN, navHtml);
+    // nav include
+    if (out.includes(NAV_INCLUDE)) {
+      const resolved = resolvePageNav(config, key);
+      const navHtml = renderNavShell(resolved, prefix);
+      out = out.replace(NAV_INCLUDE, navHtml);
+    }
+
+    // menu include：用 partials/menu.partial.html 注入
+    if (hasMenuPartial && out.includes(MENU_INCLUDE)) {
+      // 修正 assets 路径（支持 pages/ 子目录）
+      const patchedMenu = menuPartialRaw.replace(
+        /(href|src)="assets\//g,
+        `$1="${prefix}assets/`
+      );
+      out = out.replace(MENU_INCLUDE, patchedMenu);
+    }
+
     fs.writeFileSync(outPath, out, "utf8");
   }
 }
@@ -687,7 +749,9 @@ function assertBasicConfig(config) {
   if (!config.defaults.brand)
     throw new Error("site.nav.json: missing defaults.brand.");
   if (!("subtitle" in config.defaults.brand))
-    throw new Error('site.nav.json: defaults.brand.subtitle is required (no "sub" allowed).');
+    throw new Error(
+      'site.nav.json: defaults.brand.subtitle is required (no "sub" allowed).'
+    );
 }
 
 function main() {

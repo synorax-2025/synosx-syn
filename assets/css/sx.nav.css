@@ -1,0 +1,77 @@
+/* sx.nav.css — SynOSX Top Nav Constitution v1
+   2026-01-23
+
+   目标：
+   - 从旧 sx.drawer.css 抽离“可见性 + CTA 策略”
+   - 不再包含任何 Drawer 面板/滚动/抽屉视觉
+   - 与 sx.core.css 的 nav 骨架协作，而不是覆盖
+
+   约定 class（如果页面暂时没有，用不到也没关系）：
+   - #navbar .nav-desktop     → 桌面版导航区（可选）
+   - .nav-menu-btn            → 旧的汉堡按钮（可选/遗留）
+   - .sx-cta-secondary        → 顶栏里的第二个 CTA 按钮（按钮本体由 core 提供）
+   - .sx-only-mobile          → 只在移动端存在的条目（如 drawer 菜单里的“手机版专用项”）
+*/
+
+/* -----------------------------
+   1. NAV 可见性宪法（三态锁死）
+   Desktop (>980): 显示 nav-desktop，隐藏 nav-menu-btn
+   Mobile  (<=980): 隐藏 nav-desktop，显示 nav-menu-btn
+   ----------------------------- */
+
+/* 默认：菜单按钮隐藏（防止误闪） */
+.nav-menu-btn{
+  display: none !important;
+}
+
+/* 桌面：navbar 内的桌面导航强制存在 */
+#navbar .nav-desktop{
+  display: flex !important;
+}
+
+@media (max-width: 980px){
+  /* 移动：隐藏桌面导航 */
+  #navbar .nav-desktop{
+    display: none !important;
+  }
+
+  /* 移动：如果页面仍保留旧汉堡按钮，则显示它
+     （你如果决定完全用 Orb 当入口，可以不放 .nav-menu-btn 这个元素）
+  */
+  .nav-menu-btn{
+    display: inline-flex !important;
+  }
+}
+
+/* -----------------------------
+   2. 顶栏 CTA 策略（来自 drawer v1.3.1）
+   - Desktop: 主 CTA + 次 CTA
+   - Mobile : 只保留主 CTA，次 CTA 隐藏
+   ----------------------------- */
+
+/* Mobile: 隐藏顶栏第二个 CTA；允许 .sx-only-mobile 在菜单 / 内容中出现 */
+@media (max-width: 980px){
+  .sx-cta-secondary{
+    display: none !important;
+  }
+  .sx-only-mobile{
+    display: block;
+  }
+}
+
+/* Desktop: 顶栏允许第二个 CTA；隐藏 .sx-only-mobile */
+@media (min-width: 981px){
+  .sx-cta-secondary{
+    display: inline-flex;
+  }
+  .sx-only-mobile{
+    display: none !important;
+  }
+}
+
+/* -----------------------------
+   3. 与 sx.menu / sx.orb 的协作说明（仅文档说明，不加样式）
+   - 顶栏 Menu 按钮（.sx-menu-trigger）由 sx.menu.css 负责视觉
+   - Orb（.sx-orb）由 sx.orb.css 负责视觉与入口区域
+   - 本文件只管：哪些东西在什么屏幕尺寸“该出现/该消失”
+   ----------------------------- */

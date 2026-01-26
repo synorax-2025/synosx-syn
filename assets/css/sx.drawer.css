@@ -6,7 +6,7 @@
 :root{
   --sx-safe-bottom: env(safe-area-inset-bottom, 0px);
   --sx-drawer-bottom-gap: 55px;  /* 离底多少 */
-  --sx-drawer-side-gap: 64px;    /* 左右留白 */
+  --sx-drawer-side-gap: 10px;    /* 左右留白 */
   --sx-drawer-max-vh: 0.35;      /* 抽屉最多占 50% 视口高度（🔑 父框锁死高度） */
 }
 

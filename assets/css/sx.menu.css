@@ -88,8 +88,8 @@
 /* Mobile：Bottom Console（带边界的系统面板） */
 @media (max-width: 767.98px) {
   .sx-menu-panel {
-    left: 20px;
-    right: 20px;
+    left: 10px;
+    right: 10px;
     bottom: 60px;
     top: auto;
 

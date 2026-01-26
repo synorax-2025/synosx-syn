@@ -129,20 +129,41 @@ section{ padding: 100px 0; }
 .grid{ display:grid; gap: 18px; }
 
 /* -----------------------------
-   Navbar (shared)
-   Page can supply its own nav markup, these are baseline styles
+   Navbar (shared · SYSTEM-LEVEL)
+   --------------------------------
+   ✅ GOVERNANCE: NAV ROLE IS EXPLICIT
+
+   规则：
+   - 裸 <nav> 不拥有“固定顶栏”权力（避免污染 Drawer/Modal/Content 内的 nav 语义）
+   - 只有带 .sx-navbar 的 nav 才是系统顶栏（fixed / blur / border）
+
+   WHY（写给未来维护者）：
+   - 系统内会出现 drawer / modal / inspector 等结构，它们可能使用 <nav> 语义标签
+   - 如果对 nav 做裸标签全局 fixed，会导致“内部 nav 被当成顶栏” → 产生叠层/错位/滚动权冲突
+   - 因此：顶栏不是所有 nav，而是一个明确角色：.sx-navbar
+
+   TL;DR：
+   👉 顶栏：<nav class="sx-navbar" ...>
+   👉 抽屉/内容导航：建议用 <div role="navigation"> 或者 nav 但不要带 sx-navbar
    ----------------------------- */
-nav{
+
+/* ✅ SYSTEM NAVBAR ONLY */
+nav.sx-navbar{
   position: fixed;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+
   z-index: 100;
+
   backdrop-filter: blur(18px);
   background: rgba(10, 14, 26, 0.72);
   border-bottom: 1px solid rgba(255,255,255,0.06);
+
   transition: background var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 
-nav.scrolled{
+nav.sx-navbar.scrolled{
   background: rgba(10, 14, 26, 0.92);
   box-shadow: 0 14px 30px rgba(0,0,0,0.32);
 }
@@ -153,8 +174,12 @@ nav.scrolled{
    - 顶栏骨架固定（nav-content / logo / actions）
    - 品牌规则写死：SynOSX 可换行；logo-sub 永不换行
    - 与 sx.drawer.css 共存：drawer 只控制 menu 的显示隐藏
+
+   ⚠️ GOVERNANCE:
+   - 这些骨架 class 默认只服务于 .sx-navbar
+   - Drawer / Modal 内禁止复用 .nav-content / .nav-actions / .nav-links 作为内部布局骨架
    ----------------------------- */
-.nav-content{
+.sx-navbar .nav-content{
   max-width: var(--max);
   margin: 0 auto;
   padding: 16px 24px;
@@ -169,7 +194,7 @@ nav.scrolled{
 }
 
 /* Brand block */
-.logo{
+.sx-navbar .logo{
   display: flex;
   align-items: center;
   gap: 12px;
@@ -178,7 +203,7 @@ nav.scrolled{
 }
 
 /* optional: SX icon (if used by page nav) */
-.logo-icon{
+.sx-navbar .logo-icon{
   width: 40px;
   height: 40px;
   border-radius: 14px;
@@ -197,21 +222,21 @@ nav.scrolled{
 }
 
 /* Text stack: allow main title wrap, forbid sub wrap */
-.logo span{
+.sx-navbar .logo span{
   display: flex;
   flex-direction: column;
   line-height: 1.15;
   min-width: 0; /* ✅ 关键：让主品牌在 flex 内正确换行 */
 }
 
-.logo b{
+.sx-navbar .logo b{
   font-weight: 900;
   letter-spacing: -0.02em;
   white-space: normal; /* ✅ 主品牌允许换行 */
 }
 
 /* ✅ 冻结规则：副标题永不换行、永不被压缩 */
-.logo-sub{
+.sx-navbar .logo-sub{
   white-space: nowrap;
   flex-shrink: 0;
 
@@ -222,7 +247,7 @@ nav.scrolled{
 }
 
 /* Actions block */
-.nav-actions{
+.sx-navbar .nav-actions{
   display: flex;
   align-items: center;
   gap: 10px;
@@ -231,7 +256,7 @@ nav.scrolled{
 }
 
 /* Desktop nav links (optional) */
-.nav-links{
+.sx-navbar .nav-links{
   list-style: none;
   display: flex;
   gap: 14px;
@@ -243,12 +268,12 @@ nav.scrolled{
    ----------------------------- */
 
 /* 1) tab 之间更松一点 */
-.nav-links{
+.sx-navbar .nav-links{
   gap: 22px;              /* 原来 14px 太挤 */
 }
 
 /* 2) tab 自身点击热区更舒服 */
-.nav-links a{
+.sx-navbar .nav-links a{
   display: inline-flex;
   align-items: center;
   padding: 8px 10px;      /* 让每个 tab 自带“呼吸感” */
@@ -258,7 +283,7 @@ nav.scrolled{
 }
 
 /* 3) hover 更清晰（可选，但建议有） */
-.nav-links a:hover{
+.sx-navbar .nav-links a:hover{
   background: rgba(255,255,255,0.06);
   color: rgba(232,236,245,0.98);
 }
@@ -383,15 +408,15 @@ footer{
   .container{ padding: 0 18px; }
 
   /* nav padding shrink */
-  .nav-content{ padding: 14px 18px; }
+  .sx-navbar .nav-content{ padding: 14px 18px; }
 
   /* icon slightly smaller on small screens */
-  .logo-icon{
+  .sx-navbar .logo-icon{
     width: 36px;
     height: 36px;
     border-radius: 12px;
   }
 
   /* keep actions tight */
-  .nav-actions{ gap: 8px; }
+  .sx-navbar .nav-actions{ gap: 8px; }
 }

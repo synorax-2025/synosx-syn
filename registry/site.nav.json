@@ -29,7 +29,9 @@
           }
         ]
       },
-      "tail": [{ "label": "Contact", "href": "index.html#contact" }]
+      "tail": [
+        { "label": "Contact", "href": "index.html#contact" }
+      ]
     },
 
     "actions": {
@@ -65,8 +67,26 @@
           }
         ]
       },
-      "tail": [{ "label": "Contact", "href": "index.html#contact" }],
+      "tail": [
+        { "label": "Contact", "href": "index.html#contact" }
+      ],
       "actions": []
+    },
+
+    "entry": {
+      "desktop": {
+        "type": "menu-button",
+        "id": "sx-menu-button",
+        "role": "primary-nav-trigger",
+        "ariaLabel": "Open SynOSX Menu"
+      },
+      "mobile": {
+        "type": "orb",
+        "id": "sx-orb",
+        "role": "primary-nav-trigger",
+        "position": "bottom-right",
+        "ariaLabel": "Open SynOSX Menu"
+      }
     }
   },
 
@@ -271,7 +291,11 @@
     "case-video": {
       "brand": { "subtitle": "· Video", "href": "cases.html" },
 
-      "desktop": { "usecases": { "enabled": false }, "links": [], "tail": [] },
+      "desktop": {
+        "usecases": { "enabled": false },
+        "links": [],
+        "tail": []
+      },
 
       "actions": {
         "secondary": {
@@ -302,7 +326,11 @@
     "case-voicewall": {
       "brand": { "subtitle": "· VoiceWall", "href": "cases.html" },
 
-      "desktop": { "usecases": { "enabled": false }, "links": [], "tail": [] },
+      "desktop": {
+        "usecases": { "enabled": false },
+        "links": [],
+        "tail": []
+      },
 
       "actions": {
         "secondary": {
@@ -333,7 +361,11 @@
     "narrative-case": {
       "brand": { "subtitle": "· Narrative-case", "href": "narratives.html" },
 
-      "desktop": { "usecases": { "enabled": false }, "links": [], "tail": [] },
+      "desktop": {
+        "usecases": { "enabled": false },
+        "links": [],
+        "tail": []
+      },
 
       "actions": {
         "secondary": {
@@ -364,15 +396,14 @@
     "replay": {
       "brand": { "subtitle": "· Audit Replay", "href": "replay.html#top" },
 
-      "desktop": { "usecases": { "enabled": false }, "links": [], "tail": [] },
+      "desktop": {
+        "usecases": { "enabled": false },
+        "links": [],
+        "tail": []
+      },
 
       "actions": {
-        "secondary": {
-          "role": "secondary",
-          "type": "link",
-          "label": "返回判例",
-          "href": "cases.html"
-        },
+        "secondary":null,  
         "primary": {
           "role": "primary",
           "type": "button",

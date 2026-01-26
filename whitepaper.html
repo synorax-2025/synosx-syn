@@ -18,7 +18,8 @@
   <link rel="stylesheet" href="assets/css/sx.core.css" />
    <link rel="stylesheet" href="assets/css/sx.nav.css" />
   <link rel="stylesheet" href="assets/css/sx.statusbar.css" />
-  <link rel="stylesheet" href="assets/css/sx.drawer.css" />
+  <link rel="stylesheet" href="assets/css/sx.menu.css" />
+  <link rel="stylesheet" href="assets/css/sx.orb.css" />
 
   <!-- ✅ Page CSS (page-only) -->
   <link rel="stylesheet" href="assets/css/pages/whitepaper.page.css" />
@@ -27,8 +28,7 @@
 <body class="has-statusbar">
   <div class="bg-gradient" aria-hidden="true"></div>
 
-  <!-- ✅ Nav injected by tools/build-includes.mjs (SSOT: registry/site.nav.json) -->
-  <!--@include nav-->
+  <!--@include document-menu-->
 
   <header class="hero" id="top">
     <div class="container">
@@ -500,7 +500,8 @@
   <!-- ✅ Shared JS -->
   <script src="assets/js/sx.statusbar.js"></script>
   <script src="assets/js/sx.core.js"></script>
-  <script src="assets/js/sx.drawer.js"></script>
+  <script src="assets/js/sx.menu.js"></script>
+  <script src="assets/js/sx.orb.js" defer></script>
 
   <!-- ✅ Page runtime -->
   <script src="assets/js/runtime/whitepaper.runtime.js"></script>

@@ -1,0 +1,67 @@
+<!-- partials/nav.shell.html
+     ROLE: System Navigation Shell
+     NOTE:
+     - Structure-only shell for Nav + Drawer + Orb.
+     - Content is injected by tools/build-includes.mjs from registry/site.nav.json.
+-->
+
+<nav id="navbar" class="sx-navbar" aria-label="Primary Navigation">
+  <div class="nav-content">
+    <!--@brand-->
+    <!--@desktop-links-->
+    <!--@topbar-actions-->
+  </div>
+</nav>
+
+<div id="sx-mobile-menu" class="sx-drawer" aria-hidden="true">
+  <div class="sx-drawer-backdrop" data-close="sx-drawer" aria-hidden="true"></div>
+
+  <aside
+    class="sx-drawer-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Mobile Navigation"
+    tabindex="-1"
+  >
+    <div class="sx-drawer-top">
+      <!--@drawer-brand-->
+      <button
+        class="sx-drawer-close"
+        type="button"
+        data-close="sx-drawer"
+        aria-label="Close Menu"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- GOVERNANCE:
+         Drawer inner navigation must not rely on bare <nav> rules.
+         We keep a neutral container with role="navigation". -->
+    <div class="sx-drawer-nav" role="navigation" aria-label="Mobile Links">
+      <!--@drawer-links-->
+      <!--@drawer-usecases-->
+      <!--@drawer-tail-->
+    </div>
+
+    <!--@drawer-actions-->
+  </aside>
+</div>
+
+<!-- Mobile Orb · System Entry -->
+<button
+  id="sx-orb"
+  class="sx-orb"
+  type="button"
+  aria-label="Open SynOSX Menu"
+>
+  <span class="sx-orb-core" aria-hidden="true"></span>
+</button>
+
+<!-- System Entry Registry -->
+<div
+  hidden
+  data-sx-entry-registry
+  data-desktop-entry="sx-menu-button"
+  data-mobile-entry="sx-orb"
+></div>

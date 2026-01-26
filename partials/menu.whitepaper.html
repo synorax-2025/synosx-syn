@@ -1,0 +1,152 @@
+<!-- menu.whitepaper.html — Whitepaper 专用 Menu（返回首页 + 目录）
+     ✅ 复用 sx.menu.css / sx.menu.js 交互
+     ✅ iOS 面板滚动：唯一滚动容器 .sx-menu-content
+-->
+
+<!-- 顶部横排导航：Document Mode Header -->
+<nav
+  id="navbar"
+  class="sx-navbar whitepaper-header"
+  aria-label="Whitepaper Navigation"
+>
+  <div class="nav-content">
+    <!-- 左侧 Logo / 标题 -->
+    <a href="index.html" class="logo">
+      <div class="logo-icon">SX</div>
+      <span>
+        <b>SynOSX</b>
+        <span class="logo-sub">· Whitepaper</span>
+      </span>
+    </a>
+
+    <!-- 右侧操作区 -->
+    <div class="nav-actions">
+      <a href="index.html" class="btn-secondary">返回首页</a>
+
+      <!-- 目录按钮 -->
+      <button
+        type="button"
+        class="btn-secondary sx-menu-trigger"
+        data-sx-menu="trigger"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <span class="sx-menu-icon">☰</span>
+        <span class="sx-menu-label">目录</span>
+      </button>
+
+      <!-- 主 CTA：跳转 Manifest -->
+      <a href="manifest.html#top" class="cta-button">
+        阅读 Manifest
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ORB 触发器（右下角） -->
+<button
+  class="sx-orb"
+  data-sx-menu="trigger"
+  aria-label="Open SynOSX Menu"
+  type="button"
+>
+  <span class="sx-orb-core" aria-hidden="true"></span>
+</button>
+
+<!-- MENU Overlay -->
+<div class="sx-menu-overlay" data-sx-menu="overlay" hidden></div>
+
+<!-- MENU Panel -->
+<aside
+  class="sx-menu-panel"
+  data-sx-menu="panel"
+  aria-hidden="true"
+  aria-label="SynOSX Whitepaper Menu"
+>
+  <header class="sx-menu-panel-header">
+    <div class="sx-menu-panel-title">
+      <span class="sx-menu-panel-tag">导航</span>
+      <span class="sx-menu-panel-text">Whitepaper</span>
+    </div>
+    <button
+      class="sx-menu-close"
+      type="button"
+      data-sx-menu="close"
+      aria-label="关闭菜单"
+    >
+      ✕
+    </button>
+  </header>
+
+  <!-- Tabs -->
+  <div class="sx-menu-tabs" role="tablist">
+    <button
+      type="button"
+      class="sx-menu-tab is-active"
+      role="tab"
+      data-sx-menu-tab="chapters"
+      aria-selected="true"
+    >
+      目录
+    </button>
+    <button
+      type="button"
+      class="sx-menu-tab"
+      role="tab"
+      data-sx-menu-tab="quick"
+      aria-selected="false"
+    >
+      快速入口
+    </button>
+  </div>
+
+  <!-- ⭐ 唯一滚动容器 -->
+  <div class="sx-menu-content">
+    <!-- Tab 1: Whitepaper 目录 -->
+    <section
+      class="sx-menu-section is-active"
+      data-sx-menu-panel="chapters"
+      role="tabpanel"
+    >
+      <h2 class="sx-menu-section-title">Whitepaper 目录</h2>
+      <ul class="sx-menu-list">
+        <li><a class="sx-menu-item" href="#top">顶部 · Whitepaper</a></li>
+        <li><a class="sx-menu-item" href="#toc">目录 · Table of Contents</a></li>
+        <li><a class="sx-menu-item" href="#w1">Ch.1 · Problem Statement</a></li>
+        <li><a class="sx-menu-item" href="#w2">Ch.2 · Governance Background</a></li>
+        <li><a class="sx-menu-item" href="#w3">Ch.3 · System Architecture</a></li>
+        <li><a class="sx-menu-item" href="#w4">Ch.4 · Contract Model</a></li>
+        <li><a class="sx-menu-item" href="#w5">Ch.5 · Runtime Enforcement</a></li>
+        <li><a class="sx-menu-item" href="#w6">Ch.6 · Audit & Evidence</a></li>
+        <li><a class="sx-menu-item" href="#w7">Ch.7 · Use Cases</a></li>
+        <li><a class="sx-menu-item" href="#w8">Ch.8 · Conclusion</a></li>
+      </ul>
+    </section>
+
+    <!-- Tab 2: 快速入口 -->
+    <section
+      class="sx-menu-section"
+      data-sx-menu-panel="quick"
+      role="tabpanel"
+    >
+      <h2 class="sx-menu-section-title">快速入口</h2>
+      <ul class="sx-menu-list">
+        <li>
+          <a class="sx-menu-item" href="index.html">
+            返回首页 · SynOSX Overview
+          </a>
+        </li>
+        <li>
+          <a class="sx-menu-item" href="manifest.html">
+            阅读 Manifest · System Declaration
+          </a>
+        </li>
+        <li>
+          <a class="sx-menu-item" href="#top">
+            回到本文顶部
+          </a>
+        </li>
+      </ul>
+    </section>
+  </div>
+</aside>

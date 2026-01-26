@@ -1,9 +1,8 @@
 /* tools/build-includes.mjs — static include builder (no deps, ESM)
    ✅ Reads registry/site.nav.json (Single Source of Truth)
-   ✅ Builds per-page nav+drawer+orb HTML and injects via <!--@include nav-->
-   ✅ Reads registry/document.menus.json for document pages
-   ✅ Injects page-specific document menu via <!--@include document-menu-->
-   ✅ Recreates dist/: copies non-html assets, rebuilds html with injected nav / document menus
+   ✅ Builds per-page nav+drawer HTML and injects into html via <!--@include nav-->
+   ✅ Injects menu.partial.html via <!--@include menu-->
+   ✅ Recreates dist/: copies non-html assets, rebuilds html with injected nav/menu
 
    GOVERNANCE NOTE (VERY IMPORTANT):
    - System Navbar is a ROLE, not a tag.
@@ -19,20 +18,13 @@ import path from "node:path";
 const ROOT = process.cwd();
 const DIST_DIR = path.join(ROOT, "dist");
 
-// ─────────────────────────────
-// Config paths
-// ─────────────────────────────
-
 const NAV_CONFIG_PATH = path.join(ROOT, "registry", "site.nav.json");
-const DOC_MENU_CONFIG_PATH = path.join(
-  ROOT,
-  "registry",
-  "document.menus.json"
-);
 
 // include tokens
 const NAV_INCLUDE = "<!--@include nav-->";
-const DOCUMENT_MENU_INCLUDE = "<!--@include document-menu-->";
+const MENU_INCLUDE = "<!--@include menu-->";
+
+const MENU_PARTIAL_PATH = path.join(ROOT, "partials", "menu.partial.html");
 
 // Exclude folders from dist copy (source-only / tooling / repo internals)
 const EXCLUDE_DIR_NAMES = new Set([
@@ -44,10 +36,6 @@ const EXCLUDE_DIR_NAMES = new Set([
   "partials",
   "zzdocs",
 ]);
-
-// ─────────────────────────────
-// FS helpers
-// ─────────────────────────────
 
 function readText(p) {
   return fs.readFileSync(p, "utf8");
@@ -101,10 +89,6 @@ function listHtmlFilesRec(absDir, relBase = "") {
   }
   return out;
 }
-
-// ─────────────────────────────
-// Utils
-// ─────────────────────────────
 
 function isPlainObject(x) {
   return x && typeof x === "object" && !Array.isArray(x);
@@ -166,9 +150,7 @@ function safeId(s, fallback = "sx-id") {
   return cleaned ? cleaned : fallback;
 }
 
-// ─────────────────────────────
-// Href prefix logic
-// ─────────────────────────────
+/* -------------------- Href prefix -------------------- */
 
 function isExternalOrSpecialHref(href) {
   if (!href) return true;
@@ -207,9 +189,7 @@ function calcPrefixForRelHtml(relHtmlPath) {
   return "../".repeat(parts.length);
 }
 
-// ─────────────────────────────
-// Normalize resolved page config
-// ─────────────────────────────
+/* -------------------- Normalize resolved page config -------------------- */
 
 /**
  * Policy normalization:
@@ -286,9 +266,7 @@ function normalizeResolved(resolved) {
   return out;
 }
 
-// ─────────────────────────────
-// Rendering: Desktop
-// ─────────────────────────────
+/* -------------------- Rendering: Desktop -------------------- */
 
 function renderDesktopNav(desktop = {}, prefix) {
   const links = desktop.links ?? [];
@@ -436,9 +414,7 @@ function renderUseCasesDesktop(usecases, prefix) {
   ];
 }
 
-// ─────────────────────────────
-// Rendering: Topbar actions (with entry registry)
-// ─────────────────────────────
+/* -------------------- Rendering: Actions (Topbar) -------------------- */
 
 function renderTopbarActions(actions = {}, prefix, desktopEntryId) {
   const secondary = actions.secondary ?? null;
@@ -446,7 +422,7 @@ function renderTopbarActions(actions = {}, prefix, desktopEntryId) {
 
   const parts = [];
 
-  // System Menu Button (Desktop Entry Trigger)
+  // ✅ System Menu Button (Desktop Entry Trigger)
   parts.push(
     `
     <button
@@ -512,9 +488,7 @@ function renderTopbarActions(actions = {}, prefix, desktopEntryId) {
   return `<div class="nav-actions">${parts.join("")}</div>`;
 }
 
-// ─────────────────────────────
-// Rendering: Drawer
-// ─────────────────────────────
+/* -------------------- Rendering: Drawer -------------------- */
 
 function renderDrawerLinks(links = [], prefix) {
   return (links ?? [])
@@ -664,9 +638,7 @@ function renderDrawerActions(actions = [], prefix) {
   return `<div class="sx-drawer-actions">${btns}</div>`;
 }
 
-// ─────────────────────────────
-// Shell (Generated HTML)
-// ─────────────────────────────
+/* -------------------- Shell (Generated HTML) -------------------- */
 
 function renderNavShell(resolvedRaw, prefix) {
   const resolved = normalizeResolved(resolvedRaw);
@@ -680,8 +652,11 @@ function renderNavShell(resolvedRaw, prefix) {
   const brandSubtitle = brand.subtitle || "· Governance OS";
   const brandHref = brand.href || "index.html";
 
-  const desktopEntryId = entry.desktop?.id || "sx-menu-button";
-  const mobileEntryId = entry.mobile?.id || "sx-orb";
+  // 默认入口 id，如有 entry.xxx.id 则覆盖
+  const desktopEntryId =
+    entry.desktop?.id || "sx-menu-button";
+  const mobileEntryId =
+    entry.mobile?.id || "sx-orb";
 
   const brandHtml = `
     <a class="logo" href="${escapeHtml(
@@ -698,12 +673,9 @@ function renderNavShell(resolvedRaw, prefix) {
   `.trim();
 
   const desktopUl = renderDesktopNav(desktop, prefix);
-  const actions = renderTopbarActions(
-    resolved.actions || {},
-    prefix,
-    desktopEntryId
-  );
+  const actions = renderTopbarActions(resolved.actions || {}, prefix, desktopEntryId);
 
+  // ✅ GOVERNANCE: navbar must carry .sx-navbar (system role)
   const nav = `
     <nav id="navbar" class="sx-navbar" aria-label="Primary Navigation">
       <div class="nav-content">
@@ -741,6 +713,9 @@ function renderNavShell(resolvedRaw, prefix) {
           <button class="sx-drawer-close" type="button" data-close="sx-drawer" aria-label="Close Menu">✕</button>
         </div>
 
+        <!-- GOVERNANCE:
+             Drawer inner navigation must not rely on bare <nav> rules.
+             Use a neutral container with role="navigation" to avoid future leakage. -->
         <div class="sx-drawer-nav" role="navigation" aria-label="Mobile Links">
 ${drawerLinks}
 ${drawerUsecases ? "\n" + drawerUsecases : ""}
@@ -752,7 +727,7 @@ ${drawerTail ? "\n" + drawerTail : ""}
     </div>
   `.trim();
 
-  // Mobile Orb
+  // ✅ Mobile Orb（系统级入口 · 手机主入口）
   const orbHtml = `
     <button
       id="${escapeHtml(mobileEntryId)}"
@@ -763,7 +738,7 @@ ${drawerTail ? "\n" + drawerTail : ""}
     </button>
   `.trim();
 
-  // System Entry Registry
+  // ✅ System Entry Registry（唯一入口登记簿）
   const registryHtml = `
     <div
       hidden
@@ -776,9 +751,7 @@ ${drawerTail ? "\n" + drawerTail : ""}
   return `${nav}\n\n${drawerHtml}\n\n${orbHtml}\n\n${registryHtml}`;
 }
 
-// ─────────────────────────────
-// Resolve
-// ─────────────────────────────
+/* -------------------- Resolve -------------------- */
 
 function resolvePageNav(config, pageKey) {
   const defaults = config.defaults || {};
@@ -791,12 +764,13 @@ function pageKeyFromFilename(relPath) {
   return path.posix.basename(p, ".html");
 }
 
-// ─────────────────────────────
-// Build
-// ─────────────────────────────
+/* -------------------- Build -------------------- */
 
-function buildHtmlFiles(navConfig, docMenus) {
+function buildHtmlFiles(config) {
   const relFiles = listHtmlFilesRec(ROOT);
+
+  const hasMenuPartial = fs.existsSync(MENU_PARTIAL_PATH);
+  const menuPartialRaw = hasMenuPartial ? readText(MENU_PARTIAL_PATH) : "";
 
   for (const rel of relFiles) {
     const inPath = path.join(ROOT, rel);
@@ -810,48 +784,25 @@ function buildHtmlFiles(navConfig, docMenus) {
     const prefix = calcPrefixForRelHtml(rel);
     const key = pageKeyFromFilename(rel);
 
-    // 1) nav include
+    // nav include
     if (out.includes(NAV_INCLUDE)) {
-      const resolved = resolvePageNav(navConfig, key);
+      const resolved = resolvePageNav(config, key);
       const navHtml = renderNavShell(resolved, prefix);
       out = out.replace(NAV_INCLUDE, navHtml);
     }
 
-    // 2) document menu include (per page, from registry/document.menus.json)
-    if (out.includes(DOCUMENT_MENU_INCLUDE)) {
-      const partialFile = docMenus?.[key];
-
-      if (partialFile) {
-        const partialPath = path.join(ROOT, "partials", partialFile);
-        if (fs.existsSync(partialPath)) {
-          let partialRaw = readText(partialPath);
-
-          // 修正 assets 路径（支持 pages/ 子目录）
-          partialRaw = partialRaw.replace(
-            /(href|src)="assets\//g,
-            `$1="${prefix}assets/`
-          );
-
-          out = out.replace(DOCUMENT_MENU_INCLUDE, partialRaw);
-        } else {
-          console.warn(
-            `[build-includes] document menu "${key}" not found: ${partialPath}`
-          );
-          out = out.replace(DOCUMENT_MENU_INCLUDE, "");
-        }
-      } else {
-        // 没有登记就直接去掉占位
-        out = out.replace(DOCUMENT_MENU_INCLUDE, "");
-      }
+    // menu include：用 partials/menu.partial.html 注入
+    if (hasMenuPartial && out.includes(MENU_INCLUDE)) {
+      const patchedMenu = menuPartialRaw.replace(
+        /(href|src)="assets\//g,
+        `$1="${prefix}assets/`
+      );
+      out = out.replace(MENU_INCLUDE, patchedMenu);
     }
 
     fs.writeFileSync(outPath, out, "utf8");
   }
 }
-
-// ─────────────────────────────
-// Guards & Main
-// ─────────────────────────────
 
 function assertBasicConfig(config) {
   if (!config || typeof config !== "object")
@@ -871,29 +822,15 @@ function main() {
     throw new Error(`Missing: ${NAV_CONFIG_PATH}`);
   }
 
-  const navConfig = readJson(NAV_CONFIG_PATH);
-  assertBasicConfig(navConfig);
-
-  // document menus 是可选的
-  let docMenus = {};
-  if (fs.existsSync(DOC_MENU_CONFIG_PATH)) {
-    try {
-      docMenus = readJson(DOC_MENU_CONFIG_PATH) || {};
-    } catch (err) {
-      console.warn(
-        `[build-includes] Failed to read document.menus.json: ${DOC_MENU_CONFIG_PATH}`,
-        err
-      );
-      docMenus = {};
-    }
-  }
+  const config = readJson(NAV_CONFIG_PATH);
+  assertBasicConfig(config);
 
   if (fs.existsSync(DIST_DIR))
     fs.rmSync(DIST_DIR, { recursive: true, force: true });
   ensureDir(DIST_DIR);
 
   copyDir(ROOT, DIST_DIR);
-  buildHtmlFiles(navConfig, docMenus);
+  buildHtmlFiles(config);
 
   console.log("✅ build-includes: dist/ generated.");
 }

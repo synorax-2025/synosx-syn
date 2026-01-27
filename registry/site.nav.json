@@ -261,12 +261,7 @@
       },
 
       "actions": {
-        "secondary": {
-          "role": "secondary",
-          "type": "link",
-          "label": "返回首页",
-          "href": "index.html"
-        },
+        "secondary":null,
         "primary": {
           "role": "primary",
           "type": "link",
@@ -298,12 +293,7 @@
       },
 
       "actions": {
-        "secondary": {
-          "role": "secondary",
-          "type": "link",
-          "label": "返回首页",
-          "href": "index.html"
-        },
+        "secondary":null,
         "primary": {
           "role": "primary",
           "type": "link",
@@ -333,12 +323,7 @@
       },
 
       "actions": {
-        "secondary": {
-          "role": "secondary",
-          "type": "link",
-          "label": "返回首页",
-          "href": "index.html"
-        },
+        "secondary":null,
         "primary": {
           "role": "primary",
           "type": "link",

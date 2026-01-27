@@ -7,10 +7,14 @@ synorax-2025/synosx-site.git
 https://synorax-2025.github.io/synosx-site/
 
 推送后刷新即可。
+git status
 
 git add .
 git commit -m "save"
 git push
+
+git tag -a v2 -m "SynOSX Site v2: Nav + Drawer + Manifest/Whitepaper menus finalized"
+git push --tags
 
 python -m http.server 8080
 http://localhost:8080/registry/narratives/chapters.registry.json

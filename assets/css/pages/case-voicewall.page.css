@@ -57,9 +57,17 @@ body[data-case="voicewall"] .case-subtitle{
   margin-right: auto;
   font-size: 16px;
   line-height: 1.9;
-
-  /* 旧图那种更暗：灰白而不是亮蓝 */
   color: rgba(232,236,245,0.62);
+}
+
+/* -----------------------------
+   ✅ Card rhythm governance (fix “cards squeezed together”)
+   - Put spacing responsibility on the section container
+   - Do NOT add margin to .card itself
+   ----------------------------- */
+body[data-case="voicewall"] .case-voicewall > .container{
+  display: grid;
+  gap: 18px; /* 想更松：22 / 24 */
 }
 
 /* -----------------------------
@@ -120,8 +128,6 @@ body[data-case="voicewall"] .list{
 body[data-case="voicewall"] .list li{
   margin-bottom: 8px;
   line-height: 1.9;
-
-  /* ✅ list 同正文一致，别用 opacity */
   color: rgba(232,236,245,0.72);
 }
 
@@ -231,5 +237,10 @@ body[data-case="voicewall"] .spacer-top{
   body[data-case="voicewall"] .flow-arrow .step{
     padding: 9px 14px;
     white-space: normal;
+  }
+
+  /* mobile: card gap a bit tighter */
+  body[data-case="voicewall"] .case-voicewall > .container{
+    gap: 14px;
   }
 }

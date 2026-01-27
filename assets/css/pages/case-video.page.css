@@ -45,6 +45,12 @@ body[data-case="video"] .case-video{
   padding-top: 70px;
 }
 
+/* ✅ 关键修复：卡片之间的纵向节奏由容器治理（不让 card 自带 margin） */
+body[data-case="video"] .case-video > .container{
+  display: grid;
+  gap: 18px; /* 你想更松：22 / 24 */
+}
+
 /* card：保持你原来的质感，但让长文更舒服 */
 body[data-case="video"] .card{
   padding: 34px;
@@ -130,6 +136,11 @@ body[data-case="video"] .case-note{
 
   body[data-case="video"] .case-title{
     font-size: clamp(32px, 8.6vw, 46px);
+  }
+
+  /* 移动端：卡片间距略缩一点更紧凑 */
+  body[data-case="video"] .case-video > .container{
+    gap: 14px;
   }
 
   body[data-case="video"] .card{

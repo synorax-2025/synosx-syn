@@ -353,12 +353,7 @@
       },
 
       "actions": {
-        "secondary": {
-          "role": "secondary",
-          "type": "link",
-          "label": "返回目录",
-          "href": "narratives.html"
-        },
+        "secondary":null,
         "primary": {
           "role": "primary",
           "type": "link",

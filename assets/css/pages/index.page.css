@@ -836,3 +836,38 @@
   .dag-switchbar{ flex-direction: column; align-items: flex-start; gap: 10px; }
   .dag-switch-buttons{ width: 100%; justify-content: center; }
 }
+
+/* Console Preview (Index only) */
+.console-preview{
+  position: relative;
+}
+
+.console-preview .console-shot{
+  margin: 28px auto 0;
+  padding: 16px;
+  max-width: 1200px;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.06),
+    rgba(255,255,255,0.02)
+  );
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow:
+    0 40px 120px rgba(0,0,0,0.45),
+    inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.console-preview .console-shot img{
+  width: 100%;
+  display: block;
+  border-radius: 14px;
+}
+
+.console-preview .console-shot .muted{
+  margin-top: 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  letter-spacing: 0.25px;
+}

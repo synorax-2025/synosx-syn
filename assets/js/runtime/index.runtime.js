@@ -131,12 +131,27 @@
   })();
 
   // ----------------------------
-  // version badge (index-only)
+  // version badge (index-only) — read from manifest.html meta[sx-version]
   // ----------------------------
-  (function patchVersionBadge(){
+  (function patchManifestVersionBadge(){
     const badge = document.getElementById("sx-version-badge");
     if (!badge) return;
-    const v = (document.querySelector('meta[name="sx-version"]')?.getAttribute("content") || "").trim();
-    if (v) badge.textContent = v;
+
+    // 占位：避免重复文案 & 避免闪动旧值
+    badge.textContent = "—";
+
+    fetch("manifest.html", { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error("manifest fetch failed");
+        return res.text();
+      })
+      .then((html) => {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const v = (doc.querySelector('meta[name="sx-version"]')?.getAttribute("content") || "").trim();
+        if (v) badge.textContent = v;
+      })
+      .catch(() => {
+        badge.textContent = "—";
+      });
   })();
 })();

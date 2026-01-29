@@ -871,3 +871,29 @@
   font-size: 12.5px;
   letter-spacing: 0.25px;
 }
+
+.identity-pin{
+  margin-top: 14px;
+  max-width: 620px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(232,236,245,0.88);
+}
+
+.identity-pin strong{
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+.identity-sub{
+  display:block;
+  font-size: 13.5px;
+  color: rgba(232,236,245,0.75);
+}
+
+.identity-cn{
+  display:block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-muted);
+}

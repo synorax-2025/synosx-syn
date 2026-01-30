@@ -75,3 +75,105 @@
    - Orb（.sx-orb）由 sx.orb.css 负责视觉与入口区域
    - 本文件只管：哪些东西在什么屏幕尺寸“该出现/该消失”
    ----------------------------- */
+
+   /* -----------------------------
+   4. Desktop Use Cases Dropdown (SYSTEM NAV)
+   - Scope: ONLY #navbar (system top nav)
+   - Desktop only: >=981px
+   - Fix: hover gap / clickability / z-index
+   ----------------------------- */
+
+@media (min-width: 981px){
+
+  /* 触发器容器：必须是 relative */
+  #navbar .nav-dropdown{
+    position: relative;
+  }
+
+  #navbar .nav-caret{
+    margin-left: 6px;
+    opacity: .7;
+  }
+
+  /* 面板：用 opacity/pointer-events 控制，不用 display:none */
+  #navbar .nav-drop-menu{
+    position: absolute;
+    top: 100%;                 /* ✅ 关键：不要 +10px 造成 hover 断层 */
+    left: 0;
+
+    min-width: 260px;
+    padding: 10px;
+
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(10,14,26,0.92);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.45);
+
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+
+    z-index: 999;              /* ✅ 防止被 hero/背景/卡片叠层盖住 */
+    transition: opacity var(--dur, 260ms) var(--ease, ease),
+                transform var(--dur, 260ms) var(--ease, ease);
+  }
+
+  /* hover bridge：给鼠标从按钮→面板一个“看不见的桥” */
+  #navbar .nav-drop-menu::before{
+    content:"";
+    position:absolute;
+    left:0; right:0;
+    top:-12px;
+    height:12px;
+  }
+
+  /* 展开逻辑：hover 绑在容器上 */
+  #navbar .nav-dropdown:hover .nav-drop-menu{
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* 菜单项点击区 */
+  #navbar .nav-drop-menu a{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 850;
+    color: rgba(232,236,245,0.92);
+    border: 1px solid transparent;
+  }
+
+  #navbar .nav-drop-menu a:hover{
+    background: rgba(255,255,255,0.03);
+    border-color: rgba(255,255,255,0.08);
+  }
+
+  #navbar .nav-drop-divider{
+    height: 1px;
+    margin: 8px 6px;
+    background: rgba(255,255,255,0.08);
+  }
+
+  #navbar .nav-drop-narratives{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(59,130,246,0.18) !important;
+    background: rgba(59,130,246,0.06);
+    color: rgba(159,195,255,0.95) !important;
+  }
+
+  #navbar .nav-drop-sub{
+    font-size: 12px;
+    font-weight: 800;
+    opacity: .78;
+  }
+}
+
